@@ -1,0 +1,210 @@
+/* =========================================
+   Global Variables & Colors
+   ========================================= */
+:root {
+    --font-family: 'Manrope', sans-serif;
+    
+    /* Exact colors requested */
+    --text-main: #2D3338;
+    --text-muted: #596065;
+    --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+    
+    /* Extracted solid accent color for icons/links based on your gradient */
+    --accent-teal: #1E6264;
+    
+    --left-bg-gradient: linear-gradient(135deg, #e4f3f4 0%, #eaf1f6 100%); 
+    --right-bg: #fdfdfd;
+    --border-color: #e5e7eb;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--right-bg);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Utility Classes */
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+.text-accent { color: var(--accent-teal) !important; }
+.bg-accent { background-color: var(--accent-teal) !important; }
+
+/* =========================================
+   Header & Navigation
+   ========================================= */
+.logo-text {
+    letter-spacing: -0.5px;
+}
+
+.nav-link-custom {
+    transition: color 0.2s ease;
+}
+
+.nav-link-custom:hover, .hover-dark:hover {
+    color: var(--text-main) !important;
+}
+
+.header-btn {
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+.header-btn:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    color: var(--text-main);
+}
+
+/* =========================================
+   Main Layout & Panels
+   ========================================= */
+.left-panel {
+    background: var(--left-bg-gradient);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft glowing circle effect to match design background subtlety */
+.left-panel::before {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    right: 10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.right-panel {
+    background-color: #fcfcfc;
+}
+
+/* =========================================
+   Typography & Badges
+   ========================================= */
+.main-heading {
+    font-size: 3.5rem;
+    line-height: 1.1;
+}
+
+.tracking-tight {
+    letter-spacing: -1.5px;
+}
+
+.tracking-wide {
+    letter-spacing: 0.5px;
+}
+
+.custom-badge {
+    background-color: #bdf2f0;
+    color: var(--accent-teal);
+    font-size: 0.75rem;
+}
+
+/* =========================================
+   Form Elements & Inputs
+   ========================================= */
+.login-card {
+    border-radius: 24px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04) !important;
+}
+
+.shadow-sm-custom {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+.custom-input-group {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-input-group:focus-within {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(30, 98, 100, 0.1);
+}
+
+.custom-input-group .input-group-text,
+.custom-input-group .form-control {
+    background-color: transparent;
+}
+
+.custom-input-group .form-control:focus {
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.custom-input-group input::placeholder {
+    color: #a0abb5;
+    font-weight: 500;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* =========================================
+   Buttons & Selectors
+   ========================================= */
+/* Gradient Button */
+.btn-gradient {
+    background: var(--btn-gradient);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-gradient:hover, .btn-gradient:focus {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 98, 100, 0.25) !important;
+}
+
+/* Outline/Google Button */
+.btn-outline-custom {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.btn-outline-custom:hover {
+    background-color: #f9fafb;
+}
+
+/* Segmented Control (Role Selector) */
+.role-selector {
+    background-color: #f3f4f6 !important;
+}
+
+.role-selector .active-role {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: var(--text-main) !important;
+}
+
+.hover-bg:hover {
+    background-color: rgba(255,255,255,0.4) !important;
+    color: var(--text-main) !important;
+}
+
+/* Checkbox override */
+.custom-checkbox .form-check-input:checked {
+    background-color: var(--accent-teal);
+    border-color: var(--accent-teal);
+}
+
+/* Feature Icons */
+.feature-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}

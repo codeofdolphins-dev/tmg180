@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Areas of Support | TMG180</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="areas-of-support.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <main class="flex-grow-1 d-flex flex-column flex-lg-row">
+        
+        <div class="col-lg-5 col-xl-5 left-panel d-flex flex-column justify-content-center p-4 p-md-5 position-relative">
+            
+            <div class="content-wrapper mx-auto w-100" style="max-width: 480px;">
+                <span class="badge custom-badge rounded-pill mb-4 px-3 py-2 fw-bold text-uppercase tracking-wide">
+                    ONBOARDING
+                </span>
+                
+                <h1 class="fw-bold text-main mb-4 tracking-tight main-heading">What areas of support are you looking for today?</h1>
+                <p class="fs-6 text-muted-custom mb-5 lh-base pe-md-4 fw-medium">
+                    We respect your boundaries. Let us know when you feel most present so we can match you with the right support window.
+                </p>
+                
+                <div class="feature-list d-flex flex-column gap-4 mt-5">
+                    <div class="d-flex align-items-center">
+                        <div class="check-icon-bg rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm-custom">
+                            <img src="../../assets/images/right-icon.png" alt="">
+                        </div>
+                        <span class="fw-medium text-muted-custom fs-6">Tailored features for your specific role.</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="check-icon-bg rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm-custom">
+                            <img src="../../assets/images/right-icon.png" alt="">
+                        </div>
+                        <span class="fw-medium text-muted-custom fs-6">Focused interface for maximum productivity.</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-lg-7 col-xl-7 right-panel d-flex flex-column position-relative p-4 p-md-5">
+            
+            <div class="w-100 mx-auto my-auto" style="max-width: 680px;">
+                <form id="supportAreasForm" action="dashboard.html">
+                    
+                    <div class="row g-4 mb-5">
+                        
+                        <div class="col-md-6">
+                            <label class="w-100 h-100 custom-checkbox-wrapper cursor-pointer">
+                                <input type="checkbox" name="supportArea" value="mental-clarity" class="d-none">
+                                <div class="support-card p-4 rounded-4 transition-all h-100 d-flex flex-column">
+                                    <div class="icon-box bg-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm-custom flex-shrink-0">
+                                        <!-- <i class="bi bi-lightbulb fs-5 text-accent"></i> -->
+                                         <img src="../../assets/images/mental-clarity.png" alt="">
+                                    </div>
+                                    <h5 class="fw-bold text-main mb-2 fs-5">Mental clarity</h5>
+                                    <p class="text-muted-custom small mb-0 lh-base">Reducing mental fog and finding focus through guided exercises.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="w-100 h-100 custom-checkbox-wrapper cursor-pointer">
+                                <input type="checkbox" name="supportArea" value="emotional-support" class="d-none">
+                                <div class="support-card p-4 rounded-4 transition-all h-100 d-flex flex-column">
+                                    <div class="icon-box bg-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm-custom flex-shrink-0">
+                                        <!-- <i class="bi bi-suit-heart fs-5 text-accent"></i> -->
+                                         <img src="../../assets/images/love-icon.png" alt="">
+                                    </div>
+                                    <h5 class="fw-bold text-main mb-2 fs-5">Emotional support</h5>
+                                    <p class="text-muted-custom small mb-0 lh-base">Tools to help navigate complex emotions and find inner balance.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="w-100 h-100 custom-checkbox-wrapper cursor-pointer">
+                                <input type="checkbox" name="supportArea" value="personal-growth" class="d-none">
+                                <div class="support-card p-4 rounded-4 transition-all h-100 d-flex flex-column">
+                                    <div class="icon-box bg-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm-custom flex-shrink-0">
+                                        <!-- <i class="bi bi-graph-up-arrow fs-5 text-accent"></i> -->
+                                         <img src="../../assets/images/grow-icon.png" alt="">
+                                    </div>
+                                    <h5 class="fw-bold text-main mb-2 fs-5">Personal growth</h5>
+                                    <p class="text-muted-custom small mb-0 lh-base">Structured paths for self-discovery and long-term development.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="w-100 h-100 custom-checkbox-wrapper cursor-pointer">
+                                <input type="checkbox" name="supportArea" value="quiet-reflection" class="d-none">
+                                <div class="support-card p-4 rounded-4 transition-all h-100 d-flex flex-column">
+                                    <div class="icon-box bg-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm-custom flex-shrink-0">
+                                        <!-- <i class="bi bi-flower1 fs-5 text-accent"></i> -->
+                                         <img src="../../assets/images/flower-icon1.png" alt="">
+                                    </div>
+                                    <h5 class="fw-bold text-main mb-2 fs-5">Quiet reflection</h5>
+                                    <p class="text-muted-custom small mb-0 lh-base">Creating space for stillness and mindfulness in a busy world.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="px-2 px-md-4 mx-auto" style="max-width: 440px;">
+                        <button type="submit" class="btn btn-gradient w-100 py-3 rounded-pill fw-bold mb-3 fs-6 text-white border-0 shadow-sm d-flex justify-content-center align-items-center gap-2">
+                            Continue <i class="bi bi-arrow-right"></i>
+                        </button>
+                        
+                        <div class="text-center mt-3">
+                            <a href="#" class="btn-skip text-decoration-none transition-all d-inline-flex align-items-center">
+                                SKIP <i class="bi bi-chevron-double-right ms-1" style="font-size: 0.8rem;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="w-100 mt-auto pt-5 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <span class="text-muted-custom" style="font-size: 0.7rem;">&copy; 2026 The Breathable Interface</span>
+                <div class="d-flex gap-3 mt-3 mt-md-0">
+                    <a href="#" class="text-muted-custom text-decoration-none hover-dark transition-all" style="font-size: 0.7rem;">Privacy Policy</a>
+                    <a href="#" class="text-muted-custom text-decoration-none hover-dark transition-all" style="font-size: 0.7rem;">Terms of Service</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="area-ofsupport.js"></script>
+</body>
+</html>

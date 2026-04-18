@@ -1,0 +1,162 @@
+/* =========================================
+   Global Variables & Colors
+   ========================================= */
+:root {
+    --font-family: 'Manrope', sans-serif;
+    
+    /* Typography */
+    --text-main: #2D3338;
+    --text-muted: #596065;
+    
+    /* Brand Colors */
+    --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+    --accent-teal: #145B5E; 
+    --badge-bg: #C9EFE2; /* Cyan tint for ONBOARDING badge */
+    
+    /* Layout Backgrounds */
+    --bg-left: #F4F7F8;
+    --bg-right: #FFFFFF;
+    
+    /* Card Elements */
+    --card-border: #E6E8EA;
+    --card-bg-hover: #FAFBFC;
+    --card-bg-selected: #F2F8F8; /* Soft teal tint */
+    
+    /* Icon Box Backgrounds */
+    --color-powder: #DDF0F8;   /* Light Blue */
+    --color-mint: #C9EFE2;     /* Light Cyan */
+    --color-lavender: #E0DAF5; /* Light Purple */
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Classes */
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+
+.main-heading {
+    font-size: 2.8rem;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+}
+
+.tracking-tight { letter-spacing: -1.5px; }
+.tracking-wide { letter-spacing: 0.5px; }
+
+/* =========================================
+   Layout & Panels
+   ========================================= */
+.left-panel {
+    background-color: var(--bg-left);
+    border-right: 1px solid rgba(0,0,0,0.03);
+}
+
+.right-panel {
+    background-color: var(--bg-right);
+}
+
+/* Badge & Checkmarks */
+.custom-badge {
+    background-color: var(--badge-bg);
+    color: var(--accent-teal);
+    font-size: 0.7rem;
+}
+
+.check-icon-bg {
+    width: 24px;
+    height: 24px;
+    background-color: #FFFFFF;
+    border: 1px solid #E6E8EA;
+}
+
+.check-icon-bg i {
+    font-size: 0.8rem;
+}
+
+.shadow-sm-custom {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+/* =========================================
+   Session Selectable Cards
+   ========================================= */
+.cursor-pointer { cursor: pointer; }
+
+.session-card {
+    background-color: #FFFFFF;
+    border: 1.5px solid var(--card-border);
+    padding: 1.5rem !important; /* Slightly more padding for these specific cards */
+}
+
+.icon-box {
+    width: 64px;
+    height: 64px;
+}
+
+.bg-powder { background-color: var(--color-powder) !important; }
+.bg-mint { background-color: var(--color-mint) !important; }
+.bg-lavender { background-color: var(--color-lavender) !important; }
+
+/* Custom Radio Indicator */
+.radio-indicator {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #D1D5DB;
+    background-color: #FFFFFF;
+    transition: all 0.2s ease;
+}
+
+/* Hover State */
+.custom-radio-wrapper:hover .session-card {
+    border-color: #D1D5DB;
+    background-color: var(--card-bg-hover);
+}
+
+/* Selected State */
+input[type="radio"]:checked + .session-card {
+    border-color: var(--accent-teal);
+    background-color: var(--card-bg-selected);
+    box-shadow: 0 8px 24px rgba(20, 91, 94, 0.08);
+}
+
+input[type="radio"]:checked + .session-card .radio-indicator {
+    border: 7px solid var(--accent-teal); /* Creates the inner dot effect */
+    background-color: #FFFFFF;
+}
+
+/* =========================================
+   Buttons & Links
+   ========================================= */
+.btn-gradient {
+    background: var(--btn-gradient);
+    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-gradient:hover, .btn-gradient:focus {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 98, 100, 0.25) !important;
+}
+
+.hover-dark:hover {
+    color: var(--text-main) !important;
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}
+
+/* Responsiveness */
+@media(max-width:992px){
+    .left-panel {
+        border-right: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .main-heading {
+        font-size: 2.2rem;
+    }
+}

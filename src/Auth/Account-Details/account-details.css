@@ -1,0 +1,192 @@
+/* =========================================
+   Global Variables & Colors
+   ========================================= */
+:root {
+    --font-family: 'Manrope', sans-serif;
+    
+    /* Exact colors */
+    --text-main: #2D3338;
+    --text-muted: #8A949C; /* Slightly lighter gray to match form placeholders and labels */
+    --text-muted-dark: #596065;
+    
+    /* Primary Action */
+    --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+    --accent-teal: #145B5E; 
+    
+    /* Secondary Action */
+    --btn-secondary-bg: #D4E7EC;
+    --btn-secondary-hover: #C2DCE2;
+    
+    /* Backgrounds */
+    --bg-left: #EEF3F5; /* Very soft grayish blue */
+    --bg-right: #F8F9FA; 
+    --bg-input: #F4F6F8;
+    
+    /* Optional Badge */
+    --bg-optional: #D0E4EE;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Classes */
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted-dark) !important; }
+.text-accent { color: var(--accent-teal) !important; }
+
+.main-heading {
+    font-size: 2.5rem;
+    letter-spacing: -1.5px;
+    line-height: 1.2;
+}
+
+.tracking-tight { letter-spacing: -1px; }
+.tracking-wide { letter-spacing: 0.5px; }
+.step-label { font-size: 0.75rem; }
+
+/* =========================================
+   Layout & Panels
+   ========================================= */
+.left-panel {
+    background-color: var(--bg-left);
+    border-right: 1px solid rgba(0,0,0,0.03);
+}
+
+.right-panel { 
+    background-color: var(--bg-right); 
+}
+
+.bg-accent { background-color: var(--accent-teal) !important; }
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+}
+
+/* =========================================
+   Stepper Menu (Vertical)
+   ========================================= */
+.stepper-menu .stepper-item {
+    transition: all 0.2s ease;
+    color: #A0AAB2; /* Default inactive color */
+    cursor: default;
+}
+
+.stepper-menu .stepper-item i {
+    opacity: 0.7;
+}
+
+.stepper-menu .stepper-item.active {
+    background-color: #FFFFFF;
+    color: var(--accent-teal);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.stepper-menu .stepper-item.active i {
+    opacity: 1;
+}
+
+.quote-box {
+    background-color: rgba(255,255,255,0.4);
+}
+
+/* =========================================
+   Form Elements & Card
+   ========================================= */
+.form-card {
+    border-radius: 28px !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.04) !important;
+}
+
+/* Profile Upload UI */
+.avatar-upload {
+    width: 80px;
+    height: 80px;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #E9ECEF;
+}
+
+.camera-badge {
+    width: 28px;
+    height: 28px;
+    bottom: 0;
+    right: 0;
+    border: 2px solid #FFFFFF;
+}
+
+.bg-input {
+    background-color: var(--bg-input) !important;
+}
+
+/* Custom Elevated Inputs */
+.custom-input {
+    background-color: var(--bg-input) !important;
+    border: 2px solid transparent !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease;
+}
+
+.custom-input:focus, .custom-input:focus-within {
+    border-color: rgba(20, 91, 94, 0.2) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 0 0 4px rgba(20, 91, 94, 0.05) !important;
+}
+
+.custom-input input::placeholder, .custom-input::placeholder {
+    color: #A0AAB2;
+    font-weight: 500;
+}
+
+.bg-light-blue {
+    background-color: var(--bg-optional);
+}
+
+.cursor-pointer { cursor: pointer; }
+
+/* =========================================
+   Buttons & Links
+   ========================================= */
+.btn-gradient {
+    background: var(--btn-gradient);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-gradient:hover, .btn-gradient:focus {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 98, 100, 0.25) !important;
+}
+
+.btn-secondary-custom {
+    background-color: var(--btn-secondary-bg);
+    color: var(--accent-teal) !important;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-custom:hover {
+    background-color: var(--btn-secondary-hover);
+    transform: translateY(-1px);
+}
+
+.hover-dark:hover {
+    color: var(--text-main) !important;
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}
+
+/* Responsiveness */
+@media(max-width:992px){
+    .left-panel {
+        border-right: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+}

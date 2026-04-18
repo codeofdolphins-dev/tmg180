@@ -1,0 +1,137 @@
+/* =========================================
+   Global Variables & Base Setup
+   ========================================= */
+:root {
+    --font-family: 'Manrope', sans-serif;
+    
+    /* Exact colors requested */
+    --text-main: #2D3338;
+    --text-muted: #596065;
+    --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+    
+    /* Extracted solid accent color for icons/links based on your gradient */
+    --accent-teal: #1E6264;
+    --color-light-teal: #e0f2f1; /* Light background for the envelope icon */
+    
+    --bg-right: #fdfdfd;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-right);
+}
+
+/* Typography Classes */
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+.text-accent { color: var(--accent-teal) !important; }
+.bg-accent { background-color: var(--accent-teal) !important; }
+.bg-light-teal { background-color: var(--color-light-teal) !important; }
+
+/* =========================================
+   Layout & Panels
+   ========================================= */
+.left-panel {
+    /* Fallback gradient */
+    background: linear-gradient(135deg, #e3eceb 0%, #d5e1df 40%, #e8edea 100%);
+    background-image: url("../../assets/images/check-your-email.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft wave overlay effect */
+.left-panel::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.left-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+.right-panel {
+    background-color: var(--bg-right);
+}
+
+/* =========================================
+   Typography & Branding
+   ========================================= */
+.tracking-tight {
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+}
+
+.brand-text {
+    letter-spacing: -0.5px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* =========================================
+   UI Elements (Cards, Icons, Progress)
+   ========================================= */
+.auth-card {
+    border-radius: 24px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04) !important;
+}
+
+.icon-badge {
+    width: 72px;
+    height: 72px;
+}
+
+/* Progress Indicator (Step 2 of 3) */
+.progress-dash {
+    width: 32px;
+    height: 4px;
+    background-color: #d1d5db; /* muted grey */
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.progress-dash.active {
+    background-color: var(--accent-teal);
+}
+
+/* Button */
+.btn-gradient {
+    background: var(--btn-gradient);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-gradient:hover, .btn-gradient:focus {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 98, 100, 0.25) !important;
+}
+
+/* Divider & Links */
+.short-divider {
+    width: 40px;
+    border-width: 2px;
+    border-radius: 2px;
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}
+
+.hover-dark:hover {
+    color: var(--text-main) !important;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Your Email | TMG180</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="resend-email.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <main class="flex-grow-1 d-flex flex-column flex-lg-row">
+        
+        <div class="col-lg-6 left-panel d-flex flex-column p-4 p-md-5 position-relative">
+            
+            <div class="d-flex align-items-center mb-auto pt-2 pt-md-4 ps-md-4">
+                <div class="logo-icon bg-accent text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm">
+                    <i class="bi bi-infinity fs-6"></i>
+                </div>
+                <span class="fw-bold fs-5 text-main brand-text">TMG180</span>
+            </div>
+
+            <div class="content-wrapper mx-auto mb-auto w-100 pe-lg-5" style="max-width: 480px; margin-top: 15vh;">
+                <h1 class="display-6 fw-bold text-main mb-4 tracking-tight">Check your email</h1>
+                <p class="fs-5 text-muted-custom mb-5 lh-base pe-md-4">
+                    We've sent a secure password reset link to your inbox.
+                </p>
+            </div>
+            
+            <div class="mt-auto ps-md-4 pb-md-4">
+                <div class="d-flex gap-2 mb-3">
+                    <div class="progress-dash active"></div>
+                    <div class="progress-dash"></div>
+                    <div class="progress-dash"></div>
+                </div>
+                <p class="text-muted-custom small fw-medium mb-0">Step 2 of 3: Verification</p>
+            </div>
+        </div>
+
+        <div class="col-lg-6 right-panel d-flex flex-column align-items-center justify-content-center p-4 p-md-5 position-relative">
+            
+            <div class="card auth-card border-0 bg-white w-100 p-4 p-md-5 text-center mb-4" style="max-width: 460px;">
+                
+                <div class="icon-badge bg-light-teal rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4">
+                    <i class="bi bi-envelope-check-fill text-accent fs-3"></i>
+                </div>
+
+                <h2 class="fw-bold mb-3 text-main fs-3">Check your email</h2>
+                
+                <p class="text-muted-custom mb-4 pb-2 fs-6">
+                    We sent a password reset link to<br>
+                    <span class="text-main fw-bold">user@example.com</span>
+                </p>
+
+                <p class="text-muted-custom small lh-lg mb-5 px-md-3">
+                    Use the link in the email to continue resetting your password. It might take a few minutes to arrive.
+                </p>
+                
+                <button type="button" id="resendBtn" class="btn btn-gradient w-100 py-3 rounded-pill fw-bold mb-4 fs-6 text-white border-0 shadow-sm">
+                    <a href="../Create-New-Password/create-new-password.html" class="text-white text-decoration-none">Resend email</a>
+                </button>
+                
+                <a href="../Sign-in-screen/sign-in.html" class="text-accent text-decoration-none fw-bold hover-dark transition-all mb-4 d-inline-flex align-items-center justify-content-center">
+                    <i class="bi bi-arrow-left me-2"></i> Back to sign in
+                </a>
+
+                <hr class="short-divider text-muted-custom opacity-25 mx-auto mb-4">
+
+                <a href="forgot-password.html" class="text-muted-custom text-decoration-none small fw-medium hover-dark transition-all">
+                    Use a different email
+                </a>
+            </div>
+
+            <div class="text-center mt-2">
+                <span class="text-muted-custom small fw-medium">Didn't receive the email?</span>
+                <a href="#" class="text-accent text-decoration-none small fw-bold ms-1">Contact Support</a>
+            </div>
+            
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

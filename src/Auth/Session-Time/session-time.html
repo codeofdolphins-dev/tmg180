@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferred Session Times | TMG180</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="session-time.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <main class="flex-grow-1 d-flex flex-column flex-lg-row">
+        
+        <div class="col-lg-5 col-xl-5 left-panel d-flex flex-column justify-content-center p-4 p-md-5 position-relative">
+            
+            <div class="content-wrapper mx-auto w-100" style="max-width: 480px;">
+                <span class="badge custom-badge rounded-pill mb-4 px-3 py-2 fw-bold text-uppercase tracking-wide">
+                    ONBOARDING
+                </span>
+                
+                <h1 class="fw-bold text-main mb-4 tracking-tight main-heading">What are your<br>preferred session times?</h1>
+                <p class="fs-6 text-muted-custom mb-5 lh-base pe-md-4 fw-medium">
+                    We respect your boundaries. Let us know when you feel most present so we can match you with the right support window.
+                </p>
+                
+                <div class="feature-list d-flex flex-column gap-4">
+                    <div class="d-flex align-items-center">
+                        <div class="check-icon-bg rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm-custom">
+                            <!-- <i class="bi bi-check2 text-main"></i> -->
+                             <img src="../../assets/images/right-icon.png" alt="">
+                        </div>
+                        <span class="fw-medium text-muted-custom fs-6">Tailored features for your specific role.</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="check-icon-bg rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm-custom">
+                            <!-- <i class="bi bi-check2 text-main"></i> -->
+                             <img src="../../assets/images/right-icon.png" alt="">
+                        </div>
+                        <span class="fw-medium text-muted-custom fs-6">Focused interface for maximum productivity.</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-lg-7 col-xl-7 right-panel d-flex flex-column position-relative p-4 p-md-5">
+            
+            <div class="w-100 mx-auto my-auto" style="max-width: 580px;">
+                <form id="sessionTimeForm" action="next-step.html">
+                    
+                    <label class="w-100 mb-4 custom-radio-wrapper cursor-pointer">
+                        <input type="radio" name="sessionTime" value="morning" class="d-none">
+                        <div class="session-card p-4 d-flex align-items-center rounded-4 transition-all">
+                            <div class="icon-box bg-powder rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                                <!-- <i class="bi bi-brightness-alt-high fs-3 text-main"></i> -->
+                                 <i class="bi bi-sun fs-3 text-main"></i>
+                            </div>
+                            <div class="ms-4 flex-grow-1">
+                                <h4 class="fw-bold text-main mb-0 fs-3">Morning</h4>
+                            </div>
+                            <div class="radio-indicator rounded-circle ms-3 flex-shrink-0"></div>
+                        </div>
+                    </label>
+
+                    <label class="w-100 mb-4 custom-radio-wrapper cursor-pointer">
+                        <input type="radio" name="sessionTime" value="afternoon" class="d-none" checked>
+                        <div class="session-card p-4 d-flex align-items-center rounded-4 transition-all">
+                            <div class="icon-box bg-mint rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-sun fs-3 text-main"></i>
+                            </div>
+                            <div class="ms-4 flex-grow-1">
+                                <h4 class="fw-bold text-main mb-0 fs-3">Afternoon</h4>
+                            </div>
+                            <div class="radio-indicator rounded-circle ms-3 flex-shrink-0"></div>
+                        </div>
+                    </label>
+
+                    <label class="w-100 mb-5 custom-radio-wrapper cursor-pointer">
+                        <input type="radio" name="sessionTime" value="evening" class="d-none">
+                        <div class="session-card p-4 d-flex align-items-center rounded-4 transition-all">
+                            <div class="icon-box bg-lavender rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                                <i class="bi bi-moon fs-4 text-main"></i>
+                            </div>
+                            <div class="ms-4 flex-grow-1">
+                                <h4 class="fw-bold text-main mb-0 fs-3">Evening</h4>
+                            </div>
+                            <div class="radio-indicator rounded-circle ms-3 flex-shrink-0"></div> 
+                        </div>
+                    </label>
+
+                    <div class="px-2">
+                        <button type="submit" class="btn btn-gradient w-100 py-3 rounded-pill fw-bold mb-4 fs-6 text-white border-0 shadow-sm d-flex justify-content-center align-items-center gap-2">
+                            Continue <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="w-100 mt-auto pt-5 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <span class="text-muted-custom" style="font-size: 0.7rem;">&copy; 2026 The Breathable Interface</span>
+                <div class="d-flex gap-3 mt-3 mt-md-0">
+                    <a href="#" class="text-muted-custom text-decoration-none hover-dark transition-all" style="font-size: 0.7rem;">Privacy Policy</a>
+                    <a href="#" class="text-muted-custom text-decoration-none hover-dark transition-all" style="font-size: 0.7rem;">Terms of Service</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="session-time.js"></script>
+</body>
+</html>

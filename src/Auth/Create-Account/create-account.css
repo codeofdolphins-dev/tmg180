@@ -1,0 +1,170 @@
+/* =========================================
+   Global Variables & Colors
+   ========================================= */
+:root {
+    --font-family: 'Manrope', sans-serif;
+    
+    /* Exact colors requested */
+    --text-main: #2D3338;
+    --text-muted: #596065;
+    --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+    
+    /* Extracted solid color for icons/text from gradient */
+    --accent-teal: #1E6264; 
+    
+    /* Backgrounds */
+    --bg-right: #F8F9FA; /* Off-white for the right panel to make white inputs pop */
+    --border-color: #E6E8EA;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Classes */
+.text-main { color: var(--text-main) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+.text-accent { color: var(--accent-teal) !important; }
+
+.main-heading {
+    font-size: 3.5rem;
+    letter-spacing: -2px;
+    line-height: 1.1;
+}
+
+.tracking-tight { letter-spacing: -1.5px; }
+.tracking-wide { letter-spacing: 0.5px; }
+
+/* =========================================
+   Layout & Panels
+   ========================================= */
+.left-panel {
+    /* Soft mesh gradient approximation matching the design */
+    background: radial-gradient(circle at top left, #DDF3F1 0%, transparent 40%),
+                radial-gradient(circle at bottom right, #EBEAF5 0%, transparent 50%),
+                #F1F4F6;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid rgba(0,0,0,0.03);
+}
+
+.right-panel { 
+    background-color: var(--bg-right); 
+}
+
+.bg-right-panel {
+    background-color: var(--bg-right) !important;
+}
+
+/* Left Panel Icons */
+.feature-icon { 
+    width: 44px; 
+    height: 44px; 
+}
+
+.shadow-sm-custom {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+}
+
+/* =========================================
+   Form Elements (Elevated Inputs)
+   ========================================= */
+.custom-input {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0,0,0,0.03) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.02) !important;
+    transition: all 0.2s ease;
+}
+
+.custom-input:focus, .custom-input:focus-within {
+    border-color: var(--accent-teal) !important;
+    box-shadow: 0 0 0 4px rgba(37, 104, 106, 0.08) !important;
+}
+
+.custom-input input::placeholder {
+    color: #A0AAB2;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+}
+
+.custom-input input[type="password"]::placeholder {
+    letter-spacing: 3px;
+    transform: translateY(-2px);
+}
+
+.cursor-pointer { cursor: pointer; }
+
+/* Checkbox */
+.custom-checkbox .form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-color: #D1D5DB;
+    cursor: pointer;
+}
+.custom-checkbox .form-check-input:checked {
+    background-color: var(--accent-teal);
+    border-color: var(--accent-teal);
+}
+
+/* =========================================
+   Password Strength & Checklist
+   ========================================= */
+.strength-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+    text-align: right;
+}
+
+.strength-bar {
+    height: 4px;
+    flex: 1;
+    background-color: #E2E6E9;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.strength-bar.active {
+    background-color: var(--accent-teal);
+}
+
+/* =========================================
+   Buttons & Links
+   ========================================= */
+.btn-gradient {
+    background: var(--btn-gradient);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-gradient:hover, .btn-gradient:focus {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 98, 100, 0.25) !important;
+}
+
+.btn-outline-custom {
+    background-color: #FFFFFF;
+    border: 1px solid #E6E8EA;
+    transition: background-color 0.2s ease;
+}
+
+.btn-outline-custom:hover {
+    background-color: #F1F3F5;
+}
+
+.hover-dark:hover {
+    color: var(--text-main) !important;
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}
+
+@media(max-width:768px){
+    .main-heading {
+        font-size: calc(1.8rem + 2.5vw);
+    }
+}

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - Find Workers</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="find-woekers.css">
+</head>
+
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+
+    <ul class="nav-links mt-2">
+      <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+            src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a></li>
+      <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link active"><i
+            class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+      <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+            src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+      <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img src="../../../assets/icons/message-icon.png" alt=""
+            width="16px" height="16px"> Messages <span class="badge-notification">3</span></a></li>
+      <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt="" width="16px"
+            height="16px"> My Requests</a></li>
+    </ul>
+
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+
+      <div class="mb-4 pb-2">
+        <h2 class="fw-bold mb-3">Connect with Care</h2>
+        <p class="text-muted w-75 m-0">Discover qualified professionals who align with your specific support needs and
+          values.</p>
+      </div>
+
+      <div class="d-flex flex-wrap gap-3 mb-5 align-items-center">
+        <button class="filter-btn active">
+          LOCATION: SYDNEY <i class="fa-solid fa-xmark ms-1"></i>
+        </button>
+        <button class="filter-btn">
+          SUPPORT TYPE <i class="fa-solid fa-chevron-down ms-1"></i>
+        </button>
+        <button class="filter-btn">
+          AVAILABILITY <i class="fa-regular fa-calendar ms-1"></i>
+        </button>
+        <button class="filter-btn">
+          LANGUAGE <i class="fa-solid fa-globe ms-1"></i>
+        </button>
+        <button class="filter-btn">
+          EXPERIENCE <i class="fa-regular fa-star ms-1"></i>
+        </button>
+        <div class="border-end mx-2" style="height: 30px; border-color: var(--border-color) !important;"></div>
+        <button class="filter-btn all-filters">
+          <i class="fa-solid fa-sliders"></i> ALL FILTERS
+        </button>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0" style="font-size: 1.5rem;">120 <span
+            style="color: var(--text-light); font-weight: 600; font-size: 1rem;">workers found</span></h5>
+        <div class="sort-wrapper">
+          <span class="sort-label">SORT BY:</span>
+          <div class="sort-btn">
+            Recommended <i class="fa-solid fa-chevron-down ms-2" style="color: var(--text-light);"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-5">
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <i class="fa-regular fa-bookmark bookmark-icon"></i>
+
+            <div class="worker-img-wrap">
+              <img src="../../../assets/images/Sarah Miller.png" class="worker-img bg-avatar-1"
+                alt="Sarah Miller">
+              <div class="status-dot status-online"></div>
+            </div>
+
+            <h4 class="worker-name">Sarah Miller</h4>
+            <div class="worker-title">SPECIALIST CARE PROVIDER</div>
+
+            <div class="tag-container">
+              <span class="tag-pill tag-autism">AUTISM SUPPORT</span>
+              <span class="tag-pill tag-ndis">NDIS</span>
+            </div>
+
+            <p class="desc-text">Compassionate support worker with a background in clinical...</p>
+
+            <div class="meta-info">
+              <div class="meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>SURRY HILLS,<br>NSW</span>
+              </div>
+              <div class="meta-item text-end justify-content-end">
+                <span>8+ YEARS<br>EXP.</span>
+              </div>
+            </div>
+
+            <div class="availability-pill avail-green">
+              <i class="fa-solid fa-circle-check"></i> AVAILABLE TODAY
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-action btn-profile">PROFILE</button>
+              <button class="btn btn-action btn-contact">CONTACT</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <i class="fa-regular fa-bookmark bookmark-icon"></i>
+
+            <div class="worker-img-wrap">
+              <img src="../../../assets/images/David Chen.png" class="worker-img bg-avatar-2" alt="David Chen">
+              <div class="status-dot status-offline"></div>
+            </div>
+
+            <h4 class="worker-name">David Chen</h4>
+            <div class="worker-title">OCCUPATIONAL THERAPIST</div>
+
+            <div class="tag-container">
+              <span class="tag-pill tag-mobility">MOBILITY</span>
+              <span class="tag-pill tag-elderly">ELDERLY CARE</span>
+            </div>
+
+            <p class="desc-text">Expert in assistive technology and home modifications. Helpin...</p>
+
+            <div class="meta-info">
+              <div class="meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>PARRAMATTA,<br>NSW</span>
+              </div>
+              <div class="meta-item text-end justify-content-end">
+                <span>5+ YEARS<br>EXP.</span>
+              </div>
+            </div>
+
+            <div class="availability-pill avail-gray">
+              <i class="fa-regular fa-clock"></i> NEXT: MONDAY
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-action btn-profile">PROFILE</button>
+              <button class="btn btn-action btn-contact">CONTACT</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <i class="fa-solid fa-bookmark bookmark-icon saved"></i>
+
+            <div class="worker-img-wrap">
+              <img src="../../../assets/images/Elena Rodriguez.png" class="worker-img bg-avatar-3"
+                alt="Elena Rodriguez">
+              <div class="status-dot status-online"></div>
+            </div>
+
+            <h4 class="worker-name">Elena Rodriguez</h4>
+            <div class="worker-title">YOUTH MENTOR</div>
+
+            <div class="tag-container">
+              <span class="tag-pill tag-mental">MENTAL HEALTH</span>
+              <span class="tag-pill tag-arts">CREATIVE ARTS</span>
+            </div>
+
+            <p class="desc-text">Passionate about empowering young people through creative...</p>
+
+            <div class="meta-info">
+              <div class="meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>BONDI JUNCTION,<br>NSW</span>
+              </div>
+              <div class="meta-item text-end justify-content-end">
+                <span>3+ YEARS<br>EXP.</span>
+              </div>
+            </div>
+
+            <div class="availability-pill avail-green">
+              <i class="fa-solid fa-circle-check"></i> AVAILABLE TODAY
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-action btn-profile">PROFILE</button>
+              <button class="btn btn-action btn-contact">CONTACT</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center pb-5">
+        <button class="btn-show-more">
+          SHOW MORE RESULTS <i class="fa-solid fa-chevron-down ms-1" style="color: var(--text-light);"></i>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      // Open sidebar
+      toggleBtn.addEventListener("click", function () {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      // Close sidebar when clicking on the dark overlay
+      overlay.addEventListener("click", function () {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+    });
+  </script>
+</body>
+
+</html>

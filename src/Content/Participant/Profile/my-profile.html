@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - My Profile</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="my-profile.css">
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+            <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+                        src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
+            </li>
+            <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+                        class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+            <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+                        src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+            <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
+                        src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+                        class="badge-notification">3</span></a></li>
+            <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt=""
+                        width="16px" height="16px"> My Requests</a></li>
+        </ul>
+    
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+      
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      
+      <div class="card-custom profile-header-card">
+        <div class="profile-avatar-wrap">
+          <img src="../../../assets/images/Alex Thompson profile.png" alt="Alex Thompson" class="profile-avatar">
+          <div class="camera-badge"><i class="fa-solid fa-camera"></i></div>
+        </div>
+        <div class="profile-info">
+          <h2>Alex Thompson</h2>
+          <p>alex.thompson@example.com</p>
+          
+          <div class="progress-section">
+            <span class="progress-label">Profile Completion</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill"></div>
+            </div>
+            <span class="progress-value">70%</span>
+          </div>
+        </div>
+        <button class="btn-edit-profile"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <div class="card-title">Personal Details <i class="fa-solid fa-pen-to-square edit-icon"></i></div>
+            
+            <div class="detail-group">
+              <div class="detail-label">Full Name</div>
+              <div class="detail-value">Alex Thompson</div>
+            </div>
+            <div class="detail-group">
+              <div class="detail-label">Email Address</div>
+              <div class="detail-value">alex.thompson@example.com</div>
+            </div>
+            <div class="detail-group">
+              <div class="detail-label">Phone</div>
+              <div class="detail-value">+61 412 345 678</div>
+            </div>
+            <div class="detail-group">
+              <div class="detail-label">Location</div>
+              <div class="detail-value">Sydney, NSW</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <div class="card-title">Support Preferences</div>
+            <div class="prefs-container">
+              <span class="pref-tag">Mental Health Support</span>
+              <span class="pref-tag">Emotional Well-being</span>
+              <span class="pref-tag">Creative Expression</span>
+              <div class="pref-add"><i class="fa-solid fa-plus"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <div class="card-title">Communication Style</div>
+            
+            <div class="comm-item">
+              <i class="fa-regular fa-comment-dots"></i>
+              <span>Text Messaging</span>
+            </div>
+            <div class="comm-item">
+              <i class="fa-solid fa-phone-volume"></i>
+              <span>Voice Calls</span>
+            </div>
+            <div class="comm-item">
+              <i class="fa-solid fa-user-group"></i>
+              <span>In-person Sessions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <div class="card-title">Comfort & Boundaries</div>
+            
+            <div class="boundary-item">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Needs quiet environment</span>
+            </div>
+            <div class="boundary-item">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Prefers 60min sessions</span>
+            </div>
+            <div class="boundary-item">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Structured communication</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <div class="card-title">Availability</div>
+            
+            <div class="avail-box">
+              <div class="avail-label">Preferred Window</div>
+              <div class="avail-value">Weekdays (Morning)</div>
+            </div>
+            
+            <div class="days-container">
+              <div class="day-pill inactive">Mon</div>
+              <div class="day-pill active">Wed</div>
+              <div class="day-pill inactive">Fri</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom onboarding-card">
+            <div class="onboarding-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h5>Complete Onboarding</h5>
+            <p>You're almost there! Complete the remaining 30% to get matched with better workers.</p>
+            <button class="btn-onboarding mt-auto">Continue Onboarding</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card-custom">
+            <div class="card-title">Account Settings</div>
+            
+            <div class="settings-list">
+              
+              <div class="settings-item">
+                <div class="setting-icon"><i class="fa-solid fa-lock"></i></div>
+                <div class="setting-details">
+                  <h6>Change Password</h6>
+                  <p>Update your account security</p>
+                </div>
+                <div class="setting-action"><i class="fa-solid fa-chevron-right"></i></div>
+              </div>
+
+              <div class="settings-item">
+                <div class="setting-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="setting-details">
+                  <h6>Privacy & Visibility</h6>
+                  <p>Manage who can see your profile</p>
+                </div>
+                <div class="setting-action"><i class="fa-solid fa-chevron-right"></i></div>
+              </div>
+
+              <div class="settings-item">
+                <div class="setting-icon"><i class="fa-regular fa-bell"></i></div>
+                <div class="setting-details">
+                  <h6>Notification Preferences</h6>
+                  <p>Configure email and push alerts</p>
+                </div>
+                <div class="setting-action">
+                  <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" checked>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom safety-card">
+            <div class="card-title mb-2">Safety & Logout</div>
+            <p>Manage your session or permanently remove your data from our sanctuary.</p>
+            
+            <button class="btn-logout mt-auto"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out from all devices</button>
+            <button class="btn-delete"><i class="fa-solid fa-xmark"></i> Delete account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      toggleBtn.addEventListener("click", function() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      overlay.addEventListener("click", function() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+    });
+  </script>
+</body>
+</html>

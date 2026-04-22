@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - Help Center</title>
+  
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="help-center.css">
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+            <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+                        src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
+            </li>
+            <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+                        class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+            <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+                        src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+            <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
+                        src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+                        class="badge-notification">3</span></a></li>
+            <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt=""
+                        width="16px" height="16px"> My Requests</a></li>
+        </ul>
+    
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+      
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      
+      <div class="page-header">
+        <h2>Help Center</h2>
+        <p>Find answers or get support when you need it</p>
+      </div>
+
+      <div class="help-search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search for help, questions, or topics...">
+      </div>
+
+      <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+          <div class="category-card">
+            <div class="cat-icon">
+                <!-- <i class="fa-solid fa-rocket"></i> -->
+                 <img src="../../../assets/icons/roket-icon.png" alt="">
+            </div>
+            <h5>Getting Started</h5>
+            <p>Everything you need to set up your profile and start.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+          <div class="category-card">
+            <div class="cat-icon">
+                <!-- <i class="fa-solid fa-user-magnifying-glass"></i> -->
+                 <img src="../../../assets/icons/find-icon.png" alt="">
+            </div>
+            <h5>Finding a Worker</h5>
+            <p>Learn how to search and filter for your perfect support match.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="category-card">
+            <div class="cat-icon">
+                <!-- <i class="fa-regular fa-calendar-check"></i> -->
+                 <img src="../../../assets/icons/manage-icon.png" alt="">
+            </div>
+            <h5>Managing Requests</h5>
+            <p>How to handle bookings, shifts, and communication.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="category-card">
+            <div class="cat-icon">
+                <!-- <i class="fa-solid fa-gears"></i> -->
+                 <img src="../../../assets/icons/acccoun-icon.png" alt="">
+            </div>
+            <h5>Account & Settings</h5>
+            <p>Update your details, billing, and privacy preferences.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <!-- <i class="fa-regular fa-comments"></i>  -->
+         <img src="../../../assets/icons/question-icon.png" alt="">
+        Frequently Asked Questions
+      </div>
+
+      <div class="accordion custom-accordion" id="faqAccordion">
+        
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true">
+              How do I find a support worker?
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Navigate to the "Find Workers" tab in your sidebar. You can use filters to find people based on location, availability, and specific skills that match your NDIS goals.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false">
+              How do I contact a worker?
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Once you find a suitable profile, click on "Contact" or "View Profile" and select the message icon. You can start a secure, encrypted conversation directly on the platform.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false">
+              What happens after sending a request?
+            </button>
+          </h2>
+          <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              The worker will receive a notification and can choose to accept, decline, or message you back for more details. You can track all statuses in your "My Requests" tab.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false">
+              How do I update my profile?
+            </button>
+          </h2>
+          <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Go to the "My Profile" tab in the bottom left of your sidebar. From there, you can edit your personal details, support preferences, and availability.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row g-4">
+        
+        <div class="col-lg-7">
+          <div class="contact-card">
+            <h4>Still need help?</h4>
+            <p>Send us a message and our team will get back to you shortly.</p>
+            
+            <form>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Your Name</label>
+                  <input type="text" class="form-control" placeholder="Alex Johnson">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" class="form-control" placeholder="alex@example.com">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea class="form-control" placeholder="How can we support you today?"></textarea>
+              </div>
+              <button type="submit" class="btn-submit">Send Message</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          
+          <div class="support-detail-card">
+            <div class="support-header">
+              <div class="support-icon"><i class="fa-regular fa-envelope"></i></div>
+              <div>
+                <h5>Email Support</h5>
+                <span>support@tmg180.com.au</span>
+              </div>
+            </div>
+            <p class="support-desc">Our dedicated support team is available Mon-Fri, 9am - 5pm to help with any platform inquiries.</p>
+            <div class="response-badge">
+              <i class="fa-regular fa-clock"></i> Typical response time: within 24 hours
+            </div>
+          </div>
+
+          <div class="support-detail-card urgent">
+            <div class="support-header">
+              <div class="support-icon"><i class="fa-solid fa-headset"></i></div>
+              <div>
+                <h5 style="color: var(--primary-teal);">Urgent Support</h5>
+              </div>
+            </div>
+            <p class="support-desc">If this is an emergency or involves immediate safety concerns, please call our 24/7 hotline directly or contact local emergency services.</p>
+            <a href="#" class="urgent-link">View emergency contacts <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      toggleBtn.addEventListener("click", function() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      overlay.addEventListener("click", function() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+    });
+  </script>
+</body>
+</html>

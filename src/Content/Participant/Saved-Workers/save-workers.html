@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - Saved Workers</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="save-workers.css">
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+            <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+                        src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
+            </li>
+            <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+                        class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+            <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link active"><img
+                        src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+            <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
+                        src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+                        class="badge-notification">3</span></a></li>
+            <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt=""
+                        width="16px" height="16px"> My Requests</a></li>
+        </ul>
+    
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: #64748B;"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+      
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      
+      <div class="page-header">
+        <div>
+          <h2 class="fw-bold mb-2" style="font-size: 2rem;">Saved Workers</h2>
+          <p class="text-muted m-0" style="font-size: 1rem; font-weight: 500;">People you've saved to review and connect with</p>
+        </div>
+        <div class="sort-wrapper mt-3 mt-md-0">
+          <span class="sort-label">Sort by</span>
+          <div class="sort-btn">
+            Recently Saved <i class="fa-solid fa-chevron-down" style="color: #64748B;"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-row">
+        <button class="filter-pill filter-cyan">Availability: Any</button>
+        <button class="filter-pill filter-gray">Location: Sydney</button>
+        <button class="filter-pill filter-gray">Support: Clinical</button>
+        <button class="filter-text-btn"><i class="fa-solid fa-filter"></i> All Filters</button>
+      </div>
+
+      <div class="bulk-actions-wrapper">
+        <span class="bulk-label">Bulk Actions:</span>
+        <button class="bulk-btn bulk-btn-contact"><i class="fa-regular fa-envelope"></i> Contact selected</button>
+        <button class="bulk-btn bulk-btn-remove"><i class="fa-regular fa-trash-can"></i> Remove selected</button>
+      </div>
+
+      <div class="row g-4">
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            
+            <div class="card-header-flex">
+              <div class="worker-img-wrap">
+                <img src="../../../assets/images/Dr. Sarah Jenkins.png" class="worker-img" alt="Sarah Jenkins">
+                <div class="status-dot dot-online"></div>
+              </div>
+              <div class="text-end">
+                <div class="heart-circle ms-auto"><i class="fa-solid fa-heart"></i></div>
+                <div class="status-pill status-responded">RESPONDED</div>
+              </div>
+            </div>
+
+            <h4 class="worker-name">Dr. Sarah Jenkins</h4>
+            <div class="worker-title">Clinical Psychologist • Trauma Recovery</div>
+            
+            <div class="tags-wrapper">
+              <span class="tag-gray">Mental Health</span>
+              <span class="tag-gray">English, Spanish</span>
+              <span class="tag-gray">AHPRA Cert</span>
+            </div>
+            
+            <p class="quote-text">"Dedicated to creating a safe harbor for emotional healing and..."</p>
+            
+            <ul class="meta-list">
+              <li><i class="fa-solid fa-location-dot"></i> <span>Sydney, CBD (On-site & Remote)</span></li>
+              <li><i class="fa-solid fa-briefcase"></i> <span>12 Years Experience</span></li>
+              <li><i class="fa-regular fa-calendar"></i> <span class="text-teal">Available: Mon, Wed, Fri</span></li>
+            </ul>
+            
+            <div class="card-actions mt-auto">
+              <button class="btn btn-action btn-view">View Profile</button>
+              <button class="btn btn-action btn-contact-light">Contact</button>
+            </div>
+            <button class="btn-remove">REMOVE FROM SAVED</button>
+            
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            
+            <div class="card-header-flex">
+              <div class="worker-img-wrap">
+                <img src="../../../assets/images/Marcus Thorne.png" class="worker-img" alt="Marcus Thorne">
+                <div class="status-dot dot-offline"></div>
+              </div>
+              <div class="text-end">
+                <div class="heart-circle ms-auto"><i class="fa-solid fa-heart"></i></div>
+                <div class="status-pill status-not-contacted">NOT CONTACTED</div>
+              </div>
+            </div>
+
+            <h4 class="worker-name">Marcus Thorne</h4>
+            <div class="worker-title">Disability Support • Mobility Specialist</div>
+            
+            <div class="tags-wrapper">
+              <span class="tag-gray">Physical Therapy</span>
+              <span class="tag-gray">English</span>
+              <span class="tag-gray">First Aid Cert</span>
+            </div>
+            
+            <p class="quote-text">"Passionate about empowering individuals to live their most..."</p>
+            
+            <ul class="meta-list">
+              <li><i class="fa-solid fa-location-dot"></i> <span>Parramatta, NSW (In-home)</span></li>
+              <li><i class="fa-solid fa-briefcase"></i> <span>8 Years Experience</span></li>
+              <li><i class="fa-regular fa-calendar"></i> <span class="text-teal">Available: Weekends</span></li>
+            </ul>
+            
+            <div class="card-actions mt-auto">
+              <button class="btn btn-action btn-view">View Profile</button>
+              <button class="btn btn-action btn-contact-light">Contact</button>
+            </div>
+            <button class="btn-remove">REMOVE FROM SAVED</button>
+            
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            
+            <div class="card-header-flex">
+              <div class="worker-img-wrap">
+                <img src="../../../assets/images/Elena Rodriguez2.png" class="worker-img" alt="Elena Rodriguez">
+                <div class="status-dot dot-online"></div>
+              </div>
+              <div class="text-end">
+                <div class="heart-circle ms-auto"><i class="fa-solid fa-heart"></i></div>
+                <div class="status-pill status-contacted">CONTACTED</div>
+              </div>
+            </div>
+
+            <h4 class="worker-name">Elena Rodriguez</h4>
+            <div class="worker-title">Life Coach • Youth Advocacy</div>
+            
+            <div class="tags-wrapper">
+              <span class="tag-gray">Youth Support</span>
+              <span class="tag-gray">Spanish, Italian</span>
+              <span class="tag-gray">NDIS Provider</span>
+            </div>
+            
+            <p class="quote-text">"Helping young adults navigate complex transitions with clarity..."</p>
+            
+            <ul class="meta-list">
+              <li><i class="fa-solid fa-location-dot"></i> <span>Melbourne, VIC (Hybrid)</span></li>
+              <li><i class="fa-solid fa-briefcase"></i> <span>5 Years Experience</span></li>
+              <li><i class="fa-regular fa-calendar"></i> <span class="text-teal">Available: Weekdays After 5pm</span></li>
+            </ul>
+            
+            <div class="card-actions mt-auto">
+              <button class="btn btn-action btn-view">View Profile</button>
+              <button class="btn btn-action btn-contact-light">Contact</button>
+            </div>
+            <button class="btn-remove">REMOVE FROM SAVED</button>
+            
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom-search">
+        <div class="search-icon-circle">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <p>Looking for something specific?</p>
+        <button class="btn-browse">Browse Search Results</button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      // Open sidebar
+      toggleBtn.addEventListener("click", function() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      // Close sidebar when clicking on the dark overlay
+      overlay.addEventListener("click", function() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+    });
+  </script>
+</body>
+</html>

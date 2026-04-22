@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMG180 - My Requests</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="my-requests.css">
+
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand-container">
+            <div class="brand">
+                <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+                <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px"
+                    class="p-1">
+                <span class="brand-text">TMG180</span>
+            </div>
+            <div class="brand-subtext">Participant Portal</div>
+        </div>
+
+        <ul class="nav-links mt-2">
+            <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+                        src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
+            </li>
+            <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+                        class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+            <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+                        src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a>
+            </li>
+            <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
+                        src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+                        class="badge-notification">3</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link active"><img src="../../../assets/icons/list-icon.png"
+                        alt="" width="16px" height="16px"> My Requests</a></li>
+        </ul>
+
+        <div class="nav-footer">
+            <ul class="nav-links p-0">
+                <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i
+                            class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a>
+                </li>
+                <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear"
+                            style="width:20px; text-align:center;"></i> Settings</a></li>
+                <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i
+                            class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help
+                        Center</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="top-nav">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+                    <input type="text" placeholder="Search resources, workers or documents...">
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <i class="fa-regular fa-bell notification-bell"></i>
+                <i class="fa-solid fa-gear d-none d-sm-block"></i>
+                <div class="user-info">
+                    <div class="name">Alex Johnson</div>
+                    <div class="id">PID: #8291</div>
+                </div>
+                <div class="avatar-container">
+                    <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar">
+                    <div class="avatar-status"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-container">
+
+            <div class="page-header">
+                <div>
+                    <h2>My Requests</h2>
+                    <p>Track and manage your support requests</p>
+                </div>
+                <div class="sort-wrapper">
+                    <span class="sort-label">Sort by:</span>
+                    <div class="sort-btn">
+                        Recent <i class="fa-solid fa-chevron-down"
+                            style="color: var(--text-light); font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-3 col-6">
+                    <div class="summary-card">
+                        <div class="summary-label">Total Requests</div>
+                        <div class="summary-value val-total">12</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="summary-card">
+                        <div class="summary-label">Waiting</div>
+                        <div class="summary-value val-waiting">3</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="summary-card">
+                        <div class="summary-label">Accepted</div>
+                        <div class="summary-value val-accepted">7</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="summary-card">
+                        <div class="summary-label">Responded</div>
+                        <div class="summary-value val-responded">2</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-tabs">
+                <div class="filter-tab active">All</div>
+                <div class="filter-tab">Waiting</div>
+                <div class="filter-tab">Responded</div>
+                <div class="filter-tab">Accepted</div>
+                <div class="filter-tab">Declined</div>
+            </div>
+
+            <div class="request-list">
+
+                <div class="request-card">
+                    <img src="../../../assets/images/Sarah Miller.png" class="req-avatar" alt="Sarah Jenkins">
+                    <div class="req-body">
+                        <div class="req-worker-info">
+                            <h5 class="req-worker-name">Sarah Jenkins</h5>
+                            <span class="role-badge">Clinical Psychologist</span>
+                        </div>
+                        <div class="req-title">Support Request for Daily Assistance</div>
+                        <p class="req-desc">Looking for help with daily routines and emotional support.</p>
+                        <div class="req-date">SENT ON OCT 24, 2023</div>
+                    </div>
+                    <div class="req-actions">
+                        <div class="status-pill status-waiting">
+                            <div class="status-dot"></div> Waiting
+                        </div>
+                        <button class="btn-action-outline">Cancel Request</button>
+                    </div>
+                </div>
+
+                <div class="request-card">
+                    <img src="../../../assets/images/David Miller2.png" class="req-avatar" alt="David Miller">
+                    <div class="req-body">
+                        <div class="req-worker-info">
+                            <h5 class="req-worker-name">David Miller</h5>
+                            <span class="role-badge">Occupational Therapist</span>
+                        </div>
+                        <div class="req-title">Assistance with Mobility & Exercise</div>
+                        <p class="req-desc">Requesting a specialized plan for at-home mobility exercises.</p>
+                        <div class="req-date">SENT ON OCT 22, 2023</div>
+                    </div>
+                    <div class="req-actions">
+                        <div class="status-pill status-responded">
+                            <div class="status-dot"></div> Responded
+                        </div>
+                        <button class="btn-action-solid">View Message</button>
+                    </div>
+                </div>
+
+                <div class="request-card">
+                    <img src="../../../assets/images/Elena Rodriguez4.png" class="req-avatar" alt="Elena Rodriguez">
+                    <div class="req-body">
+                        <div class="req-worker-info">
+                            <h5 class="req-worker-name">Elena Rodriguez</h5>
+                            <span class="role-badge">Youth Mentor</span>
+                        </div>
+                        <div class="req-title">Creative Expression Workshops</div>
+                        <p class="req-desc">Seeking guidance on integrating art into daily therapy.</p>
+                        <div class="req-date">SENT ON OCT 20, 2023</div>
+                    </div>
+                    <div class="req-actions">
+                        <div class="status-pill status-accepted">
+                            <div class="status-dot"></div> Accepted
+                        </div>
+                        <div class="action-btn-group">
+                            <button class="btn-action-solid">Start Chat</button>
+                            <button class="btn-action-outline">Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-card">
+                    <img src="../../../assets/images/Marcus Wright.png" class="req-avatar" alt="Marcus Wright"
+                        style="filter: grayscale(100%);">
+                    <div class="req-body">
+                        <div class="req-worker-info">
+                            <h5 class="req-worker-name">Marcus Wright</h5>
+                            <span class="role-badge">Disability Support Pro</span>
+                        </div>
+                        <div class="req-title">Community Access Support</div>
+                        <p class="req-desc">Support for attending local community events and social groups.</p>
+                        <div class="req-date">SENT ON OCT 18, 2023</div>
+                    </div>
+                    <div class="req-actions">
+                        <div class="status-pill status-declined">
+                            <div class="status-dot"></div> Declined
+                        </div>
+                        <button class="btn-action-solid">Find Another Worker</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById("mobileToggle");
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("sidebarOverlay");
+
+            toggleBtn.addEventListener("click", function () {
+                sidebar.classList.add("show");
+                overlay.classList.add("show");
+            });
+
+            overlay.addEventListener("click", function () {
+                sidebar.classList.remove("show");
+                overlay.classList.remove("show");
+            });
+        });
+    </script>
+</body>
+
+</html>

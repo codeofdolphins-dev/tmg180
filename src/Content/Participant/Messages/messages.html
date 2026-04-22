@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - Messages</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="messages.css">
+  
+</head>
+
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+
+    <ul class="nav-links mt-2">
+      <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+            src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a></li>
+      <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+            class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+      <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+            src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+      <li class="nav-item"><a href="../Messages/messages.html" class="nav-link active"><img
+            src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+            class="badge-notification">3</span></a></li>
+      <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img
+            src="../../../assets/icons/list-icon.png" alt="" width="16px" height="16px"> My Requests</a></li>
+    </ul>
+
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="messaging-wrapper">
+
+      <div class="inbox-panel">
+        <div class="inbox-header">
+          <h2>Messages</h2>
+          <p>Your conversations</p>
+          <div class="inbox-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search messages">
+          </div>
+        </div>
+
+        <div class="inbox-list">
+
+          <div class="conversation-item active">
+            <div class="convo-avatar-wrap">
+              <img src="../../../assets/images/Sarah Jenkins.png" class="convo-avatar" alt="Sarah">
+              <div class="convo-status-dot online"></div>
+            </div>
+            <div class="convo-details">
+              <div class="convo-header">
+                <span class="convo-name">Sarah Jenkins</span>
+                <span class="convo-time">10:45 AM</span>
+              </div>
+              <div class="convo-snippet-wrap">
+                <span class="convo-snippet">I'll be there by 9 AM tom...</span>
+                <div class="unread-indicator"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="conversation-item">
+            <div class="convo-avatar-wrap">
+              <img src="../../../assets/images/David Miller.png" class="convo-avatar" alt="David"
+                style="filter: grayscale(100%); opacity: 0.8;">
+            </div>
+            <div class="convo-details">
+              <div class="convo-header">
+                <span class="convo-name">David Miller</span>
+                <span class="convo-time">Yesterday</span>
+              </div>
+              <div class="convo-snippet-wrap">
+                <span class="convo-snippet">The paperwork has been proce...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="conversation-item">
+            <div class="convo-avatar-wrap">
+              <img src="../../../assets/images/Elena Rodriguez3.png" class="convo-avatar" alt="Elena">
+            </div>
+            <div class="convo-details">
+              <div class="convo-header">
+                <span class="convo-name">Elena Rodriguez</span>
+                <span class="convo-time">Tuesday</span>
+              </div>
+              <div class="convo-snippet-wrap">
+                <span class="convo-snippet">Thanks for sending those detai...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="conversation-item">
+            <div class="convo-avatar-wrap">
+              <div class="convo-avatar avatar-initials">TS</div>
+            </div>
+            <div class="convo-details">
+              <div class="convo-header">
+                <span class="convo-name">TMG180 Support</span>
+                <span class="convo-time">Oct 12</span>
+              </div>
+              <div class="convo-snippet-wrap">
+                <span class="convo-snippet">Your monthly statement is now...</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="chat-panel">
+
+        <div class="chat-header">
+          <div class="chat-user-info">
+            <img src="../../../assets/images/Sarah Jenkins.png" alt="Sarah">
+            <div class="chat-user-details">
+              <h5>Sarah Jenkins</h5>
+              <div class="chat-user-status">
+                <i class="fa-solid fa-circle"></i> Online
+              </div>
+            </div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="btn-view-profile"><i class="fa-regular fa-user"></i> View profile</button>
+            <button class="btn-more"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+          </div>
+        </div>
+
+        <div class="chat-body">
+
+          <div class="date-separator">
+            <span>REQUEST ACCEPTED • OCT 14, 2023</span>
+          </div>
+
+          <div class="message-row received">
+            <img src="../../../assets/images/Sarah Jenkins.png" class="message-avatar" alt="Sarah">
+            <div class="message-content">
+              <div class="message-bubble">
+                Hello! I've just accepted your request for the morning walk tomorrow. I'm looking forward to it.
+              </div>
+              <span class="message-time">10:30 AM</span>
+            </div>
+          </div>
+
+          <div class="message-row sent">
+            <div class="message-content">
+              <div class="message-bubble">
+                That's great, Sarah! Should we stick to the usual route through the park?
+              </div>
+              <span class="message-time">10:32 AM</span>
+            </div>
+          </div>
+
+          <div class="message-row received">
+            <img src="../../../assets/images/Sarah Jenkins.png" class="message-avatar" alt="Sarah"
+              style="visibility: hidden;">
+            <div class="message-content">
+              <div class="message-bubble">
+                Yes, that sounds perfect. The weather forecast says it'll be a sunny morning!
+              </div>
+            </div>
+          </div>
+
+          <div class="message-row received">
+            <img src="../../../assets/images/Sarah Jenkins.png" class="message-avatar" alt="Sarah">
+            <div class="message-content">
+              <div class="message-bubble">
+                I'll be there by 9 AM tomorrow!
+              </div>
+              <span class="message-time">10:45 AM</span>
+            </div>
+          </div>
+
+          <div class="typing-indicator">
+            <span class="dots">...</span> Sarah is typing...
+          </div>
+
+        </div>
+
+        <div class="chat-footer">
+          <div class="chat-input-wrapper">
+            <button class="btn-attachment"><i class="fa-solid fa-paperclip"></i></button>
+            <input type="text" class="chat-input" placeholder="Write a message...">
+            <button class="btn-emoji"><i class="fa-regular fa-face-smile"></i></button>
+            <button class="btn-send"><i class="fa-regular fa-paper-plane"></i></button>
+          </div>
+          <div class="encryption-notice">
+            Messages are end-to-end encrypted for your safety.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      toggleBtn.addEventListener("click", function () {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      overlay.addEventListener("click", function () {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+
+      // Auto-scroll chat to bottom
+      const chatBody = document.querySelector('.chat-body');
+      chatBody.scrollTop = chatBody.scrollHeight;
+    });
+  </script>
+</body>
+
+</html>

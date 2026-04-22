@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG180 - Participant Portal</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="participant-dashboard.css">
+</head>
+
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <!-- <i class="fa-solid fa-dharmachakra"></i> -->
+        <img src="../../../assets/icons/logo-icon1.png" alt="TMG180 Logo" height="29.17px" width="30px" class="p-1">
+        <span class="brand-text">TMG180</span>
+      </div>
+      <div class="brand-subtext">Participant Portal</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+      <li class="nav-item"><a href="#" class="nav-link active"> <img src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a></li>
+      <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+      <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+      <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span class="badge-notification">3</span></a></li>
+      <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt="" width="16px" height="16px"> My Requests</a></li>
+    </ul>
+    
+    <div class="nav-footer">
+      <ul class="nav-links p-0">
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="../Settings/settings.html" class="nav-link"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input type="text" placeholder="Search resources, workers or documents...">
+        </div>
+      </div>
+      
+      <div class="user-profile">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-solid fa-gear d-none d-sm-block"></i>
+        <div class="user-info">
+          <div class="name">Alex Johnson</div>
+          <div class="id">PID: #8291</div>
+        </div>
+        <div class="avatar-container">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar">
+          <div class="avatar-status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      
+      <div class="card-custom welcome-banner">
+        <div class="pill-badge">DASHBOARD OVERVIEW</div>
+        <h2>Welcome back, <span style="color: var(--primary-teal);">Alex.</span></h2>
+        <p>Let's continue your support journey. We've updated your matches and request statuses based on your recent activity.</p>
+        
+        <div class="stats-container">
+          <div class="stats-pill green"><img src="../../../assets/icons/progerss-icon.png" alt=""> 60% Progress</div>
+          <div class="stats-pill blue"><img src="../../../assets/icons//new-message.png" alt=""> 3 New Messages</div>
+          <div class="stats-pill orange"><img src="../../../assets/icons/active-request.png" alt=""> 1 Active Request</div>
+        </div>
+      </div>
+
+      <div class="card-custom milestone-card">
+        <span class="milestone-badge">ONBOARDING JOURNEY</span>
+        <div class="milestone-header">
+          <h5>Current Milestone</h5>
+          <span>Estimated completion: 15 mins</span>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        
+        <div class="steps-container">
+          
+          <div class="step-item completed">
+            <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+            <div class="step-label">Profile Basics</div>
+          </div>
+          
+          <div class="step-item completed">
+            <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+            <div class="step-label">Documents</div>
+          </div>
+          
+          <div class="step-item active">
+            <div class="step-circle"><i class="fa-solid fa-bolt"></i></div>
+            <div class="step-label">Preferences</div>
+          </div>
+          
+          <div class="step-item pending">
+            <div class="step-circle">04</div>
+            <div class="step-label">Final Review</div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="quick-actions-header">Quick Actions</div>
+      <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom action-card">
+            <div class="icon-box bg-icon-green"><img src="../../../assets/icons/find-worker.png" alt=""></div>
+            <h6>Find a Worker</h6>
+            <p>Discover verified support partners near your location.</p>
+            <a href="#" class="link-action" style="color: var(--green-text);">EXPLORE NOW <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom action-card">
+            <div class="icon-box bg-icon-blue"><img src="../../../assets/icons/finish-setup.png" alt=""></div>
+            <h6>Finish Setup</h6>
+            <p>Complete your profile to unlock premium benefits.</p>
+            <a href="#" class="link-action" style="color: var(--blue-text);">RESUME <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom action-card">
+            <div class="icon-box bg-icon-purple"><img src="../../../assets/icons/view-message.png" alt=""></div>
+            <h6>View Messages</h6>
+            <p>Check for new updates from your dedicated team.</p>
+            <a href="#" class="link-action" style="color: var(--purple-text);">OPEN INBOX <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom action-card">
+            <div class="icon-box bg-icon-orange"><img src="../../../assets/icons/request-status.png" alt=""></div>
+            <h6>Requests Status</h6>
+            <p>Track the progress of your sent applications.</p>
+            <a href="#" class="link-action" style="color: var(--yellow-text);">VIEW STATUS <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        
+        <div class="col-lg-8">
+          
+          <div class="section-header">
+            <h6>Saved Support Workers</h6>
+            <button class="btn-view-all">View all saved</button>
+          </div>
+          
+          <div class="row g-3 mb-5">
+            <div class="col-md-4">
+              <div class="card-custom worker-card">
+                <i class="fa-solid fa-bookmark bookmark-icon"></i>
+                <div class="worker-img-wrap">
+                  <img src="../../../assets/images/Worker profile.png" class="worker-img" alt="Sarah">
+                  <div class="status-dot"></div>
+                </div>
+                <h6>Sarah Mitchell</h6>
+                <div class="tags-flex">
+                  <span class="tag-pill tag-autism">AGED CARE</span>
+                  <span class="tag-pill tag-ndis">NURSING</span>
+                </div>
+                <p>Specializing in emotional support and daily living activities for diverse...</p>
+                <button class="btn-profile">View Full Profile</button>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="card-custom worker-card">
+                <i class="fa-solid fa-bookmark bookmark-icon"></i>
+                <div class="worker-img-wrap">
+                  <img src="../../../assets/images/Worker profile.png" class="worker-img" alt="David">
+                  <div class="status-dot status-offline"></div>
+                </div>
+                <h6>David Chen</h6>
+                <div class="tags-flex">
+                  <span class="tag-pill tag-mobility">DISABILITY</span>
+                  <span class="tag-pill tag-elderly">CERTIFIED</span>
+                </div>
+                <p>Passion for helping young adults develop independent living skills through...</p>
+                <button class="btn-profile">View Full Profile</button>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="card-custom worker-card">
+                <i class="fa-solid fa-bookmark bookmark-icon"></i>
+                <div class="worker-img-wrap">
+                  <img src="../../../assets/images/Worker profile.png" class="worker-img" alt="Elena">
+                  <div class="status-dot"></div>
+                </div>
+                <h6>Elena Rodriguez</h6>
+                <div class="tags-flex">
+                  <span class="tag-pill tag-companion">COMPANION</span>
+                  <span class="tag-pill tag-spanish">FLUENT SPANISH</span>
+                </div>
+                <p>Dedicated to fostering meaningful connections and providing reliable...</p>
+                <button class="btn-profile">View Full Profile</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-header">
+            <h6>Recent Requests</h6>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-light);">Sort by Status <i class="fa-solid fa-chevron-down ms-1"></i></div>
+          </div>
+          
+          <div class="request-item">
+            <div class="request-icon bg-icon-purple"><img src="../../../assets/icons/support.png" alt=""></div>
+            <div class="request-info">
+              <h6>Support Session with Sarah M.</h6>
+              <span>Sent on Oct 24, 2023</span>
+            </div>
+            <div class="status-badge" style="background: var(--purple-light); color: var(--purple-text);">RESPONDED</div>
+          </div>
+
+          <div class="request-item">
+            <div class="request-icon bg-icon-orange"><img src="../../../assets/icons/weekly.png" alt=""></div>
+            <div class="request-info">
+              <h6>Weekly Community Access</h6>
+              <span>Sent on Oct 20, 2023</span>
+            </div>
+            <div class="status-badge" style="background: var(--yellow-light); color: var(--yellow-text);">WAITING</div>
+          </div>
+
+          <div class="request-item">
+            <div class="request-icon bg-icon-green"><img src="../../../assets/icons/transport.png" alt=""></div>
+            <div class="request-info">
+              <h6>Transport Assistance Request</h6>
+              <span>Sent on Oct 16, 2023</span>
+            </div>
+            <div class="status-badge" style="background: var(--green-light); color: var(--green-text);">ACCEPTED</div>
+          </div>
+
+        </div>
+
+        <div class="col-lg-4">
+          
+          <div class="section-header"><h6>Recent Activity</h6></div>
+          
+          <div class="card-custom mb-4">
+            <div class="timeline">
+              <div class="timeline-item green">
+                <div class="fw-bold">You contacted Sarah Mitchell</div>
+                <div class="text-muted">2 hours ago</div>
+              </div>
+              <div class="timeline-item blue">
+                <div class="fw-bold">New reply from support team</div>
+                <div class="text-muted">Yesterday, 4:15 PM</div>
+              </div>
+              <div class="timeline-item orange mb-0">
+                <div class="fw-bold">Uploaded "NDIS Plan.pdf"</div>
+                <div class="text-muted">3 days ago</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="support-box">
+            <h5>Need assistance?</h5>
+            <p>Our support team is here to help you navigate your journey.</p>
+            <button class="btn-help">Get help</button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
+  <script src="dashboard.js"></script>
+</body>
+
+</html>

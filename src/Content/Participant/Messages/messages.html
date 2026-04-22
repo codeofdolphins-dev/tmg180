@@ -159,6 +159,9 @@
       <div class="chat-panel">
 
         <div class="chat-header">
+          <button class="btn-back d-lg-none" id="backToInbox">
+  <i class="fa-solid fa-arrow-left"></i>
+</button>
           <div class="chat-user-info">
             <img src="../../../assets/images/Sarah Jenkins.png" alt="Sarah">
             <div class="chat-user-details">
@@ -247,24 +250,46 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const toggleBtn = document.getElementById("mobileToggle");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("sidebarOverlay");
 
-      toggleBtn.addEventListener("click", function () {
-        sidebar.classList.add("show");
-        overlay.classList.add("show");
-      });
+  const toggleBtn = document.getElementById("mobileToggle");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
 
-      overlay.addEventListener("click", function () {
-        sidebar.classList.remove("show");
-        overlay.classList.remove("show");
-      });
+  const messagingWrapper = document.querySelector(".messaging-wrapper");
+  const conversationItems = document.querySelectorAll(".conversation-item");
+  const backBtn = document.getElementById("backToInbox");
 
-      // Auto-scroll chat to bottom
-      const chatBody = document.querySelector('.chat-body');
-      chatBody.scrollTop = chatBody.scrollHeight;
+  // Sidebar toggle
+  toggleBtn.addEventListener("click", function () {
+    sidebar.classList.add("show");
+    overlay.classList.add("show");
+  });
+
+  overlay.addEventListener("click", function () {
+    sidebar.classList.remove("show");
+    overlay.classList.remove("show");
+  });
+
+  // 👉 Open chat when clicking user (Mobile)
+  conversationItems.forEach(item => {
+    item.addEventListener("click", () => {
+      if (window.innerWidth <= 992) {
+        messagingWrapper.classList.add("show-chat");
+      }
     });
+  });
+
+  // 👉 Back to inbox
+  backBtn.addEventListener("click", () => {
+    messagingWrapper.classList.remove("show-chat");
+  });
+
+  // Auto scroll
+  const chatBody = document.querySelector('.chat-body');
+  chatBody.scrollTop = chatBody.scrollHeight;
+});
+
+    
   </script>
 </body>
 

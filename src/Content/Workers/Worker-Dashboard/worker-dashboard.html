@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG Portal - Worker Dashboard</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="worker-dashboard.css">
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <span class="brand-text">TMG Portal</span>
+      </div>
+      <div class="brand-subtext">Worker Dashboard</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+      <li class="nav-item"><a href="#" class="nav-link active"><img src="../../../assets/icons/dash-icon.png" alt="" width="18px" height="16px">Dashboard</a></li>
+      <li class="nav-item"><a href="../Calendar/worker-calendar.html" class="nav-link"><img src="../../../assets/icons/calendar-icon.png" alt="" width="18px" height="16px">Calendar</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/participants-icon.png" alt="" width="22px" height="18px">Participants</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/resources-icon.png" alt="" width="18px" height="18px"> Resources</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/two-fector-icon.png" alt="" width="18px" height="18px">Compliance</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/learning-hub.png" alt="" width="18px" height="18px"> Learning Hub</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/settings-icon.png" alt="" width="18px" height="18px">Settings</a></li>
+    </ul>
+    
+    <div class="nav-footer">
+      <a href="#" class="btn-help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
+      <a href="#" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search files, participants, or tasks...">
+        </div>
+      </div>
+      
+      <div class="top-tabs d-none d-md-flex">
+        <a href="#" class="top-tab active">Overview</a>
+        <a href="#" class="top-tab">Schedule</a>
+        <a href="#" class="top-tab">
+          Support 
+          <span class="tab-badge"></span>
+        </a>
+      </div>
+
+      <div class="top-actions">
+        <i class="fa-regular fa-bell notification-bell"></i>
+        <i class="fa-regular fa-message"></i>
+        
+        <div class="user-profile">
+          <div class="user-info">
+            <div class="name">Sarah Jenkins</div>
+            <div class="role">Support Worker</div>
+          </div>
+          <img src="../../../assets/images/Worker Avatar.png" alt="User" class="avatar">
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      <div class="row g-4">
+        
+        <div class="col-lg-8">
+          
+          <div class="card-custom welcome-banner">
+            <div class="banner-header">
+              <span class="badge-shift">ACTIVE SHIFT</span>
+              <span class="banner-date">Monday, Oct 23</span>
+            </div>
+            
+            <h2>Welcome back, Sarah</h2>
+            <p>You have a productive day ahead with 4 sessions scheduled.<br>Your profile is nearly complete.</p>
+            
+            <div class="banner-footer">
+              <div class="progress-wrap">
+                <div class="progress-text">
+                  <span>Profile Completion</span>
+                  <span>85%</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill"></div>
+                </div>
+              </div>
+              <button class="btn-complete">Complete Setup</button>
+            </div>
+          </div>
+
+          <div class="card-custom">
+            <div class="schedule-header">
+              <div>
+                <h5>Today's Schedule</h5>
+                <p>4 Sessions Scheduled • Oct 23, 2023</p>
+              </div>
+              <div class="toggle-pill">
+                <div class="toggle-btn active">Today</div>
+                <div class="toggle-btn">Week</div>
+              </div>
+            </div>
+
+            <div class="schedule-list">
+              <div class="schedule-item active-item">
+                <div class="time-block">
+                  <div class="time-val" style="color: rgba(37, 104, 106, 1);">10:30</div>
+                  <div class="time-ampm">AM</div>
+                </div>
+                <div class="event-details">
+                  <div class="event-title-row">
+                    <h6 class="event-title">Support Coordination</h6>
+                    <span class="badge-online"><i class="fa-solid fa-video"></i> ONLINE</span>
+                  </div>
+                  <div class="event-meta">
+                    <span><i class="fa-regular fa-user"></i> Participant #882</span>
+                    <span><i class="fa-regular fa-clock"></i> 60 Mins</span>
+                  </div>
+                </div>
+                <div class="event-action go">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </div>
+              </div>
+
+              <div class="schedule-item normal-item">
+                <div class="time-block">
+                  <div class="time-val">1:00</div>
+                  <div class="time-ampm">PM</div>
+                </div>
+                <div class="event-details">
+                  <div class="event-title-row">
+                    <h6 class="event-title">Community Access Support</h6>
+                    <span class="badge-next">NEXT</span>
+                  </div>
+                  <div class="event-meta">
+                    <span>Participant #104 • In-person</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="schedule-item normal-item">
+                <div class="time-block">
+                  <div class="time-val">3:30</div>
+                  <div class="time-ampm">PM</div>
+                </div>
+                <div class="event-details">
+                  <div class="event-title-row">
+                    <h6 class="event-title">Initial Intake Review</h6>
+                  </div>
+                  <div class="event-meta">
+                    <span>Participant #441 • Online</span>
+                  </div>
+                </div>
+                <div class="event-action">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Quick Actions</div>
+          <div class="qa-grid">
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-1">
+                <!-- <i class="fa-solid fa-user-plus"></i> -->
+                 <img src="../../../assets/icons/add-participant-icon.png" alt="">
+            </div>
+              <span>Add Participant</span>
+            </div>
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-2">
+                <!-- <i class="fa-solid fa-file-signature"></i> -->
+                 <img src="../../../assets/icons/continue-icon.png" alt="">
+            </div>
+              <span>Continue Intake</span>
+            </div>
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-3">
+                <!-- <i class="fa-solid fa-file-pen"></i> -->
+                 <img src="../../../assets/icons/note-icon.png" alt="">
+            </div>
+              <span>Add Daily Note</span>
+            </div>
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-4">
+                <!-- <i class="fa-solid fa-file-invoice-dollar"></i> -->
+                 <img src="../../../assets/icons/invoice-icon.png" alt="">
+            </div>
+              <span>Create Invoice</span>
+            </div>
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-5">
+                <!-- <i class="fa-solid fa-cloud-arrow-up"></i> -->
+                 <img src="../../../assets/icons/compilance-icon.png" alt="">
+            </div>
+              <span>Upload Compliance</span>
+            </div>
+            <div class="qa-card">
+              <div class="qa-icon qa-icon-6">
+                <!-- <i class="fa-solid fa-network-wired"></i> -->
+                 <img src="../../../assets/icons/learning-icon.png" alt="">
+            </div>
+              <span>Learning Hub</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-lg-4">
+          
+          <div class="card-custom">
+            <div class="section-title " style="color:rgba(45, 51, 56, 1) !important;">
+              <span>
+                <!-- <i class="fa-solid fa-triangle-exclamation"></i> -->
+                 <img src="../../../assets/icons/denger-icon.png" alt="">
+                 Compliance Alerts</span>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-icon">
+                <!-- <i class="fa-solid fa-shield"></i> -->
+                 <img src="../../../assets/icons/two-fector-icon.png" alt="">
+            </div>
+              <div class="alert-content">
+                <h6>NDIS Check Renewal</h6>
+                <p>Due in 12 days • Action Required</p>
+              </div>
+            </div>
+
+            <div class="alert-card alert-danger">
+              <div class="alert-icon">
+                <!-- <i class="fa-solid fa-file-contract"></i> -->
+                 <img src="../../../assets/icons/professional-hammer-icon.png" alt="">
+            </div>
+              <div class="alert-content">
+                <h6>Professional Indemnity</h6>
+                <p>Expires Oct 30 • Immediate Attention</p>
+              </div>
+            </div>
+
+            <button class="btn-view-compliance">View All Compliance</button>
+          </div>
+
+          <div class="card-custom">
+            <div class="section-title">Performance Snapshots</div>
+            
+            <div class="perf-row">
+              <div class="perf-card">
+                <div class="perf-icon teal">
+                    <!-- <i class="fa-regular fa-calendar-check"></i> -->
+                     <img src="../../../assets/icons/total-sessions-icon.png" alt="">                </div>
+                <div class="perf-details">
+                  <div class="perf-label">TOTAL SESSIONS</div>
+                  <div class="perf-val-row">
+                    <span class="perf-value">18</span>
+                    <span class="perf-badge green">+12%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="perf-card">
+                <div class="perf-icon yellow">
+                    <!-- <i class="fa-regular fa-clipboard"></i> -->
+                     <img src="../../../assets/icons/active-request.png" alt="">
+                </div>
+                <div class="perf-details">
+                  <div class="perf-label">PENDING NOTES</div>
+                  <div class="perf-val-row">
+                    <span class="perf-value">4</span>
+                    <span class="perf-badge orange">Action</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="training-header">
+              <span>TRAINING PROGRESS</span>
+              <span class="training-percent">72%</span>
+            </div>
+            
+            <div class="training-item">
+              <div class="training-item-header">
+                <span>Policy Acknowledgements</span>
+                <span>4/5</span>
+              </div>
+              <div class="t-bar-bg">
+                <div class="t-bar-fill teal"></div>
+              </div>
+            </div>
+
+            <div class="training-item mb-0">
+              <div class="training-item-header">
+                <span>Training Modules</span>
+                <span>9/12</span>
+              </div>
+              <div class="t-bar-bg">
+                <div class="t-bar-fill purple"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-custom mb-0">
+            <div class="section-title">
+              Priority Tasks <span class="badge-new">3 NEW</span>
+            </div>
+            
+            <ul class="task-list">
+              <li class="task-item">
+                <div class="task-circle"></div>
+                <span class="task-text">Complete intake review</span>
+              </li>
+              <li class="task-item">
+                <div class="task-circle"></div>
+                <span class="task-text">Submit monthly invoice</span>
+              </li>
+              <li class="task-item">
+                <div class="task-circle"></div>
+                <span class="task-text">Review compliance update</span>
+              </li>
+            </ul>
+            
+            <button class="btn-view-compliance mt-0">See All Tasks</button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="dashboard-footer">
+      SECURE WORKER PORTAL • DATA ENCRYPTION ACTIVE • TMG180 HEALTHCARE SYSTEM V4.2
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      toggleBtn.addEventListener("click", function() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      overlay.addEventListener("click", function() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+      
+      const tabs = document.querySelectorAll('.top-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

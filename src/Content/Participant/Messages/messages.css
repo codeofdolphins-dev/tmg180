@@ -808,3 +808,58 @@ body {
         padding: 5px 5px 5px 20px;
     }
 }
+
+/* Mobile WhatsApp Style */
+@media (max-width: 992px) {
+
+    .messaging-wrapper {
+        position: relative;
+        height: 100%;
+    }
+
+    .inbox-panel,
+    .chat-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.3s ease;
+        background: #fff;
+    }
+
+    /* Default: show inbox */
+    .chat-panel {
+        transform: translateX(100%);
+        z-index: 2;
+    }
+
+    .inbox-panel {
+        z-index: 3;
+    }
+
+    /* When chat is active */
+    .messaging-wrapper.show-chat .chat-panel {
+        transform: translateX(0);
+    }
+
+    .messaging-wrapper.show-chat .inbox-panel {
+        transform: translateX(-100%);
+    }
+
+    /* Back button */
+    .btn-back {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        margin-right: 10px;
+        color: var(--primary-teal);
+        cursor: pointer;
+    }
+}
+
+@media(max-width:989px) and (min-width:631px){
+.chat-user-info {
+    padding-right: 320px;
+}
+}

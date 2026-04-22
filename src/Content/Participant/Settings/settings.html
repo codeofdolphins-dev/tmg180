@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TMG180 - Settings</title>
-  
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="settings.css">
 </head>
+
 <body>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -23,43 +25,46 @@
       </div>
       <div class="brand-subtext">Participant Portal</div>
     </div>
-    
+
     <ul class="nav-links mt-2">
-            <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
-                        src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
-            </li>
-            <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
-                        class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
-            <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
-                        src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
-            <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
-                        src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
-                        class="badge-notification">3</span></a></li>
-            <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img src="../../../assets/icons/list-icon.png" alt=""
-                        width="16px" height="16px"> My Requests</a></li>
-        </ul>
-    
+      <li class="nav-item"><a href="../Dashboard/participant-dashboard.html" class="nav-link"> <img
+            src="../../../assets/icons/dash-icon.png" alt="" width="16px" height="16px"> Dashboard</a>
+      </li>
+      <li class="nav-item"><a href="../Find-Workers/find-workers.html" class="nav-link"><i
+            class="fa-solid fa-user-check" style="width:20px; text-align:center;"></i> Find Workers</a></li>
+      <li class="nav-item"><a href="../Saved-Workers/save-workers.html" class="nav-link"><img
+            src="../../../assets/icons/save-icon.png" alt="" width="16px" height="16px"> Saved Workers</a></li>
+      <li class="nav-item"><a href="../Messages/messages.html" class="nav-link"><img
+            src="../../../assets/icons/message-icon.png" alt="" width="16px" height="16px"> Messages <span
+            class="badge-notification">3</span></a></li>
+      <li class="nav-item"><a href="../Requests/my-requests.html" class="nav-link"><img
+            src="../../../assets/icons/list-icon.png" alt="" width="16px" height="16px"> My Requests</a></li>
+    </ul>
+
     <div class="nav-footer">
       <ul class="nav-links p-0">
-        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user" style="width:20px; text-align:center;"></i> My Profile</a></li>
-        <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-gear" style="width:20px; text-align:center;"></i> Settings</a></li>
-        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
+        <li class="nav-item"><a href="../Profile/my-profile.html" class="nav-link"><i class="fa-regular fa-circle-user"
+              style="width:20px; text-align:center;"></i> My Profile</a></li>
+        <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-gear"
+              style="width:20px; text-align:center;"></i> Settings</a></li>
+        <li class="nav-item"><a href="../Help/help-center.html" class="nav-link"><i
+              class="fa-regular fa-circle-question" style="width:20px; text-align:center;"></i> Help Center</a></li>
       </ul>
     </div>
   </aside>
 
   <main class="main-content">
-    
+
     <header class="top-nav">
       <div class="d-flex align-items-center">
         <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
-        
+
         <div class="search-container">
           <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
           <input type="text" placeholder="Search resources, workers or documents...">
         </div>
       </div>
-      
+
       <div class="user-profile">
         <i class="fa-regular fa-bell notification-bell"></i>
         <i class="fa-solid fa-gear d-none d-sm-block"></i>
@@ -68,37 +73,43 @@
           <div class="id">PID: #8291</div>
         </div>
         <div class="avatar-container">
-          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;">
+          <img src="../../../assets/images/alex johnson.png" alt="User" class="avatar"
+            style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;">
           <div class="avatar-status"></div>
         </div>
       </div>
     </header>
 
     <div class="page-container">
-      
+
       <div class="page-header">
         <h2>Settings</h2>
         <p>Manage your account and personal preferences for a better health journey.</p>
       </div>
 
       <div class="row">
-        
+
         <div class="col-lg-3 mb-4">
-          <div class="settings-nav-item active"><i class="fa-regular fa-user" style="width: 20px; text-align: center;"></i> Account</div>
-          <div class="settings-nav-item"><i class="fa-solid fa-shield-halved" style="width: 20px; text-align: center;"></i> Security</div>
-          <div class="settings-nav-item"><i class="fa-regular fa-bell" style="width: 20px; text-align: center;"></i> Notifications</div>
-          <div class="settings-nav-item"><i class="fa-solid fa-lock" style="width: 20px; text-align: center;"></i> Privacy</div>
-          <div class="settings-nav-item"><i class="fa-solid fa-sliders" style="width: 20px; text-align: center;"></i> Preferences</div>
+          <div class="settings-nav-item active" data-target="account-id"><i class="fa-regular fa-user"
+              style="width: 20px; text-align: center;"></i> Account</div>
+          <div class="settings-nav-item" data-target="security-id"><i class="fa-solid fa-shield-halved"
+              style="width: 20px; text-align: center;"></i> Security</div>
+          <div class="settings-nav-item" data-target="notification-id"><i class="fa-regular fa-bell" style="width: 20px; text-align: center;"></i>
+            Notifications</div>
+          <div class="settings-nav-item" data-target="privacy-id"><i class="fa-solid fa-lock" style="width: 20px; text-align: center;"></i>
+            Privacy</div>
+          <div class="settings-nav-item" data-target="preferences-id"><i class="fa-solid fa-sliders" style="width: 20px; text-align: center;"></i>
+            Preferences</div>
         </div>
 
         <div class="col-lg-9">
-          
-          <div class="settings-card">
+
+          <div class="settings-card" id="account-id">
             <div class="card-header-flex">
               <div class="icon-circle icon-teal"><i class="fa-regular fa-user"></i></div>
               <h5>Account Information</h5>
             </div>
-            
+
             <div class="settings-row">
               <div class="info-group">
                 <span class="info-label">FULL NAME</span>
@@ -106,7 +117,7 @@
               </div>
               <span class="edit-link">Edit</span>
             </div>
-            
+
             <div class="settings-row">
               <div class="info-group">
                 <span class="info-label">EMAIL ADDRESS</span>
@@ -114,7 +125,7 @@
               </div>
               <span class="edit-link">Edit</span>
             </div>
-            
+
             <div class="settings-row">
               <div class="info-group">
                 <span class="info-label">PHONE NUMBER</span>
@@ -124,20 +135,20 @@
             </div>
           </div>
 
-          <div class="settings-card">
+          <div class="settings-card" id="security-id">
             <div class="card-header-flex">
               <div class="icon-circle icon-gray">
                 <!-- <i class="fa-solid fa-shield-halved"></i> -->
-                 <img src="../../../assets/icons/security-icon.png" alt="">
-               </div>
+                <img src="../../../assets/icons/security-icon.png" alt="">
+              </div>
               <h5>Security Settings</h5>
             </div>
-            
+
             <div class="settings-row">
               <div class="setting-item-with-icon">
                 <div class="setting-item-icon">
-                    <!-- <i class="fa-solid fa-ellipsis"></i> -->
-                     <img src="../../../assets/icons/password-icon.png" alt="">
+                  <!-- <i class="fa-solid fa-ellipsis"></i> -->
+                  <img src="../../../assets/icons/password-icon.png" alt="">
                 </div>
                 <div class="info-group">
                   <span class="info-title">Password</span>
@@ -146,12 +157,12 @@
               </div>
               <button class="btn-change-pass">Change Password</button>
             </div>
-            
+
             <div class="settings-row">
               <div class="setting-item-with-icon">
                 <div class="setting-item-icon">
-                    <!-- <i class="fa-solid fa-shield-halved"></i> -->
-                     <img src="../../../assets/icons/two-fector-icon.png" alt="">
+                  <!-- <i class="fa-solid fa-shield-halved"></i> -->
+                  <img src="../../../assets/icons/two-fector-icon.png" alt="">
                 </div>
                 <div class="info-group">
                   <span class="info-title">Two-factor Authentication</span>
@@ -164,12 +175,12 @@
             </div>
           </div>
 
-          <div class="settings-card">
+          <div class="settings-card" id="notification-id">
             <div class="card-header-flex">
               <div class="icon-circle icon-gray"><i class="fa-regular fa-bell"></i></div>
               <h5>Notification Preferences</h5>
             </div>
-            
+
             <div class="settings-row">
               <div class="notification-row">
                 <i class="fa-regular fa-envelope"></i>
@@ -179,7 +190,7 @@
                 <input class="form-check-input" type="checkbox" checked>
               </div>
             </div>
-            
+
             <div class="settings-row">
               <div class="notification-row">
                 <i class="fa-regular fa-message"></i>
@@ -189,39 +200,42 @@
                 <input class="form-check-input" type="checkbox" checked>
               </div>
             </div>
-            
+
             <div class="settings-row">
               <div class="notification-row">
                 <i class="fa-regular fa-clipboard"></i>
                 <span>Request Updates</span>
               </div>
               <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox"> </div>
+                <input class="form-check-input" type="checkbox">
+              </div>
             </div>
           </div>
 
-          <div class="settings-card">
+          <div class="settings-card" id="privacy-id">
             <div class="card-header-flex">
               <div class="icon-circle icon-yellow">
                 <!-- <i class="fa-solid fa-lock"></i> -->
-                 <img src="../../../assets/icons/previcy-control-icon.png" alt="">
-            </div>
+                <img src="../../../assets/icons/previcy-control-icon.png" alt="">
+              </div>
               <h5>Privacy Control</h5>
             </div>
-            
+
             <div class="settings-row">
               <div class="info-group" style="max-width: 80%;">
                 <span class="info-title">Public Profile Visibility</span>
                 <span class="info-sub">Allow other community members to see your progress and achievements.</span>
               </div>
               <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox"> </div>
+                <input class="form-check-input" type="checkbox">
+              </div>
             </div>
-            
+
             <div class="settings-row">
               <div class="info-group" style="max-width: 80%;">
                 <span class="info-title">Anonymized Data Sharing</span>
-                <span class="info-sub">Help us improve by sharing anonymized health data with our research partners.</span>
+                <span class="info-sub">Help us improve by sharing anonymized health data with our research
+                  partners.</span>
               </div>
               <div class="form-check form-switch m-0">
                 <input class="form-check-input" type="checkbox" checked>
@@ -229,17 +243,17 @@
             </div>
           </div>
 
-          <div class="settings-card danger-card">
+          <div class="settings-card" id="preferences-id">
             <div class="card-header-flex">
               <div class="icon-circle icon-red">
                 <!-- <i class="fa-solid fa-triangle-exclamation"></i> -->
-                 <img src="../../../assets/icons/denger-icon.png" alt="">
-            </div>
+                <img src="../../../assets/icons/denger-icon.png" alt="">
+              </div>
               <h5>Danger Zone</h5>
             </div>
-            
+
             <p class="danger-desc">These actions are permanent and cannot be undone. Please proceed with caution.</p>
-            
+
             <div class="danger-actions">
               <button class="btn-danger-outline">Sign Out from All Devices</button>
               <button class="btn-danger-solid">Delete My Account</button>
@@ -257,23 +271,52 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.css"></script>
-  
+
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const toggleBtn = document.getElementById("mobileToggle");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("sidebarOverlay");
+    document.addEventListener("DOMContentLoaded", function () {
 
-      toggleBtn.addEventListener("click", function() {
-        sidebar.classList.add("show");
-        overlay.classList.add("show");
-      });
+  const toggleBtn = document.getElementById("mobileToggle");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
 
-      overlay.addEventListener("click", function() {
-        sidebar.classList.remove("show");
-        overlay.classList.remove("show");
-      });
+  // Sidebar toggle
+  toggleBtn.addEventListener("click", function () {
+    sidebar.classList.add("show");
+    overlay.classList.add("show");
+  });
+
+  overlay.addEventListener("click", function () {
+    sidebar.classList.remove("show");
+    overlay.classList.remove("show");
+  });
+
+  // SETTINGS NAV LOGIC
+  const navItems = document.querySelectorAll(".settings-nav-item");
+
+  navItems.forEach(item => {
+    item.addEventListener("click", function () {
+
+      // Remove active from all
+      navItems.forEach(i => i.classList.remove("active"));
+
+      // Add active to clicked
+      this.classList.add("active");
+
+      // Scroll to section
+      const targetId = this.getAttribute("data-target");
+      const targetSection = document.getElementById(targetId);
+
+      if (targetSection) {
+        targetSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
     });
+  });
+
+});
   </script>
 </body>
+
 </html>

@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMG Portal - Calendar</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Base Colors */
+      --primary-teal: #25686A;
+      --bg-gray: #F8FAFC; 
+      --text-main: #2D3338;
+      --text-muted: #596065;
+      --text-light: #64748B;
+      --border-color: #E4E9EE;
+      --sidebar-width: 250px;
+      
+      /* Active Gradient */
+      --btn-gradient: linear-gradient(97.13deg, #25686A 0%, #145B5E 100%);
+
+      /* Palette Matches */
+      --teal-light-bg: #E8F5F3;
+      --teal-text: #0D9488;
+      --card-bg: #FFFFFF;
+      --danger-dark: #DC2626;
+      --danger-light-bg: #FEF2F2;
+      --warning-dark: #D97706;
+      --warning-light-bg: #FFFBEB;
+      --success-dark: #059669;
+      --success-light-bg: #ECFDF5;
+      --pale-blue-bg: #E0F2FE;
+      --icon-gray-bg: #F1F5F9;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background-color: var(--bg-gray);
+      color: var(--text-main);
+      margin: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: #FFFFFF;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .brand-container {
+      padding: 32px 24px 20px 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .brand-text {
+      font-size: 20px; /* FIXED from 20px */
+  font-weight: 700;
+      color: var(--primary-teal);
+    }
+
+    .brand-subtext {
+      font-size: 12px;
+  font-weight: 500;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      flex-grow: 1;
+      padding: 0 16px;
+      list-style: none;
+      margin: 0;
+      margin-top: 10px;
+    }
+
+    .nav-item {
+      margin-bottom: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      color: var(--text-light);
+      text-decoration: none;
+      border-radius: 24px;
+      font-size: 14px;
+  font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background-color: var(--bg-gray);
+      color: var(--text-main);
+    }
+
+    .nav-link.active {
+      background: var(--btn-gradient);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(37, 104, 106, 0.25);
+    }
+
+    .nav-footer {
+      padding: 24px 16px;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-help-center {
+      background-color: var(--pale-blue-bg);
+      color: #0284C7;
+      border-radius: 24px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 14px;
+  font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    .btn-help-center:hover { background-color: #bae6fd; color: #0284C7; }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 14px;
+  font-weight: 500;
+      border-radius: 24px;
+      transition: background-color 0.2s;
+    }
+    .btn-logout:hover { background-color: var(--danger-light-bg); color: var(--danger-dark); }
+
+    /* Mobile Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .sidebar-overlay.show { display: block; opacity: 1; }
+
+    /* --- Main Content --- */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      transition: margin-left 0.3s ease-in-out;
+    }
+
+    /* --- Topbar --- */
+    .top-nav {
+      background-color: #FFFFFF;
+      height: 72px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .mobile-toggle {
+      display: none;
+      font-size: 1.25rem;
+      color: var(--primary-teal);
+      cursor: pointer;
+      margin-right: 20px;
+    }
+
+    .search-container {
+      background-color: var(--icon-gray-bg);
+      border-radius: 24px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 320px;
+    }
+    .search-container input {
+      border: none; background: transparent; outline: none; width: 100%;
+      font-size: 0.85rem; font-family: 'Manrope', sans-serif; color: var(--text-main);
+       font-weight: 400;
+    }
+    .search-container input::placeholder { color: #94A3B8; }
+    .search-container i { color: #94A3B8; }
+
+    /* Right Profile */
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px; 
+    }
+    .header-icon {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .header-icon.has-notification::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--danger-dark);
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 8px;
+    }
+    .user-info { text-align: right; line-height: 1.2; }
+    .user-info .name { font-size: 14px;
+  font-weight: 700; color: var(--text-main); }
+    .user-info .role { font-size: 10px; /* FIXED */
+  font-weight: 500; color: var(--text-light);}
+    .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+    /* =========================================
+       PAGE CONTENT: CALENDAR
+       ========================================= */
+    .page-container {
+      padding: 32px 40px;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Controls Header */
+    .page-controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .page-title h2 { font-size: 32px;
+  font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+    .page-title p { font-size: 14px;
+  font-weight: 400; color: var(--text-light); margin: 0;}
+
+    .calendar-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Toggles & Nav */
+    .toggle-group {
+      display: flex;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 4px;
+    }
+    .toggle-btn {
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toggle-btn.active {
+      background-color: var(--icon-gray-bg);
+      color: var(--primary-teal);
+    }
+
+    .date-navigator {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 6px 16px;
+    }
+    .nav-arrow { color: var(--text-light); cursor: pointer; font-size: 0.8rem; }
+    .nav-arrow:hover { color: var(--text-main); }
+    .current-date { font-size: 13px; font-weight: 800; color: var(--text-main); text-align: center; line-height: 1.2; }
+    
+    .btn-today {
+      background-color: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-add-session {
+      background: var(--btn-gradient);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 10px rgba(37, 104, 106, 0.2);
+      transition: opacity 0.2s;
+    }
+    .btn-add-session:hover { opacity: 0.9; }
+
+    /* --- Calendar Grid Layout --- */
+    .calendar-card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid #FFFFFF;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calendar-wrapper {
+      width: 100%;
+      overflow-x: auto; /* Smooth mobile scrolling */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .calendar-main {
+      min-width: 800px; /* Forces scroll on small screens to preserve layout */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Grid Header */
+    .cal-header-row {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      padding-top: 16px;
+    }
+    .cal-time-col-header { width: 80px; flex-shrink: 0; }
+    .cal-day-col {
+      flex: 1;
+      text-align: center;
+      padding-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .day-name { font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+    .day-number {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: var(--text-main);
+    }
+    .cal-day-col.active .day-number { background-color: var(--primary-teal); color: #FFFFFF; }
+
+    /* Grid Body */
+    .cal-body {
+      position: relative;
+      display: flex;
+    }
+    
+    /* Background Horizontal Lines */
+    .grid-lines-bg {
+      position: absolute;
+      top: 0; left: 80px; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .grid-line {
+      height: 80px; /* 1 hour = 80px */
+      border-top: 1px solid var(--border-color);
+      box-sizing: border-box;
+      width: 100%;
+    }
+    /* Vertical line dividers */
+    .day-column-borders {
+      position: absolute; top: 0; left: 80px; right: 0; bottom: 0;
+      display: flex; pointer-events: none; z-index: 1;
+    }
+    .col-border { flex: 1; border-right: 1px solid var(--border-color); }
+    .col-border:last-child { border-right: none; }
+
+    /* Time Labels */
+    .time-labels {
+      width: 80px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+      background-color: #FFFFFF;
+    }
+    .time-label {
+      height: 80px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-align: right;
+      padding-right: 16px;
+      transform: translateY(-6px); /* Align with line */
+    }
+
+    /* Events Container */
+    .events-container {
+      flex: 1;
+      display: flex;
+      position: relative;
+      z-index: 3;
+    }
+    .day-slot { flex: 1; position: relative; }
+
+    /* The Red Current Time Indicator */
+    .current-time-line {
+      position: absolute;
+      left: -5px; /* Pull into time column slightly */
+      right: 0;
+      height: 2px;
+      background-color: var(--danger-dark);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .current-time-line::before {
+      content: ''; position: absolute; left: 0; top: -4px;
+      width: 10px; height: 10px; background-color: var(--danger-dark); border-radius: 50%;
+    }
+
+    /* Event Cards */
+    .cal-event {
+      position: absolute;
+      left: 8px; right: 8px;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .cal-event:hover { transform: scale(1.02); z-index: 5; }
+    
+    .cal-event.teal { background-color: var(--success-light-bg); border-left: 4px solid var(--success-dark); }
+    .cal-event.blue { background-color: var(--pale-blue-bg); border-left: 4px solid #3B82F6; }
+    .cal-event.purple { background-color: #F3E8FF; border-left: 4px solid #9333EA; }
+    .cal-event.gray { background-color: var(--icon-gray-bg); border-left: 4px solid var(--text-light); }
+
+    .ev-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .ev-status { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; color: #FFFFFF; text-transform: uppercase;}
+    .ev-status.completed { background-color: var(--success-dark); }
+    .ev-status.ongoing { background-color: #3B82F6; }
+    .ev-status.upcoming { background-color: #9333EA; }
+    .ev-time { font-size: 10px; font-weight: 700; color: var(--text-main); }
+    
+    .ev-title { font-size: 12px; font-weight: 800; color: var(--text-main); line-height: 1.3; margin-bottom: 4px; }
+    .ev-meta { font-size: 10px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+    /* --- Right Sidebar Content --- */
+    .right-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Overview Card */
+    .overview-card {
+      background-color: var(--icon-gray-bg);
+      border-radius: 20px;
+      padding: 24px;
+    }
+    .sidebar-title { font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    
+    .stat-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .stat-icon { width: 40px; height: 40px; background-color: #FFFFFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); }
+    .stat-details { flex: 1; }
+    .stat-label { font-size: 9px; /* FIXED from 10px */
+  font-weight: 700;  color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .stat-value {  font-size: 20px; /* FIXED from 32px */
+  font-weight: 900; color: var(--text-main); line-height: 1; }
+    .stat-extra { color: var(--primary-teal); font-size: 1.1rem; }
+
+    .priority-box { margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+    .p-label { font-size: 10px; font-weight: 800; color: var(--primary-teal); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .p-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+    .p-time { font-size: 11px; color: var(--text-light); font-weight: 600; display: flex; align-items: center; gap: 6px;}
+
+    /* Upcoming Card */
+    .section-header-split { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-header-split h6 { font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+    .section-header-split a { font-size: 10px; font-weight: 800; color: var(--primary-teal); text-decoration: none; text-transform: uppercase; }
+
+    .upcoming-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+    .up-time { display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: 800; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px;}
+    .up-dot { width: 8px; height: 8px; background-color: var(--primary-teal); border-radius: 50%; }
+    .up-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+    .up-user { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .up-user img { width: 24px; height: 24px; border-radius: 50%; }
+
+    /* Quick Actions */
+    .dashed-actions {
+      border: 1px dashed var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #FAFAFA;
+    }
+    .btn-action-light {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.2s;
+    }
+    .btn-action-light:hover { background-color: var(--icon-gray-bg); }
+    .btn-action-light i { color: var(--primary-teal); font-size: 1.1rem; }
+
+    /* Productivity Tip */
+    .tip-card {
+      background: var(--btn-gradient);
+      border-radius: 20px;
+      padding: 24px;
+      color: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+    }
+    .tip-card::after {
+      content: '\f0eb';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: -10px;
+      bottom: -20px;
+      font-size: 6rem;
+      color: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+    .tip-icon {
+      width: 32px; height: 32px; background-color: rgba(255,255,255,0.2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 0.9rem;
+    }
+    .tip-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .tip-text { font-size: 12px; font-weight: 500; line-height: 1.6; opacity: 0.9; }
+
+
+    /* --- Responsive --- */
+    @media (max-width: 992px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: block; }
+      .top-nav { padding: 0 20px; }
+      .page-container { padding: 24px 20px; }
+      .page-controls-header { flex-direction: column; align-items: flex-start; }
+      .calendar-actions { width: 100%; justify-content: space-between; }
+    }
+    
+    @media (max-width: 576px) {
+      .user-info { display: none; } 
+      .top-actions { gap: 14px; }
+      .calendar-actions { flex-direction: column; align-items: stretch; }
+      .date-navigator { justify-content: space-between; }
+      .toggle-group { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-container">
+      <div class="brand">
+        <span class="brand-text">TMG Portal</span>
+      </div>
+      <div class="brand-subtext">Worker Dashboard</div>
+    </div>
+    
+    <ul class="nav-links mt-2">
+      <li class="nav-item"><a href="../Worker-Dashboard/worker-dashboard.html" class="nav-link"><img src="../../../assets/icons/dash-icon.png" alt="" width="18px" height="16px">Dashboard</a></li>
+      <li class="nav-item"><a href="#" class="nav-link active"><img src="../../../assets/icons/calendar-icon.png" alt="" width="18px" height="16px">Calendar</a></li>
+      <li class="nav-item"><a href="../Participant/worker-participant.html" class="nav-link"><img src="../../../assets/icons/participants-icon.png" alt="" width="22px" height="18px">Participants</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/resources-icon.png" alt="" width="18px" height="18px"> Resources</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/two-fector-icon.png" alt="" width="18px" height="18px">Compliance</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/learning-hub.png" alt="" width="18px" height="18px"> Learning Hub</a></li>
+      <li class="nav-item"><a href="#" class="nav-link"><img src="../../../assets/icons/settings-icon.png" alt="" width="18px" height="18px">Settings</a></li>
+    </ul>
+    
+    <div class="nav-footer">
+      <a href="#" class="btn-help-center"><i class="fa-regular fa-circle-question"></i> Help Center</a>
+      <a href="#" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-nav">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bars mobile-toggle" id="mobileToggle"></i>
+        
+        <div class="search-container d-none d-md-flex">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search sessions or resources...">
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <i class="fa-regular fa-bell header-icon has-notification"></i>
+        <i class="fa-regular fa-message header-icon"></i>
+        
+        <div class="user-profile">
+          <div class="user-info d-none d-sm-block">
+            <div class="name">Sarah Jenkins</div>
+            <div class="role">Support Worker</div>
+          </div>
+          <img src="../../../assets/images/Worker Avatar.png" alt="User" class="avatar">
+        </div>
+      </div>
+    </header>
+
+    <div class="page-container">
+      
+      <div class="page-controls-header">
+        <div class="page-title">
+          <h2>Calendar</h2>
+          <p>Manage your professional schedule with precision.</p>
+        </div>
+
+        <div class="calendar-actions">
+          <div class="toggle-group">
+            <div class="toggle-btn">Day</div>
+            <div class="toggle-btn active">Week</div>
+            <div class="toggle-btn">Month</div>
+          </div>
+          
+          <div class="date-navigator">
+            <i class="fa-solid fa-chevron-left nav-arrow"></i>
+            <div class="current-date">October<br>2023</div>
+            <i class="fa-solid fa-chevron-right nav-arrow"></i>
+          </div>
+          
+          <button class="btn-today">Today</button>
+          
+          <button class="btn-add-session"><i class="fa-solid fa-plus"></i> Add Session</button>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        
+        <div class="col-xl-9 col-lg-8">
+          <div class="calendar-card">
+            
+            <div class="calendar-wrapper">
+              <div class="calendar-main">
+                
+                <div class="cal-header-row">
+                  <div class="cal-time-col-header"></div>
+                  <div class="cal-day-col active">
+                    <span class="day-name">Mon</span>
+                    <span class="day-number">23</span>
+                  </div>
+                  <div class="cal-day-col">
+                    <span class="day-name">Tue</span>
+                    <span class="day-number">24</span>
+                  </div>
+                  <div class="cal-day-col">
+                    <span class="day-name">Wed</span>
+                    <span class="day-number">25</span>
+                  </div>
+                  <div class="cal-day-col">
+                    <span class="day-name">Thu</span>
+                    <span class="day-number">26</span>
+                  </div>
+                  <div class="cal-day-col">
+                    <span class="day-name">Fri</span>
+                    <span class="day-number">27</span>
+                  </div>
+                </div>
+
+                <div class="cal-body">
+                  
+                  <div class="grid-lines-bg">
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line" style="border-bottom: 1px solid var(--border-color);"></div>
+                  </div>
+                  
+                  <div class="day-column-borders">
+                    <div class="col-border"></div>
+                    <div class="col-border"></div>
+                    <div class="col-border"></div>
+                    <div class="col-border"></div>
+                    <div class="col-border"></div>
+                  </div>
+
+                  <div class="time-labels">
+                    <div class="time-label">08:00 AM</div>
+                    <div class="time-label">09:00 AM</div>
+                    <div class="time-label">10:00 AM</div>
+                    <div class="time-label">11:00 AM</div>
+                    <div class="time-label">12:00 PM</div>
+                    <div class="time-label">01:00 PM</div>
+                  </div>
+
+                  <div class="events-container">
+                    
+                    <div class="current-time-line" style="top: 220px;"></div>
+
+                    <div class="day-slot">
+                      <div class="cal-event teal" style="top: 80px; height: 120px;">
+                        <div class="ev-top">
+                          <span class="ev-status completed">Completed</span>
+                          <span class="ev-meta"><i class="fa-solid fa-video"></i> Online</span>
+                        </div>
+                        <div class="ev-time">09:00 - 10:30</div>
+                        <div class="ev-title mt-1">Support Coordination</div>
+                      </div>
+                    </div>
+
+                    <div class="day-slot">
+                      <div class="cal-event blue" style="top: 200px; height: 160px; z-index: 10;">
+                        <div class="ev-top">
+                          <span class="ev-status ongoing">Ongoing</span>
+                        </div>
+                        <div class="ev-time">10:30 - 12:30</div>
+                        <div class="ev-title mt-1">Occupational Therapy</div>
+                      </div>
+                    </div>
+
+                    <div class="day-slot">
+                      <div class="cal-event purple" style="top: 340px; height: 80px;">
+                        <div class="ev-top">
+                          <span class="ev-status upcoming">Upcoming</span>
+                        </div>
+                        <div class="ev-time">12:15 - 01:15</div>
+                        <div class="ev-title">Progress Review</div>
+                        <div class="ev-meta mt-1"><i class="fa-solid fa-video"></i> Online</div>
+                      </div>
+                    </div>
+
+                    <div class="day-slot">
+                      </div>
+
+                    <div class="day-slot">
+                      <div class="cal-event gray" style="top: 80px; height: 80px;">
+                        <div class="ev-time">09:00 - 10:00</div>
+                        <div class="ev-title mt-1">Team Sync</div>
+                        <div class="ev-meta mt-1"><i class="fa-regular fa-user"></i> Meeting</div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4">
+          <div class="right-sidebar">
+            
+            <div class="overview-card">
+              <div class="sidebar-title">Today's Overview</div>
+              
+              <div class="stat-row">
+                <div class="stat-icon">
+                    <!-- <i class="fa-regular fa-calendar-check"></i> -->
+                     <img src="../../../assets/icons/calender-session-icon.png" alt="">
+                </div>
+                <div class="stat-details">
+                  <div class="stat-label">SESSIONS</div>
+                  <div class="stat-value">04</div>
+                </div>
+                <div class="stat-extra"><i class="fa-solid fa-arrow-trend-up"></i></div>
+              </div>
+
+              <div class="stat-row mb-0">
+                <div class="stat-icon">
+                    <!-- <i class="fa-solid fa-stopwatch"></i> -->
+                     <img src="../../../assets/icons/billable-icon.png" alt="">
+                </div>
+                <div class="stat-details">
+                  <div class="stat-label">BILLABLE</div>
+                  <div class="stat-value">6.5h</div>
+                </div>
+                <div class="stat-extra" style="color: var(--text-light);"><i class="fa-solid fa-circle-info"></i></div>
+              </div>
+
+              <div class="priority-box">
+                <div class="p-label">NEXT PRIORITY</div>
+                <div class="p-title">Progress Review</div>
+                <div class="p-time"><i class="fa-regular fa-clock"></i> Starts in 45 mins</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-header-split">
+                <h6>Upcoming</h6>
+                <a href="#">View All</a>
+              </div>
+              
+              <div class="upcoming-card">
+                <div class="up-time">
+                  <span>Tomorrow, 10:00 AM</span>
+                  <div class="up-dot"></div>
+                </div>
+                <div class="up-title">Physiotherapy Support</div>
+                <div class="up-user">
+                  <img src="../../../assets/images/dr.-sarah cen.png" alt="Dr. Chen">
+                  <span>Dr. Sarah Chen</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashed-actions">
+              <button class="btn-action-light">
+                <!-- <i class="fa-solid fa-door-open"></i> -->
+                 <img src="../../../assets/icons/book-room-icon.png" alt="">
+                 Book a Room
+              </button>
+              <button class="btn-action-light">
+                <!-- <i class="fa-regular fa-calendar-xmark"></i>  -->
+                 <img src="../../../assets/icons/block-time-icon.png" alt="">
+                Block Time
+              </button>
+            </div>
+
+            <div class="tip-card">
+              <div class="tip-icon">
+                <!-- <i class="fa-solid fa-lightbulb"></i> -->
+                 <img src="../../../assets/icons/productivity-icon.png" alt="">
+            </div>
+              <div class="tip-title">Productivity Tip</div>
+              <div class="tip-text">Friday afternoon looks clear. Ideal for finalizing your weekly clinical notes and NDIS reporting.</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleBtn = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      toggleBtn.addEventListener("click", function() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      });
+
+      overlay.addEventListener("click", function() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      });
+
+      // Group Toggle UI
+      const toggleBtns = document.querySelectorAll('.toggle-btn');
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          toggleBtns.forEach(t => t.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

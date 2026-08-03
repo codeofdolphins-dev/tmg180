@@ -1,0 +1,257 @@
+import {
+  LayoutDashboard,
+  User,
+  NotebookPen,
+  CalendarDays,
+  Search,
+  HelpCircle,
+  Lock,
+  Settings,
+  Flower2,
+  Heart,
+  Pill,
+  MessageSquareText,
+  Lightbulb,
+  ArrowLeft,
+  ArrowRight,
+  Mail,
+} from 'lucide-react';
+
+import { useNavigate } from 'react-router-dom';
+import { useRoleNav } from '../navigation/useRoleNav';
+import { PARTICIPANT_PATHS } from '../routes/paths';
+const NAV_ITEMS = [
+  { label: 'Dashboard', icon: LayoutDashboard },
+  { label: 'My Profile', icon: User },
+  { label: 'Daily Log', icon: NotebookPen },
+  { label: 'Monthly Snapshot', icon: CalendarDays },
+  { label: 'Browse Directory', icon: Search },
+];
+
+const BOTTOM_ITEMS = [
+  { label: 'Help Centre', icon: HelpCircle },
+  { label: 'Privacy & Sharing', icon: Lock },
+];
+
+const PERSONAL_CARE_OPTIONS = [
+  'Showering',
+  'Dressing',
+  'Grooming',
+  'Eating',
+  'Toileting',
+  'Oral hygiene',
+];
+
+const MEDICATION_OPTIONS = [
+  'Independent',
+  'Reminders',
+  'Full assistance',
+  'Assistance preparing medication',
+];
+
+const INFO_PARAGRAPHS = [
+  'Your self-care information belongs to you.',
+  "Share only what you're comfortable sharing.",
+  'You can update this information whenever your routines or support needs change.',
+];
+
+const HELP_PARAGRAPHS = [
+  'There are no right or wrong answers.',
+  'Tell us about the support you use in your daily self-care routine.',
+  'You can update this information whenever things change.',
+];
+
+function NavItem({ icon: Icon, label, active, small }) {
+  const go = useRoleNav('participant');
+  return (
+    <button
+      onClick={() => go(label)}
+      className={`w-full flex items-center gap-3 px-4 text-left rounded-full transition-colors ${
+        small ? 'py-2 text-xs font-bold' : 'py-3 text-sm'
+      } ${
+        active
+          ? 'bg-purple-600/30 text-brand-700 font-bold'
+          : 'text-[#4d4354] hover:bg-slate-100'
+      }`}
+    >
+      <Icon size={small ? 15 : 17} className="shrink-0" />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function CheckChip({ label }) {
+  return (
+    <button className="flex items-center gap-2.5 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-base text-[#0b1c30] hover:bg-slate-50 transition-colors">
+      <span className="w-4.5 h-4.5 rounded border border-slate-400 bg-white shrink-0" />
+      {label}
+    </button>
+  );
+}
+
+export default function ProfileSelfCare() {
+  const navigate = useNavigate();
+  return (
+    <div className="min-h-screen flex bg-[#f8f9ff] font-sans text-slate-800">
+      <aside className="w-64 shrink-0 bg-[#f8f9ff]/70 backdrop-blur-sm border-r border-slate-100 flex flex-col py-6 px-6">
+        <div className="flex items-center gap-3 mb-10 px-1">
+          <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-500 shadow flex items-center justify-center shrink-0">
+            <Flower2 size={20} className="text-white" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-brand-600 leading-none">TMG180</div>
+            <div className="text-xs font-bold text-[#4d4354] mt-1">Participant Portal</div>
+          </div>
+        </div>
+
+        <nav className="flex flex-col gap-2">
+          {NAV_ITEMS.map((item) => (
+            <NavItem key={item.label} {...item} active={item.label === 'My Profile'} />
+          ))}
+        </nav>
+
+        <div className="mt-auto pt-6 flex flex-col gap-1">
+          {BOTTOM_ITEMS.map((item) => (
+            <NavItem key={item.label} {...item} small />
+          ))}
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-16 shrink-0 bg-[#f8f9ff] border-b border-slate-200/70 flex items-center justify-end px-10">
+          <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#434655] hover:bg-white transition-colors">
+            <Settings size={20} />
+          </button>
+        </header>
+
+        <main className="flex-1 px-10 py-8">
+          <div className="max-w-236 flex flex-col gap-8">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+                Self-care
+              </h1>
+              <p className="text-base text-[#434655] max-w-2xl">
+                Help us understand your values, goals, and the support that makes a
+                difference in your life.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
+              <div className="flex flex-col gap-6">
+                <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Heart size={22} className="text-brand-600" />
+                    <h2 className="text-2xl font-semibold text-[#0b1c30]">Personal Care</h2>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0b1c30] mb-4">
+                    Tell us about your daily self-care routine and any support you use.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {PERSONAL_CARE_OPTIONS.map((label) => (
+                      <CheckChip key={label} label={label} />
+                    ))}
+                  </div>
+                </section>
+
+                <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Pill size={22} className="text-brand-600" />
+                    <h2 className="text-2xl font-semibold text-[#0b1c30]">
+                      Medication &amp; Health Routine
+                    </h2>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0b1c30] mb-4">
+                    Do you need any support with medication or daily health routines?
+                  </p>
+                  <div className="flex flex-wrap gap-3 mb-5">
+                    {MEDICATION_OPTIONS.map((label) => (
+                      <CheckChip key={label} label={label} />
+                    ))}
+                  </div>
+                  <div className="rounded-lg border border-slate-300 bg-white p-4 min-h-30">
+                    <p className="text-base text-[#6b7280]">
+                      Tell us anything else that helps with your daily routine.
+                    </p>
+                  </div>
+                </section>
+
+                <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <MessageSquareText size={22} className="text-brand-600" />
+                    <h2 className="text-2xl font-semibold text-[#0b1c30]">Daily Supports</h2>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0b1c30] mb-4">
+                    Are there any routines or equipment that help you with self-care?
+                  </p>
+                  <div className="rounded-lg border border-slate-300 bg-white p-4 min-h-30">
+                    <p className="text-base text-[#6b7280]">
+                      Shower chair, grab rails, reminder apps, adaptive equipment...
+                    </p>
+                  </div>
+                </section>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <section className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-sm font-bold text-brand-600 mb-4">
+                    Personal Profile Status
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <span className="bg-[#dce9ff] rounded-full px-4 py-1.5 text-base font-medium text-[#434655]">
+                      In progress
+                    </span>
+                    <span className="text-lg text-[#434655]">07/11</span>
+                  </div>
+                </section>
+
+                <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
+                  <h3 className="text-base font-bold text-[#006c49] mb-3">
+                    Your Information
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {INFO_PARAGRAPHS.map((p) => (
+                      <p key={p} className="text-base text-[#434655]">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Lightbulb size={18} className="text-[#2a1700]" />
+                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {HELP_PARAGRAPHS.map((p) => (
+                      <p key={p} className="text-sm italic text-[#653e00]">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <div className="pt-8 flex items-center justify-between">
+              <button onClick={() => navigate(PARTICIPANT_PATHS.profileSocialCommunity)} className="flex items-center gap-2 rounded-lg border border-brand-600 bg-white px-6 py-3 text-base text-brand-600 hover:bg-brand-50 transition-colors">
+                <ArrowLeft size={16} />
+                Previous
+              </button>
+              <div className="flex items-center gap-4">
+                <button className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-base text-[#434655] hover:bg-slate-50 transition-colors">
+                  <Mail size={18} />
+                  Save Draft
+                </button>
+                <button className="flex items-center gap-2 rounded-lg bg-brand-600 px-8 py-3 text-base font-semibold text-white hover:bg-brand-700 transition-colors">
+                  Next Step
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

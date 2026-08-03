@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROLES } from '../store';
 import { PUBLIC_PATHS } from './paths';
-import RequireRole, { RootRedirect } from './RequireRole';
-import { publicRoutes } from './publicRoutes';
+import RequireRole, { RequireSession, RootRedirect } from './RequireRole';
+import { publicRoutes, sessionRoutes } from './publicRoutes';
 import { participantRoutes } from './participantRoutes';
 import { workerRoutes } from './workerRoutes';
 import { adminRoutes } from './adminRoutes';
@@ -15,6 +15,12 @@ export default function AppRoutes() {
       {publicRoutes.map(({ path, element }) => (
         <Route key={path} path={path} element={element} />
       ))}
+
+      <Route element={<RequireSession />}>
+        {sessionRoutes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+      </Route>
 
       <Route path="/participant" element={<RequireRole role={ROLES.PARTICIPANT} />}>
         {participantRoutes.map(({ path, element }) => (

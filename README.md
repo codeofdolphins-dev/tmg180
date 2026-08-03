@@ -1,16 +1,60 @@
-# React + Vite
+# TMG180
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+pnpm monorepo. React + Vite web app, Express + Postgres API serving both web and
+mobile clients, and shared packages consumed by all of them.
 
-Currently, two official plugins are available:
+```
+apps/
+  web/          React 19 + Vite 8 + Tailwind v4 (the 69 screens)
+  api/          Express 5 + Postgres, mounted at /api/v1
+packages/
+  shared/       Roles + evidence-chain rules that must hold on every client
+  terminology/  Terminology registry client + banned-term guard
+  api-client/   Bearer-token HTTP client — web today, React Native later
+md/             Specification documents (start with md/INDEX.md)
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Requirements
 
-## React Compiler
+- Node >= 22
+- pnpm 11 (`corepack enable pnpm`)
+- Postgres (for the API; the web app runs standalone on mock data)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the Oxlint configuration
+```bash
+pnpm install
+cp apps/api/.env.example apps/api/.env   # then fill in the secrets
+pnpm dev                                  # web on :5173, api on :4000
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+`pnpm dev` runs every app in parallel. To run one:
+
+```bash
+pnpm dev:web
+pnpm dev:api
+```
+
+The web dev server proxies `/api` to `http://localhost:4000`, so the browser
+sees one origin and needs no CORS preflight. Deployed builds set `VITE_API_URL`.
+
+## Other commands
+
+| Command | Effect |
+| --- | --- |
+| `pnpm build` | Builds every package that defines a build script |
+| `pnpm lint` | oxlint across the whole workspace |
+| `pnpm --filter @tmg180/web <script>` | Run a script in one workspace package |
+| `pnpm --filter @tmg180/api add <pkg>` | Add a dependency to one package |
+
+## Conventions
+
+- **Plain JSX, no TypeScript** — matches the existing 69 screens. JSDoc where
+  types genuinely help.
+- **Workspace packages are unbuilt ESM.** They export `./src/index.js` directly,
+  so there is no build step to sequence and no stale `dist` to debug.
+- **Add dependencies to the package that uses them**, never to the root. pnpm's
+  strict `node_modules` will fail the import otherwise — that is the point, and
+  `shamefully-hoist` is not the fix.
+- **API is versioned at `/api/v1`** and authenticates with bearer tokens rather
+  than cookies, so the mobile client uses the identical path.

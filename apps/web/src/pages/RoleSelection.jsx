@@ -42,12 +42,20 @@ const ROLES = [
   },
 ];
 
+/** Static class names — Tailwind can't see interpolated ones. */
+const COLUMNS = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' };
+
 export default function RoleSelection() {
   const navigate = useNavigate();
   const selectRole = useAuthStore((s) => s.selectRole);
+  const held = useAuthStore((s) => s.roles);
+
+  // Only the workspaces this account holds. Roles are issued by the backend —
+  // this screen opens one, it never grants one.
+  const available = ROLES.filter((entry) => held.includes(entry.role));
 
   const enterPortal = (role) => {
-    selectRole(role);
+    if (!selectRole(role)) return;
     navigate(DASHBOARD_BY_ROLE[role]);
   };
 
@@ -60,8 +68,10 @@ export default function RoleSelection() {
         Choose how you’d like to experience the platform. Your journey begins here.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-300">
-        {ROLES.map(
+      <div
+        className={`grid grid-cols-1 ${COLUMNS[available.length] ?? 'sm:grid-cols-3'} gap-8 w-full max-w-300`}
+      >
+        {available.map(
           ({ role, title, description, linkLabel, icon: Icon, iconBg, iconColor, accent, blob }) => (
             <div
               key={title}

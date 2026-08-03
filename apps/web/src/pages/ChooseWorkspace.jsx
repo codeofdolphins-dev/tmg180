@@ -28,7 +28,9 @@ const WORKSPACES = [
   },
   {
     role: ROLES.ADMIN,
-    label: 'TMG180 Governance Admin',
+    // "Governance Admin" is a banned term in the terminology registry; the
+    // Figma frame's wording is replaced here per the Drift Fix Pack.
+    label: 'TMG180 Platform Admin',
     subtitle: 'Access high-level administrative tools, system settings and oversight.',
     linkLabel: 'Enter Admin',
     icon: ShieldCheck,
@@ -38,12 +40,20 @@ const WORKSPACES = [
   },
 ];
 
+/** Static class names — Tailwind can't see interpolated ones. */
+const COLUMNS = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' };
+
 export default function ChooseWorkspace() {
   const navigate = useNavigate();
   const selectRole = useAuthStore((s) => s.selectRole);
+  const held = useAuthStore((s) => s.roles);
+
+  // Only the workspaces this account holds. Roles are issued by the backend —
+  // this screen opens one, it never grants one.
+  const available = WORKSPACES.filter((workspace) => held.includes(workspace.role));
 
   const enterWorkspace = (role) => {
-    selectRole(role);
+    if (!selectRole(role)) return;
     navigate(DASHBOARD_BY_ROLE[role]);
   };
 
@@ -56,8 +66,10 @@ export default function ChooseWorkspace() {
         Choose how you'd like to experience the platform. Your journey begins here.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl flex-1">
-        {WORKSPACES.map(({ role, label, subtitle, linkLabel, icon: Icon, iconBg, blob, accent }) => (
+      <div
+        className={`grid grid-cols-1 ${COLUMNS[available.length] ?? 'sm:grid-cols-3'} gap-6 w-full max-w-5xl flex-1`}
+      >
+        {available.map(({ role, label, subtitle, linkLabel, icon: Icon, iconBg, blob, accent }) => (
           <div
             key={label}
             className="relative overflow-hidden flex flex-col bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"

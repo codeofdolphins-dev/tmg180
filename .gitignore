@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Prisma's generated client — rebuilt by `pnpm db:generate`, never committed.
+apps/api/src/generated/
+
+# Env
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

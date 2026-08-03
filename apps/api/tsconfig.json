@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": false,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Every import must resolve to a real file on disk at runtime, and every
+    // type-only import must say so — Node erases types, it does not check them.
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  // prisma.config.ts is deliberately outside the build — the Prisma CLI loads
+  // it with its own TS loader and it must not land in dist/.
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

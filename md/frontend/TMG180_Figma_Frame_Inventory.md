@@ -16,14 +16,14 @@ Status legend: ✅ built (page exists mirroring the frame) · ⚠ built but flag
 
 | Frame | Node | Built page | Status |
 | --- | --- | --- | --- |
-| Sign In | 1169:5327 | [SignIn.jsx](../src/pages/SignIn.jsx) `/sign-in` | ✅ |
-| Check Your Email | 1169:5360 | [CheckYourEmail.jsx](../src/pages/CheckYourEmail.jsx) `/check-email` | ✅ |
-| Forgot Password | 1169:5399 | [ForgotPassword.jsx](../src/pages/ForgotPassword.jsx) `/forgot-password` | ✅ |
-| Reset Password | 1169:5449 | [ResetPassword.jsx](../src/pages/ResetPassword.jsx) `/reset-password` | ✅ |
-| Create New Password | 1169:5500 | [CreateNewPassword.jsx](../src/pages/CreateNewPassword.jsx) `/create-new-password` | ✅ |
-| Success State | 1169:5567 | [PasswordUpdated.jsx](../src/pages/PasswordUpdated.jsx) `/password-updated` | ✅ |
+| Sign In | 1169:5327 | [SignIn.jsx](../../apps/web/src/pages/SignIn.jsx) `/sign-in` | ✅ |
+| Check Your Email | 1169:5360 | [CheckYourEmail.jsx](../../apps/web/src/pages/CheckYourEmail.jsx) `/check-email` | ✅ |
+| Forgot Password | 1169:5399 | [ForgotPassword.jsx](../../apps/web/src/pages/ForgotPassword.jsx) `/forgot-password` | ✅ |
+| Reset Password | 1169:5449 | [ResetPassword.jsx](../../apps/web/src/pages/ResetPassword.jsx) `/reset-password` | ✅ |
+| Create New Password | 1169:5500 | [CreateNewPassword.jsx](../../apps/web/src/pages/CreateNewPassword.jsx) `/create-new-password` | ✅ |
+| Success State | 1169:5567 | [PasswordUpdated.jsx](../../apps/web/src/pages/PasswordUpdated.jsx) `/password-updated` | ✅ |
 | Role Selection | 1169:5586 | — | ❌ |
-| Choose Your Workspace | 1170:5875 | [ChooseWorkspace.jsx](../src/pages/ChooseWorkspace.jsx) `/choose-workspace` | ✅ |
+| Choose Your Workspace | 1170:5875 | [ChooseWorkspace.jsx](../../apps/web/src/pages/ChooseWorkspace.jsx) `/choose-workspace` | ✅ |
 | Choose Your Workspace (duplicate) | 1205:612 | duplicate frame — TITLE.md open question #3 (2-card vs 3-card variant) unresolved in the file | ⚠ |
 
 ## Participant portal (17 frames)
@@ -31,20 +31,20 @@ Status legend: ✅ built (page exists mirroring the frame) · ⚠ built but flag
 | Frame | Node | Built page | Status |
 | --- | --- | --- | --- |
 | Vibrant Participant Dashboard | 1169:234 | — | ❌ |
-| Daily Support Evidence Log (Draft) | 1169:825 | — (frame is **Participant Portal**; built [DailySupportEvidenceLog.jsx](../src/pages/DailySupportEvidenceLog.jsx) `/daily-log` carries **Worker Portal** sidebar) | ⚠❌ |
+| Daily Support Evidence Log (Draft) | 1169:825 | — (frame is **Participant Portal**; built [DailySupportEvidenceLog.jsx](../../apps/web/src/pages/DailySupportEvidenceLog.jsx) `/daily-log` carries **Worker Portal** sidebar) | ⚠❌ |
 | Daily Support Evidence Log (Submitted) | 1169:1112 | — (same mismatch) | ◐❌ |
 | Daily Support Evidence Log (Submitted + Addendum) | 1170:6606 | — | ◐❌ |
-| Monthly Snapshot Summary (Draft) | 1169:1349 | [MonthlySnapshotSummary.jsx](../src/pages/MonthlySnapshotSummary.jsx) `/snapshot/summary` | ✅ |
+| Monthly Snapshot Summary (Draft) | 1169:1349 | [MonthlySnapshotSummary.jsx](../../apps/web/src/pages/MonthlySnapshotSummary.jsx) `/snapshot/summary` | ✅ |
 | Monthly Snapshot Summary (Generating) | 1169:1671 | state variant | ◐ |
 | Monthly Snapshot Summary (Locked) | 1169:1767 | state variant | ◐ |
 | Monthly Snapshot Addendum | 1170:6451 | state variant | ◐ |
-| Snapshot Exports Dashboard | 1169:1940 | — (only the empty state exists: [EmptyExport.jsx](../src/pages/EmptyExport.jsx)) | ❌ |
-| Help Centre Dashboard | 1169:2152 | [HelpCentre.jsx](../src/pages/HelpCentre.jsx) `/help` (single page; also see Worker Help Centre below) | ✅ |
+| Snapshot Exports Dashboard | 1169:1940 | — (only the empty state exists: [EmptyExport.jsx](../../apps/web/src/pages/EmptyExport.jsx)) | ❌ |
+| Help Centre Dashboard | 1169:2152 | [HelpCentre.jsx](../../apps/web/src/pages/HelpCentre.jsx) `/help` (single page; also see Worker Help Centre below) | ✅ |
 | Privacy & Sharing Dashboard | 1169:2326 | — | ❌ |
-| Session Preferences Dashboard | 1170:5652 | [SessionPreferences.jsx](../src/pages/SessionPreferences.jsx) `/preferences` | ✅ |
-| Participant Library | 1170:5926 | [Library.jsx](../src/pages/Library.jsx) `/library` | ✅ |
-| Worker Profile Detail | 1170:6090 | [WorkerDirectoryProfile.jsx](../src/pages/WorkerDirectoryProfile.jsx) `/directory/profile` | ✅ |
-| Worker Directory - Favourites Tab | 1170:6301 | [WorkerDirectory.jsx](../src/pages/WorkerDirectory.jsx) `/directory` (tabs All Workers / Favourites) | ✅ |
+| Session Preferences Dashboard | 1170:5652 | [SessionPreferences.jsx](../../apps/web/src/pages/SessionPreferences.jsx) `/preferences` | ✅ |
+| Participant Library | 1170:5926 | [Library.jsx](../../apps/web/src/pages/Library.jsx) `/library` | ✅ |
+| Worker Profile Detail | 1170:6090 | [WorkerDirectoryProfile.jsx](../../apps/web/src/pages/WorkerDirectoryProfile.jsx) `/directory/profile` | ✅ |
+| Worker Directory - Favourites Tab | 1170:6301 | [WorkerDirectory.jsx](../../apps/web/src/pages/WorkerDirectory.jsx) `/directory` (tabs All Workers / Favourites) | ✅ |
 | **Browse Verified Workers** (post-override) | 1219:2237 | — implements Final Override P4 directory | ❌ |
 | **Relational Worker Profile - Sarah Mitchell** (post-override) | 1221:3413 | — implements Final Override P3 profile | ❌ |
 
@@ -59,37 +59,37 @@ Hub: **My Personal Profile** (1207:5). Sections in the file: About Me (1207:376)
 | Frame | Node | Built page | Status |
 | --- | --- | --- | --- |
 | Worker Workspace Dashboard | 1169:2660 | — | ❌ |
-| Participants I Support | 1169:2956 | [ParticipantsISupport.jsx](../src/pages/ParticipantsISupport.jsx) `/participants-i-support` | ✅ |
-| Worker Daily Support Evidence Log | 1169:3172 | [DailySupportEvidenceLog.jsx](../src/pages/DailySupportEvidenceLog.jsx) `/daily-log` and/or [DailyLogForm.jsx](../src/pages/DailyLogForm.jsx) `/daily-log/new` — visual confirmation pending | ⚠ |
+| Participants I Support | 1169:2956 | [ParticipantsISupport.jsx](../../apps/web/src/pages/ParticipantsISupport.jsx) `/participants-i-support` | ✅ |
+| Worker Daily Support Evidence Log | 1169:3172 | [DailySupportEvidenceLog.jsx](../../apps/web/src/pages/DailySupportEvidenceLog.jsx) `/daily-log` and/or [DailyLogForm.jsx](../../apps/web/src/pages/DailyLogForm.jsx) `/daily-log/new` — visual confirmation pending | ⚠ |
 | Approved Monthly Snapshots | 1169:3455 | — | ❌ |
 | Worker Portal - Learning Hub | 1169:3676 | — (only the resource detail exists) | ❌ |
-| Worker Governance Standing | 1169:3916 | — (built [GovernanceStanding.jsx](../src/pages/GovernanceStanding.jsx) is the **Admin** variant) | ❌ |
-| Worker Portal - Resources | 1170:6813 | [Resources.jsx](../src/pages/Resources.jsx) `/resources` | ✅ |
-| Worker Portal - Settings | 1170:7043 | [WorkerSettings.jsx](../src/pages/WorkerSettings.jsx) `/worker-settings` | ✅ |
-| Worker Calendar Dashboard | 1170:7390 | [Calendar.jsx](../src/pages/Calendar.jsx) `/calendar` | ✅ |
-| Worker Help Centre Dashboard | 1170:7686 | shares [HelpCentre.jsx](../src/pages/HelpCentre.jsx)? — one built page for two frames | ⚠ |
-| Governance Item Detail | 1170:7877 | [GovernanceItemDetail.jsx](../src/pages/GovernanceItemDetail.jsx) `/governance/item-detail` | ✅ |
-| Worker Profile & Availability | 1170:8069 | [WorkerProfile.jsx](../src/pages/WorkerProfile.jsx) `/profile` — ⚠ TITLE.md marked Weekly Availability for deletion; override P3 demotes availability to supporting details. Frame still in file. | ⚠ |
-| Worker Onboarding | 1170:8393 | [WorkerOnboarding.jsx](../src/pages/WorkerOnboarding.jsx) `/onboarding` | ✅ |
-| Worker Resource Detail | 1170:8551 | [LearningHubResource.jsx](../src/pages/LearningHubResource.jsx) `/learning-hub/resource` | ✅ |
+| Worker Governance Standing | 1169:3916 | — (built [GovernanceStanding.jsx](../../apps/web/src/pages/GovernanceStanding.jsx) is the **Admin** variant) | ❌ |
+| Worker Portal - Resources | 1170:6813 | [Resources.jsx](../../apps/web/src/pages/Resources.jsx) `/resources` | ✅ |
+| Worker Portal - Settings | 1170:7043 | [WorkerSettings.jsx](../../apps/web/src/pages/WorkerSettings.jsx) `/worker-settings` | ✅ |
+| Worker Calendar Dashboard | 1170:7390 | [Calendar.jsx](../../apps/web/src/pages/Calendar.jsx) `/calendar` | ✅ |
+| Worker Help Centre Dashboard | 1170:7686 | shares [HelpCentre.jsx](../../apps/web/src/pages/HelpCentre.jsx)? — one built page for two frames | ⚠ |
+| Governance Item Detail | 1170:7877 | [GovernanceItemDetail.jsx](../../apps/web/src/pages/GovernanceItemDetail.jsx) `/governance/item-detail` | ✅ |
+| Worker Profile & Availability | 1170:8069 | [WorkerProfile.jsx](../../apps/web/src/pages/WorkerProfile.jsx) `/profile` — ⚠ TITLE.md marked Weekly Availability for deletion; override P3 demotes availability to supporting details. Frame still in file. | ⚠ |
+| Worker Onboarding | 1170:8393 | [WorkerOnboarding.jsx](../../apps/web/src/pages/WorkerOnboarding.jsx) `/onboarding` | ✅ |
+| Worker Resource Detail | 1170:8551 | [LearningHubResource.jsx](../../apps/web/src/pages/LearningHubResource.jsx) `/learning-hub/resource` | ✅ |
 
 ## Admin / Platform Governance (13 frames)
 
 | Frame | Node | Built page | Status |
 | --- | --- | --- | --- |
-| TMG180 Platform Governance Dashboard | 1169:4181 | [PlatformGovernanceDashboard.jsx](../src/pages/PlatformGovernanceDashboard.jsx) `/governance/dashboard` | ✅ |
-| Admin Participant Overview | 1169:4370 | [ParticipantOverview.jsx](../src/pages/ParticipantOverview.jsx) `/participant-overview` — ⚠ TITLE.md marked this frame for **deletion** (violates side-by-side principle); still in file and still built | ⚠ |
-| Admin - Consent Audit Log | 1169:4639 | [ConsentAuditLog.jsx](../src/pages/ConsentAuditLog.jsx) `/consent-audit-log` | ✅ |
-| Add New Report | 1169:4853 | [AddNewReport.jsx](../src/pages/AddNewReport.jsx) `/reports/new` | ✅ |
-| Admin Profile Dashboard | 1169:5056 | [AdminProfile.jsx](../src/pages/AdminProfile.jsx) `/admin-profile` | ✅ |
-| Admin - Workers Report Dashboard | 1170:8762 | [WorkersReport.jsx](../src/pages/WorkersReport.jsx) `/workers/report` | ✅ |
-| Admin Governance Standing | 1170:9001 | [GovernanceStanding.jsx](../src/pages/GovernanceStanding.jsx) `/governance/standing` | ✅ |
-| Admin - Incidents & Complaints | 1170:9251 | [IncidentsComplaints.jsx](../src/pages/IncidentsComplaints.jsx) `/incidents` | ✅ |
-| Admin - Policies Management | 1170:9492 | [Policies.jsx](../src/pages/Policies.jsx) `/policies` | ✅ |
-| Admin - Settings Dashboard | 1170:9593 | [SettingsPage.jsx](../src/pages/SettingsPage.jsx) `/settings` | ✅ |
-| Report Detail | 1205:2 | [ReportDetail.jsx](../src/pages/ReportDetail.jsx) `/reports/detail` | ✅ |
-| Policy Version Detail | 1205:276 | [PolicyVersionDetail.jsx](../src/pages/PolicyVersionDetail.jsx) `/policies/version-detail` | ✅ |
-| Ticket Detail | 1205:669 | [TicketDetail.jsx](../src/pages/TicketDetail.jsx) `/tickets/detail` | ✅ |
+| TMG180 Platform Governance Dashboard | 1169:4181 | [PlatformGovernanceDashboard.jsx](../../apps/web/src/pages/PlatformGovernanceDashboard.jsx) `/governance/dashboard` | ✅ |
+| Admin Participant Overview | 1169:4370 | [ParticipantOverview.jsx](../../apps/web/src/pages/ParticipantOverview.jsx) `/participant-overview` — ⚠ TITLE.md marked this frame for **deletion** (violates side-by-side principle); still in file and still built | ⚠ |
+| Admin - Consent Audit Log | 1169:4639 | [ConsentAuditLog.jsx](../../apps/web/src/pages/ConsentAuditLog.jsx) `/consent-audit-log` | ✅ |
+| Add New Report | 1169:4853 | [AddNewReport.jsx](../../apps/web/src/pages/AddNewReport.jsx) `/reports/new` | ✅ |
+| Admin Profile Dashboard | 1169:5056 | [AdminProfile.jsx](../../apps/web/src/pages/AdminProfile.jsx) `/admin-profile` | ✅ |
+| Admin - Workers Report Dashboard | 1170:8762 | [WorkersReport.jsx](../../apps/web/src/pages/WorkersReport.jsx) `/workers/report` | ✅ |
+| Admin Governance Standing | 1170:9001 | [GovernanceStanding.jsx](../../apps/web/src/pages/GovernanceStanding.jsx) `/governance/standing` | ✅ |
+| Admin - Incidents & Complaints | 1170:9251 | [IncidentsComplaints.jsx](../../apps/web/src/pages/IncidentsComplaints.jsx) `/incidents` | ✅ |
+| Admin - Policies Management | 1170:9492 | [Policies.jsx](../../apps/web/src/pages/Policies.jsx) `/policies` | ✅ |
+| Admin - Settings Dashboard | 1170:9593 | [SettingsPage.jsx](../../apps/web/src/pages/SettingsPage.jsx) `/settings` | ✅ |
+| Report Detail | 1205:2 | [ReportDetail.jsx](../../apps/web/src/pages/ReportDetail.jsx) `/reports/detail` | ✅ |
+| Policy Version Detail | 1205:276 | [PolicyVersionDetail.jsx](../../apps/web/src/pages/PolicyVersionDetail.jsx) `/policies/version-detail` | ✅ |
+| Ticket Detail | 1205:669 | [TicketDetail.jsx](../../apps/web/src/pages/TicketDetail.jsx) `/tickets/detail` | ✅ |
 
 ## Empty / error / privacy states (10 frames — all built ✅)
 

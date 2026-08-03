@@ -10,7 +10,7 @@ import LinkExpired from '../pages/LinkExpired';
 import SomethingWentWrong from '../pages/SomethingWentWrong';
 import { PUBLIC_PATHS as P } from './paths';
 
-/** Auth flow + role selection + share-link/system states. No session required. */
+/** Auth flow + share-link/system states. No session required. */
 export const publicRoutes = [
   { path: P.signIn, element: <SignIn /> },
   { path: P.forgotPassword, element: <ForgotPassword /> },
@@ -18,8 +18,15 @@ export const publicRoutes = [
   { path: P.resetPassword, element: <ResetPassword /> },
   { path: P.createNewPassword, element: <CreateNewPassword /> },
   { path: P.passwordUpdated, element: <PasswordUpdated /> },
-  { path: P.roleSelection, element: <RoleSelection /> },
-  { path: P.chooseWorkspace, element: <ChooseWorkspace /> },
   { path: P.linkExpired, element: <LinkExpired /> },
   { path: P.error, element: <SomethingWentWrong /> },
+];
+
+/**
+ * Workspace pickers. These show what an account holds, so they need a session —
+ * they are not a way in.
+ */
+export const sessionRoutes = [
+  { path: P.roleSelection, element: <RoleSelection /> },
+  { path: P.chooseWorkspace, element: <ChooseWorkspace /> },
 ];

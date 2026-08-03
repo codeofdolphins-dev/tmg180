@@ -1,0 +1,14 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  '@prisma/engines': set this to true or false
+  esbuild: set this to true or false
+  prisma: set this to true or false
+
+# pnpm 10+ blocks dependency build scripts unless allowlisted here.
+onlyBuiltDependencies:
+  - esbuild
+  - prisma
+  - "@prisma/engines"

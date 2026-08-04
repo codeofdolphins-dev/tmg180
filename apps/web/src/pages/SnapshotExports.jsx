@@ -1,12 +1,5 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
   ShieldCheck,
-  Settings,
   KeyRound,
   Info,
   Download,
@@ -16,20 +9,6 @@ import {
   Copy,
   CheckCircle2,
 } from 'lucide-react';
-
-import { useRoleNav } from '../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: ShieldCheck },
-];
 
 const EXPORT_HISTORY = [
   {
@@ -62,23 +41,6 @@ const AUDIT_LOG = [
   { name: 'Dr. A. Smith (Viewed)', time: 'Oct 12, 2026 • 14:30 EST', check: true },
   { name: 'Link Generated', time: 'Oct 1, 2026 • 09:15 EST', badge: 'System' },
 ];
-
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 text-sm px-4 py-3 rounded-full text-left transition-colors ${
-        active
-          ? 'bg-purple-600 text-[#f6e6ff] font-bold'
-          : 'text-[#4d4354] hover:bg-white/70'
-      }`}
-    >
-      <Icon size={17} />
-      <span>{label}</span>
-    </button>
-  );
-}
 
 function PdfButton() {
   return (
@@ -142,48 +104,7 @@ function ExportRow({ item }) {
 
 export default function SnapshotExports() {
   return (
-    <div className="min-h-screen flex bg-white font-sans text-[#4d4354]">
-      <aside className="w-72 shrink-0 bg-[#eff4ff]/70 border-r border-slate-100 flex flex-col px-6 py-6">
-        <div className="flex items-center gap-4 px-2">
-          <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 text-[#7800ce] font-bold text-lg">
-            T
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-[#7800ce] leading-none">TMG180</div>
-            <div className="text-xs font-bold text-[#4d4354] mt-1">Participant Portal</div>
-          </div>
-        </div>
-
-        <nav className="mt-10 flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Monthly Snapshot'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 border-t border-slate-200/70 flex flex-col gap-2">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 shrink-0 bg-[#f8f9ff]/80 border-b border-slate-100 flex items-center justify-between px-6">
-          <div className="flex items-center gap-3 bg-[#f8f9ff] border border-slate-200 rounded-full px-4 py-2.5 w-80">
-            <Search size={16} className="text-[#4d4354] shrink-0" />
-            <span className="text-base text-[#4d4354]/60">Search TMG180</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#4d4354]">
-              <Settings size={20} />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-bold shrink-0">
-              P
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 px-10 py-10">
+    <>
           <h1 className="text-[32px] font-bold text-[#0b1c30]">Snapshot Exports</h1>
           <p className="text-lg text-[#4d4354] mt-2">
             You own this information. You decide who sees it.
@@ -325,8 +246,6 @@ export default function SnapshotExports() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+    </>
   );
 }

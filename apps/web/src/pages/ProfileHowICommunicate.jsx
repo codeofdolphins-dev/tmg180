@@ -1,59 +1,34 @@
-import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
-  Settings,
-  Flower2,
-  Speech,
-  BrainCog,
-  Lightbulb,
-  ArrowLeft,
-  ArrowRight,
-  Mail,
-} from 'lucide-react';
+import { Speech, BrainCog, Lightbulb, TriangleAlert } from 'lucide-react';
 
-import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
-import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
+import ProfileSectionFooter from '../components/ProfileSectionFooter';
+import { useSectionForm } from '../hooks/profile';
 
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
-
+/** Values match the preferred_communication options in @tmg180/shared. */
 const COMM_METHODS = [
   {
+    value: 'verbal_speech',
     title: 'Verbal Speech',
     description: 'I prefer speaking out loud and phone calls.',
-    selected: true,
   },
   {
+    value: 'text_based',
     title: 'Text-Based',
     description: 'I prefer messaging, emails, or chat.',
-    selected: false,
   },
   {
+    value: 'sign_language',
     title: 'Sign Language',
     description: 'ASL, BSL, or other manual languages.',
-    selected: false,
   },
   {
+    value: 'aac_tools',
     title: 'AAC Tools',
     description: 'Communication boards or digital apps.',
-    selected: false,
   },
 ];
+
+const HELPS_PLACEHOLDER =
+  'For example:\n\n• Give me extra time to respond.\n• Use simple, direct language.\n• Speak slowly.\n• Write things down if needed.\n• Reduce background noise.';
 
 const YOUR_INFORMATION = [
   'Your communication preferences belong to you.',
@@ -67,28 +42,13 @@ const NEED_HELP = [
   'You can update this information whenever your preferences change.',
 ];
 
-function NavItem({ icon: Icon, label, active, small }) {
-  const go = useRoleNav('participant');
+function MethodOption({ title, description, selected, onSelect }) {
   return (
     <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 px-4 text-left rounded-full transition-colors ${
-        small ? 'py-2 text-xs font-bold' : 'py-3 text-sm'
-      } ${
-        active
-          ? 'bg-purple-600/30 text-brand-700 font-semibold'
-          : 'text-slate-600 hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={small ? 15 : 17} className="shrink-0" />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function MethodOption({ title, description, selected }) {
-  return (
-    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
       className={`flex items-start gap-3 rounded-xl p-4 text-left transition-colors ${
         selected
           ? 'bg-purple-600/10 border border-brand-600'
@@ -111,42 +71,13 @@ function MethodOption({ title, description, selected }) {
 }
 
 export default function ProfileHowICommunicate() {
-  const navigate = useNavigate();
+  const section = useSectionForm('how-i-communicate');
+  const { status, position, error } = section;
+  const { register, watch, setValue } = section.form;
+  const preferred = watch('preferred_communication') ?? '';
+
   return (
-    <div className="min-h-screen flex bg-[#f8f9ff] font-sans text-slate-800">
-      <aside className="w-64 shrink-0 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-400 shadow flex items-center justify-center shrink-0">
-            <Flower2 size={20} className="text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-brand-600 leading-tight">TMG180</div>
-            <div className="text-xs font-bold text-slate-500 mt-1">Participant Portal</div>
-          </div>
-        </div>
-
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'My Profile'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 flex flex-col gap-2">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} small />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-end px-10 py-3.5">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:bg-white/70 transition-colors">
-            <Settings size={20} />
-          </button>
-        </header>
-
-        <main className="flex-1 px-10 pb-12 pt-4">
-          <div className="max-w-238 flex flex-col gap-6">
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
             <div>
               <h1 className="text-[32px] font-semibold text-slate-900">Communication</h1>
               <p className="text-base text-slate-600 mt-2 max-w-2xl">
@@ -164,9 +95,19 @@ export default function ProfileHowICommunicate() {
                       Preferred Communication
                     </h2>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {COMM_METHODS.map((m) => (
-                      <MethodOption key={m.title} {...m} />
+                  <div role="radiogroup" aria-label="Preferred communication" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {COMM_METHODS.map(({ value, title, description }) => (
+                      <MethodOption
+                        key={value}
+                        title={title}
+                        description={description}
+                        selected={preferred === value}
+                        onSelect={() =>
+                          setValue('preferred_communication', preferred === value ? '' : value, {
+                            shouldDirty: true,
+                          })
+                        }
+                      />
                     ))}
                   </div>
                 </div>
@@ -180,25 +121,33 @@ export default function ProfileHowICommunicate() {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm font-medium text-slate-600 tracking-wide">
+                      <label
+                        htmlFor="communication_helps"
+                        className="text-sm font-medium text-slate-600 tracking-wide"
+                      >
                         Tell us what helps communication work well for you.
                       </label>
-                      <div className="bg-white border border-slate-300 rounded-xl p-4 h-62.5 text-base text-gray-500">
-                        <p>For example:</p>
-                        <p className="mt-6">• Give me extra time to respond.</p>
-                        <p>• Use simple, direct language.</p>
-                        <p>• Speak slowly.</p>
-                        <p>• Write things down if needed.</p>
-                        <p>• Reduce background noise.</p>
-                      </div>
+                      <textarea
+                        id="communication_helps"
+                        placeholder={HELPS_PLACEHOLDER}
+                        className="bg-white border border-slate-300 rounded-xl p-4 h-62.5 resize-none text-base text-slate-900 placeholder:text-gray-500 outline-none focus:border-brand-600 transition-colors"
+                        {...register('communication_helps')}
+                      />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm font-medium text-slate-600 tracking-wide">
+                      <label
+                        htmlFor="additional_needs"
+                        className="text-sm font-medium text-slate-600 tracking-wide"
+                      >
                         Additional Communication Needs
                       </label>
-                      <div className="bg-white border border-slate-300 rounded-xl px-4 py-3 text-base text-gray-500">
-                        Sensory preferences, topics to avoid, etc.
-                      </div>
+                      <input
+                        id="additional_needs"
+                        type="text"
+                        placeholder="Sensory preferences, topics to avoid, etc."
+                        className="bg-white border border-slate-300 rounded-xl px-4 py-3 text-base text-slate-900 placeholder:text-gray-500 outline-none focus:border-brand-600 transition-colors"
+                        {...register('additional_needs')}
+                      />
                     </div>
                   </div>
                 </div>
@@ -210,10 +159,20 @@ export default function ProfileHowICommunicate() {
                     Personal Profile Status
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-base font-medium text-slate-600 bg-[#dce9ff] rounded-full px-4 py-1.5">
-                      In progress
+                    <span
+                      className={`text-base font-medium rounded-full px-4 py-1.5 ${
+                        status === 'complete'
+                          ? 'text-[#006c49] bg-emerald-100'
+                          : 'text-slate-600 bg-[#dce9ff]'
+                      }`}
+                    >
+                      {status === 'complete'
+                        ? 'Completed'
+                        : status === 'in_progress'
+                          ? 'In progress'
+                          : 'Not started'}
                     </span>
-                    <span className="text-lg text-slate-600">05/11</span>
+                    <span className="text-lg text-slate-600">{position}</span>
                   </div>
                 </div>
 
@@ -244,25 +203,17 @@ export default function ProfileHowICommunicate() {
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-8 flex items-center justify-between">
-              <button onClick={() => navigate(PARTICIPANT_PATHS.profileMobilityAccess)} className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-8 py-3 text-base text-slate-600 hover:bg-slate-50 transition-colors">
-                <ArrowLeft size={16} />
-                Previous
-              </button>
-              <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-6 py-3 text-base font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                  <Mail size={18} />
-                  Save Draft
-                </button>
-                <button className="flex items-center gap-2 bg-brand-600 rounded-xl px-10 py-3 text-base font-bold text-white hover:bg-brand-700 transition-colors">
-                  Next Step
-                  <ArrowRight size={16} />
-                </button>
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
+              >
+                <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                <span>{error.message}</span>
               </div>
-            </div>
-          </div>
-        </main>
-      </div>
+            )}
+
+            <ProfileSectionFooter {...section} />
     </div>
   );
 }

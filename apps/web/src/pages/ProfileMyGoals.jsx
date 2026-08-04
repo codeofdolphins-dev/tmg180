@@ -1,37 +1,16 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
-  Settings,
-  Flower2,
   Plus,
   CircleCheck,
   Circle,
   Sparkle,
   Lightbulb,
-  ArrowLeft,
-  ArrowRight,
+  TriangleAlert,
+  X,
 } from 'lucide-react';
 
-import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
-import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
+import { useFieldArray } from 'react-hook-form';
+import ProfileSectionFooter from '../components/ProfileSectionFooter';
+import { useSectionForm } from '../hooks/profile';
 
 const GOAL_EXAMPLES = [
   '• Becoming more independent at home',
@@ -51,62 +30,20 @@ const NEED_HELP = [
   'Small steps are often the easiest way to make progress.',
 ];
 
-function NavItem({ icon: Icon, label, active, small }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 px-4 text-left rounded-full transition-colors ${
-        small ? 'py-2 text-xs font-bold' : 'py-3 text-sm'
-      } ${
-        active
-          ? 'bg-purple-600/30 text-brand-700 font-semibold'
-          : 'text-slate-600 hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={small ? 15 : 17} className="shrink-0" />
-      <span>{label}</span>
-    </button>
-  );
-}
-
 export default function ProfileMyGoals() {
-  const navigate = useNavigate();
+  const section = useSectionForm('my-goals', {
+    // A blank step row is scaffolding, not an answer.
+    transform: (answers) => ({
+      ...answers,
+      goal_steps: (answers.goal_steps ?? []).filter((step) => step.text?.trim()),
+    }),
+  });
+  const { status, position, error } = section;
+  const { register, control, setValue, watch } = section.form;
+  const steps = useFieldArray({ control, name: 'goal_steps' });
+
   return (
-    <div className="min-h-screen flex bg-[#f8f9ff] font-sans text-slate-800">
-      <aside className="w-64 shrink-0 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-400 shadow flex items-center justify-center shrink-0">
-            <Flower2 size={20} className="text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-brand-600 leading-tight">TMG180</div>
-            <div className="text-xs font-bold text-slate-500 mt-1">Participant Portal</div>
-          </div>
-        </div>
-
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'My Profile'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 flex flex-col gap-2">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} small />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-end px-10 py-3.5">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:bg-white/70 transition-colors">
-            <Settings size={20} />
-          </button>
-        </header>
-
-        <main className="flex-1 px-10 pb-12 pt-4">
-          <div className="max-w-238 flex flex-col gap-6">
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
             <div>
               <h1 className="text-[32px] font-semibold text-slate-900">My Goals</h1>
               <p className="text-base text-slate-600 mt-2 max-w-2xl">
@@ -125,12 +62,12 @@ export default function ProfileMyGoals() {
                   <h2 className="text-2xl font-semibold text-slate-900 mt-2 mb-4">
                     What are you currently working towards?
                   </h2>
-                  <div className="bg-white border border-slate-300 rounded-lg p-4 h-58 text-base text-gray-500">
-                    <p>For example:</p>
-                    {GOAL_EXAMPLES.map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
-                  </div>
+                  <textarea
+                    aria-label="What are you currently working towards?"
+                    placeholder={['For example:', ...GOAL_EXAMPLES].join('\n')}
+                    className="w-full bg-white border border-slate-300 rounded-lg p-4 h-58 resize-none text-base text-slate-900 placeholder:text-gray-500 outline-none focus:border-brand-600 transition-colors"
+                    {...register('primary_aspiration')}
+                  />
                 </div>
 
                 <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -138,24 +75,56 @@ export default function ProfileMyGoals() {
                     <h2 className="text-2xl font-semibold text-slate-900">
                       Steps Towards My Goal
                     </h2>
-                    <button className="flex items-center gap-1 text-base text-brand-600 hover:text-brand-700 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => steps.append({ text: '', done: false })}
+                      className="flex items-center gap-1 text-base text-brand-600 hover:text-brand-700 transition-colors"
+                    >
                       <Plus size={12} className="shrink-0" />
-                      + Add another step
+                      Add another step
                     </button>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-lg px-4 py-3">
-                      <CircleCheck size={20} className="text-emerald-600 shrink-0" />
-                      <div className="flex-1 rounded-lg px-3 py-2 text-base text-slate-900">
-                        Complete introductory module
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-lg px-4 py-3">
-                      <Circle size={20} className="text-slate-300 shrink-0" />
-                      <div className="flex-1 rounded-lg px-3 py-2 text-base text-gray-500">
-                        Enter your next step...
-                      </div>
-                    </div>
+                    {steps.fields.length === 0 && (
+                      <p className="text-base text-gray-500 px-1">
+                        Add the small steps that will get you there.
+                      </p>
+                    )}
+                    {steps.fields.map((field, index) => {
+                      const done = watch(`goal_steps.${index}.done`) ?? false;
+                      return (
+                        <div
+                          key={field.id}
+                          className="flex items-center gap-4 bg-white border border-slate-200 rounded-lg px-4 py-3"
+                        >
+                          <button
+                            type="button"
+                            aria-label={done ? 'Mark step as not done' : 'Mark step as done'}
+                            onClick={() => setValue(`goal_steps.${index}.done`, !done, { shouldDirty: true })}
+                          >
+                            {done ? (
+                              <CircleCheck size={20} className="text-emerald-600 shrink-0" />
+                            ) : (
+                              <Circle size={20} className="text-slate-300 shrink-0" />
+                            )}
+                          </button>
+                          <input
+                            type="text"
+                            placeholder="Enter your next step..."
+                            className="flex-1 rounded-lg px-3 py-2 text-base text-slate-900 placeholder:text-gray-500 outline-none"
+                            {...register(`goal_steps.${index}.text`)}
+                          />
+                          <button
+                            type="button"
+                            aria-label="Remove step"
+                            onClick={() => steps.remove(index)}
+                            className="text-slate-300 hover:text-slate-500 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -180,10 +149,20 @@ export default function ProfileMyGoals() {
                     Personal Profile Status
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-base font-medium text-slate-600 bg-[#dce9ff] rounded-full px-4 py-1.5">
-                      In progress
+                    <span
+                      className={`text-base font-medium rounded-full px-4 py-1.5 ${
+                        status === 'complete'
+                          ? 'text-[#006c49] bg-emerald-100'
+                          : 'text-slate-600 bg-[#dce9ff]'
+                      }`}
+                    >
+                      {status === 'complete'
+                        ? 'Completed'
+                        : status === 'in_progress'
+                          ? 'In progress'
+                          : 'Not started'}
                     </span>
-                    <span className="text-lg text-slate-600">02/11</span>
+                    <span className="text-lg text-slate-600">{position}</span>
                   </div>
                 </div>
 
@@ -214,24 +193,17 @@ export default function ProfileMyGoals() {
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-8 flex items-center justify-between">
-              <button onClick={() => navigate(PARTICIPANT_PATHS.profileAboutMe)} className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-8 py-3 text-base text-slate-600 hover:bg-slate-50 transition-colors">
-                <ArrowLeft size={16} />
-                Previous
-              </button>
-              <div className="flex items-center gap-4">
-                <button onClick={() => navigate(PARTICIPANT_PATHS.profile)} className="bg-white border border-brand-200 rounded-full px-8 py-3 text-base text-brand-600 hover:bg-purple-50 transition-colors">
-                  Save &amp; Exit
-                </button>
-                <button onClick={() => navigate(PARTICIPANT_PATHS.profileDailyLiving)} className="flex items-center gap-2 bg-brand-600 rounded-full px-8 py-3 text-base text-white hover:bg-brand-700 transition-colors">
-                  Save &amp; Continue
-                  <ArrowRight size={16} />
-                </button>
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
+              >
+                <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                <span>{error.message}</span>
               </div>
-            </div>
-          </div>
-        </main>
-      </div>
+            )}
+
+            <ProfileSectionFooter {...section} />
     </div>
   );
 }

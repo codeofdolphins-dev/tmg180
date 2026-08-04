@@ -1,9 +1,16 @@
-import { MailCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MailCheck, LoaderCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useForgotPassword } from '../hooks/auth';
 import { PUBLIC_PATHS } from '../routes/paths';
 
 export default function CheckYourEmail() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const resend = useForgotPassword();
+
+  // Carried from Forgot Password. Someone landing here directly still sees a
+  // sensible screen, just without the address.
+  const email = location.state?.email ?? null;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex flex-col font-sans text-slate-800">
@@ -21,31 +28,48 @@ export default function CheckYourEmail() {
             Check your email
           </h1>
           <p className="text-sm text-slate-500 leading-relaxed mb-6">
-            We sent a reset link to your email address. Please follow the instructions
-            to continue.
+            {email ? (
+              <>
+                If <span className="font-medium text-slate-700">{email}</span> has an account,
+                we&apos;ve sent a reset link. Please follow the instructions to continue.
+              </>
+            ) : (
+              <>
+                We sent a reset link to your email address. Please follow the instructions to
+                continue.
+              </>
+            )}
           </p>
 
           <button
-            onClick={() => navigate(PUBLIC_PATHS.resetPassword)}
+            onClick={() => navigate(PUBLIC_PATHS.signIn)}
             className="w-full bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 text-white text-sm font-semibold rounded-full py-3.5 transition-opacity"
           >
-            Open Email App
-          </button>
-
-          <button
-            onClick={() => navigate(PUBLIC_PATHS.signIn)}
-            className="text-sm font-medium text-brand-600 hover:text-brand-800 mt-4 transition-colors"
-          >
-            Skip, I'll confirm later
+            Return to Sign In
           </button>
 
           <div className="w-full border-t border-slate-100 mt-6 pt-5">
-            <p className="text-sm text-slate-500">
-              Didn't receive the email?{' '}
-              <button className="font-medium text-brand-600 hover:text-brand-800 transition-colors">
-                Click to resend
-              </button>
-            </p>
+            {resend.isSuccess ? (
+              <p className="text-sm text-emerald-600">Sent. Check your inbox again in a moment.</p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                Didn&apos;t receive the email?{' '}
+                <button
+                  type="button"
+                  disabled={!email || resend.isPending}
+                  onClick={() => resend.mutate(email)}
+                  className="font-medium text-brand-600 hover:text-brand-800 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1"
+                >
+                  {resend.isPending && <LoaderCircle size={13} className="animate-spin" />}
+                  Click to resend
+                </button>
+              </p>
+            )}
+            {resend.error && (
+              <p role="alert" className="text-xs text-rose-600 mt-2">
+                {resend.error.message}
+              </p>
+            )}
           </div>
         </div>
       </div>

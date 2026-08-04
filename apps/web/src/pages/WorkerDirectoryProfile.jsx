@@ -1,11 +1,5 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
   CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
   ArrowLeft,
   Heart,
   MapPin,
@@ -25,20 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
 import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
 
 const SUPPORT_AREAS = [
   'Daily living',
@@ -61,23 +42,6 @@ const AVAILABILITY = [
   { day: 'Friday', morning: true, afternoon: true, evening: false },
 ];
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
 function CardTitle({ icon: Icon, title }) {
   return (
     <div className="flex items-center gap-2 mb-4">
@@ -98,31 +62,7 @@ function AvailabilityDot({ available }) {
 export default function WorkerDirectoryProfile() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="mb-6 px-2">
-          <div className="text-lg font-black tracking-wider text-brand-700 leading-none">
-            TMG180
-          </div>
-          <div className="text-xs text-slate-400 mt-0.5">Human-Centered Support</div>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Browse Directory'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 flex flex-col gap-1">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto flex flex-col gap-4">
+    <div className="max-w-4xl mx-auto flex flex-col gap-4">
             <button
               onClick={() => navigate(PARTICIPANT_PATHS.directory)}
               className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors w-fit"
@@ -287,9 +227,6 @@ export default function WorkerDirectoryProfile() {
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

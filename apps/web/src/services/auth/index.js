@@ -1,17 +1,59 @@
 /**
- * The app's single auth seam. Every screen and the auth store talk to
- * `authService` — never to a backend module directly — so moving off mock
- * accounts is this one switch.
+ * The app's single auth seam. Screens and hooks talk to `authService`, never to
+ * the HTTP client directly.
  *
- * Set VITE_AUTH_BACKEND=api once the API has real user tables. Until then the
- * mock backend runs, including in production builds, because there is nothing
- * else to sign in against.
+ * Every call here reaches the API. There is no mock path: a screen that looks
+ * signed in without a server session is worse than one that fails loudly.
  */
-import { mockAuthBackend } from './mockAuthBackend.js';
-import { apiAuthBackend } from './apiAuthBackend.js';
+import { AUTH_ERROR } from '@tmg180/shared';
+import { api } from '../../lib/apiClient';
+import { AuthError } from './AuthError.js';
 
-export const USING_MOCK_AUTH = (import.meta.env.VITE_AUTH_BACKEND ?? 'mock') !== 'api';
+/** Accepts today's roles[] payload and a single-role one, defensively. */
+const rolesOf = (user) => user?.roles ?? (user?.role ? [user.role] : []);
 
-export const authService = USING_MOCK_AUTH ? mockAuthBackend : apiAuthBackend;
+const asAuthError = (error) =>
+  new AuthError(
+    error?.code ?? AUTH_ERROR.INVALID_CREDENTIALS,
+    error?.message ?? 'Something went wrong. Please try again.',
+    error?.details
+  );
+
+/** Keeps every rejection an AuthError, so screens switch on `code` only. */
+async function call(work) {
+  try {
+    return await work();
+  } catch (error) {
+    throw asAuthError(error);
+  }
+}
+
+export const authService = {
+  signIn: ({ email, password }) =>
+    call(async () => {
+      const user = await api.auth.signIn(email, password);
+      return { user, roles: rolesOf(user) };
+    }),
+
+  signUp: (details) =>
+    call(async () => {
+      const user = await api.auth.signUp(details);
+      return { user, roles: rolesOf(user) };
+    }),
+
+  me: () =>
+    call(async () => {
+      const user = await api.auth.me();
+      return { user, roles: rolesOf(user) };
+    }),
+
+  signOut: () => call(() => api.auth.signOut()),
+
+  forgotPassword: (email) => call(() => api.auth.forgotPassword(email)),
+
+  verifyResetToken: (token) => call(() => api.auth.verifyResetToken(token)),
+
+  resetPassword: ({ token, password }) => call(() => api.auth.resetPassword(token, password)),
+};
 
 export { AuthError } from './AuthError.js';

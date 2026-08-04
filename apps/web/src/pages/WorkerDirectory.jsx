@@ -1,33 +1,12 @@
 import { useState } from 'react';
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
-  LogOut,
   Info,
   Heart,
   MapPin,
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
 import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
 
 const TABS = ['All Workers', 'Favourites'];
 
@@ -49,23 +28,6 @@ const WORKERS = [
     availability: 'Weekends',
   },
 ];
-
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
 
 function WorkerCard({ worker }) {
   const navigate = useNavigate();
@@ -130,34 +92,7 @@ export default function WorkerDirectory() {
   const [activeTab, setActiveTab] = useState('Favourites');
 
   return (
-    <div className="min-h-screen flex bg-linear-to-br from-white via-white to-purple-100 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="mb-6 px-2">
-          <div className="text-lg font-black tracking-wider text-blue-600 leading-none">
-            TMG180
-          </div>
-          <div className="text-xs text-slate-400 mt-0.5">Participant Portal</div>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Browse Directory'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 flex flex-col gap-1">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
-          ))}
-          <div className="border-t border-slate-100 mt-2 pt-2">
-            <NavItem icon={LogOut} label="Logout" />
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto flex flex-col gap-5">
+    <div className="max-w-4xl mx-auto flex flex-col gap-5">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">
                 Browse verified worker profiles
@@ -197,9 +132,6 @@ export default function WorkerDirectory() {
                 <WorkerCard key={w.name} worker={w} />
               ))}
             </div>
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

@@ -22,11 +22,14 @@ import WorkerDirectoryProfile from '../pages/WorkerDirectoryProfile';
 import Library from '../pages/Library';
 import SessionPreferences from '../pages/SessionPreferences';
 import PrivacySharing from '../pages/PrivacySharing';
-import HelpCentre from '../pages/HelpCentre';
+import ParticipantHelpCentre from '../pages/ParticipantHelpCentre';
 import PermissionDeniedParticipant from '../pages/PermissionDeniedParticipant';
 import { PARTICIPANT_PATHS as P, rel } from './paths';
 
-/** Participant Portal — participant-owned records, browse + direct contact. */
+/**
+ * Participant Portal — participant-owned records, browse + direct contact.
+ * These render inside ParticipantLayout (shared fixed sidebar + top bar).
+ */
 export const participantRoutes = [
   { path: rel(P.dashboard), element: <ParticipantDashboard /> },
   { path: rel(P.profile), element: <MyPersonalProfile /> },
@@ -52,6 +55,10 @@ export const participantRoutes = [
   { path: rel(P.library), element: <Library /> },
   { path: rel(P.preferences), element: <SessionPreferences /> },
   { path: rel(P.privacySharing), element: <PrivacySharing /> },
-  { path: rel(P.help), element: <HelpCentre /> },
+  { path: rel(P.help), element: <ParticipantHelpCentre /> },
+];
+
+/** Full-screen states that intentionally render without the portal chrome. */
+export const participantStandaloneRoutes = [
   { path: rel(P.permissionDenied), element: <PermissionDeniedParticipant /> },
 ];

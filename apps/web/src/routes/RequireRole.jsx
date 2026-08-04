@@ -5,7 +5,8 @@ import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from './paths';
 
 /**
  * Route guard for a role-namespaced branch.
- * Not signed in -> sign-in. No usable workspace open -> workspace picker.
+ * Not signed in -> sign-in. No usable workspace open -> the account's own
+ * dashboard (roles are server-issued, so there is always one to open).
  * Signed in with a different workspace open -> that workspace's dashboard.
  */
 export default function RequireRole({ role }) {
@@ -19,7 +20,8 @@ export default function RequireRole({ role }) {
   }
   // Covers "no workspace open yet" and a stored role the account doesn't hold.
   if (!canUseRole(roles, activeRole)) {
-    return <Navigate to={PUBLIC_PATHS.chooseWorkspace} replace />;
+    if (!roles[0]) return <Navigate to={PUBLIC_PATHS.signIn} state={{ from: location }} replace />;
+    return <Navigate to={DASHBOARD_BY_ROLE[roles[0]]} replace />;
   }
   if (activeRole !== role) {
     return <Navigate to={DASHBOARD_BY_ROLE[activeRole]} replace />;
@@ -45,6 +47,7 @@ export function RootRedirect() {
   const activeRole = useAuthStore((s) => s.role);
 
   if (!isAuthenticated) return <Navigate to={PUBLIC_PATHS.signIn} replace />;
-  if (!canUseRole(roles, activeRole)) return <Navigate to={PUBLIC_PATHS.chooseWorkspace} replace />;
-  return <Navigate to={DASHBOARD_BY_ROLE[activeRole]} replace />;
+  const role = canUseRole(roles, activeRole) ? activeRole : roles[0];
+  if (!role) return <Navigate to={PUBLIC_PATHS.signIn} replace />;
+  return <Navigate to={DASHBOARD_BY_ROLE[role]} replace />;
 }

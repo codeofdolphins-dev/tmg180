@@ -30,6 +30,25 @@ export declare const ACCOUNT_STATUS: {
 
 export declare const SELF_SIGNUP_ROLES: readonly Role[];
 
+export interface RegistrationConsent {
+  id: string;
+  version: string;
+  required: boolean;
+  label: string;
+}
+
+export declare const REGISTRATION_CONSENTS: readonly RegistrationConsent[];
+
+export declare const REQUIRED_CONSENT_IDS: readonly string[];
+
+/** Ids of required consents the caller did not agree to. */
+export declare function missingConsents(given?: Record<string, boolean>): string[];
+
+/** What was agreed, at which wording version — for the audit record. */
+export declare function consentRecord(
+  given?: Record<string, boolean>
+): Array<{ id: string; version: string }>;
+
 export interface PasswordRule {
   id: string;
   label: string;
@@ -96,3 +115,79 @@ export declare function canFinaliseDailyLog(log: {
 }): { ok: boolean; errors: string[] };
 
 export declare function isAddendumOnly(record: { status?: string }): boolean;
+
+// --- profile.js ---
+
+export type AnswerVisibility = 'participant_private' | 'share_with_consent' | 'snapshot_only';
+
+export declare const ANSWER_VISIBILITY: {
+  readonly PRIVATE: 'participant_private';
+  readonly SHARE_WITH_CONSENT: 'share_with_consent';
+  readonly SNAPSHOT_ONLY: 'snapshot_only';
+};
+
+export type ProfileSectionStatus = 'not_started' | 'in_progress' | 'complete';
+
+export declare const PROFILE_SECTION_STATUS: {
+  readonly NOT_STARTED: 'not_started';
+  readonly IN_PROGRESS: 'in_progress';
+  readonly COMPLETE: 'complete';
+};
+
+export type ProfileQuestionType =
+  | 'text'
+  | 'textarea'
+  | 'select'
+  | 'multi'
+  | 'toggle'
+  | 'scale'
+  | 'steps';
+
+export interface ProfileQuestion {
+  key: string;
+  type: ProfileQuestionType;
+  required?: boolean;
+  options?: readonly string[];
+  min?: number;
+  max?: number;
+}
+
+export interface ProfileSection {
+  key: string;
+  order: number;
+  title: string;
+  questions: readonly ProfileQuestion[];
+}
+
+/** Any JSON-safe answer value; the question's type constrains the real shape. */
+export type ProfileAnswerValue =
+  | string
+  | boolean
+  | number
+  | string[]
+  | Array<{ text: string; done: boolean }>;
+
+export declare const PROFILE_SECTIONS: readonly ProfileSection[];
+
+export declare const PROFILE_TOTAL_SECTIONS: number;
+
+export declare function profileSection(key: string): ProfileSection | undefined;
+
+export declare function nextProfileSection(key: string): ProfileSection | null;
+
+export declare function isEmptyAnswer(value: unknown): boolean;
+
+export declare function validateAnswerValue(
+  question: ProfileQuestion,
+  value: unknown
+): string | null;
+
+export declare function validateSectionAnswers(
+  section: ProfileSection,
+  answers?: Record<string, unknown>
+): Record<string, string>;
+
+export declare function isSectionComplete(
+  section: ProfileSection,
+  answers?: Record<string, unknown>
+): boolean;

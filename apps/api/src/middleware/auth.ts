@@ -1,12 +1,18 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
-import { isRole, type Role } from '@tmg180/shared';
+import { isRole, sortRoles, type Role } from '@tmg180/shared';
 import { env } from '../config/env.js';
 import { forbidden, unauthorized } from './errors.js';
 
 /**
- * Verifies the bearer access token and attaches `req.user = { id, role }`.
+ * Verifies the bearer access token and attaches `req.user = { id, roles }`.
  * Bearer rather than cookie so the mobile client uses the same path.
+ *
+ * Stateless: the signature and expiry are the whole check, with no database
+ * round trip. That means an access token stays usable for the rest of its
+ * 15 minutes even if the account is suspended or its sessions are revoked —
+ * refresh is where those take effect. Tightening that is part of the deferred
+ * security pass.
  */
 export function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const header = req.get('authorization') ?? '';
@@ -20,19 +26,18 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
     const payload = jwt.verify(token, env.jwt.accessSecret) as JwtPayload;
     const id = Number(payload.sub);
 
-    // A token that survives verification can still carry a role we no longer
-    // recognise — treat that as invalid rather than trusting the claim.
-    if (!Number.isInteger(id) || !isRole(payload.role)) {
+    // A token that survives verification can still carry roles we no longer
+    // recognise — sortRoles drops those, and an empty set is not a session.
+    const roles = sortRoles(Array.isArray(payload.roles) ? payload.roles : []);
+    if (!Number.isInteger(id) || roles.length === 0) {
       return next(unauthorized('Invalid token.'));
     }
 
-    req.user = { id, role: payload.role };
+    req.user = { id, roles };
     next();
   } catch (error) {
     next(
-      unauthorized(
-        error instanceof jwt.TokenExpiredError ? 'Token expired.' : 'Invalid token.'
-      )
+      unauthorized(error instanceof jwt.TokenExpiredError ? 'Token expired.' : 'Invalid token.')
     );
   }
 }
@@ -48,7 +53,9 @@ export function requireRole(...roles: Role[]): RequestHandler {
 
   return function roleGuard(req, _res, next) {
     if (!req.user) return next(unauthorized());
-    if (!roles.includes(req.user.role)) return next(forbidden());
+    // Holding any one of the listed roles is enough — a participant/worker
+    // account reaches both workspaces from the same token.
+    if (!req.user.roles.some((held) => roles.includes(held))) return next(forbidden());
     next();
   };
 }

@@ -24,6 +24,52 @@ export const ACCOUNT_STATUS = {
  */
 export const SELF_SIGNUP_ROLES = [ROLES.PARTICIPANT, ROLES.WORKER];
 
+/**
+ * What a person agrees to when creating an account. Held here so the checkbox
+ * a person ticks and the record written to tmg_audit_log reference the same id
+ * and version — an acceptance record that can't be tied to exact wording is
+ * not worth much.
+ *
+ * The platform-provider acknowledgement exists because the Comprehensive Gaps
+ * Analysis flags non-disclosure as URGENT, and the Privacy Act's APP 5 wants
+ * collection notice given at the point of collection.
+ *
+ * WORDING IS PROVISIONAL — Sue Lowdon (framework author) signs off legally
+ * operative copy. Do not treat these strings as approved.
+ */
+export const REGISTRATION_CONSENTS = [
+  {
+    id: 'terms_and_privacy',
+    version: '2026-08',
+    required: true,
+    label: 'I agree to the TMG180 Terms of Service and Privacy Policy.',
+  },
+  {
+    id: 'platform_provider_disclosure',
+    version: '2026-08',
+    required: true,
+    label:
+      'I understand TMG180 is a platform provider under the NDIS Commission definition. TMG180 provides governance infrastructure — it does not deliver, coordinate, or supervise supports.',
+  },
+];
+
+export const REQUIRED_CONSENT_IDS = REGISTRATION_CONSENTS.filter(
+  (consent) => consent.required
+).map((consent) => consent.id);
+
+/** @returns {string[]} ids of required consents the caller did not agree to. */
+export function missingConsents(given = {}) {
+  return REQUIRED_CONSENT_IDS.filter((id) => given[id] !== true);
+}
+
+/** The acceptance record: what was agreed, at which version. */
+export function consentRecord(given = {}) {
+  return REGISTRATION_CONSENTS.filter((consent) => given[consent.id] === true).map((consent) => ({
+    id: consent.id,
+    version: consent.version,
+  }));
+}
+
 /** Wording matches the Create New Password screen's stated requirements. */
 export const PASSWORD_RULES = [
   { id: 'length', label: 'At least 8 characters', test: (value) => value.length >= 8 },

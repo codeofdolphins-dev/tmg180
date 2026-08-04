@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { health } from '../controllers/health.controller.js';
 import { authRoutes } from './auth.route.js';
+import { profileRoutes } from './profile.route.js';
 import { terminologyRoutes } from './terminology.route.js';
 
 /**
@@ -12,6 +13,7 @@ export const v1Routes = Router();
 v1Routes.get('/health', health);
 v1Routes.use('/auth', authRoutes);
 v1Routes.use('/terminology', terminologyRoutes);
+v1Routes.use('/participant', profileRoutes);
 
-// Still to build (22-item register): participants, goals, daily logs,
-// snapshots, consent, notifications, audit, exports.
+// Still to build (22-item register): goals, daily logs, snapshots, consent,
+// notifications, audit, exports.

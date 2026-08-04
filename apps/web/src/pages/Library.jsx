@@ -1,28 +1,13 @@
 import { useState } from 'react';
 import {
-  LayoutDashboard,
   User,
   NotebookPen,
-  CalendarDays,
   Search,
-  HelpCircle,
-  Lock,
   Network,
   BookOpen,
   PenLine,
   ArrowRight,
 } from 'lucide-react';
-
-import { useRoleNav } from '../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
 
 const TABS = ['Core Library', 'Optional Reading'];
 
@@ -71,23 +56,6 @@ const SECTIONS = [
   },
 ];
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
 function GuideCard({ icon: Icon, iconTone, readTime, title, desc, accent }) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-5">
@@ -117,37 +85,7 @@ export default function Library() {
   const [activeTab, setActiveTab] = useState('Core Library');
 
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="mb-6 px-2">
-          <div className="text-2xl font-black tracking-wider text-brand-700 leading-none">
-            TMG180
-          </div>
-          <div className="text-sm text-slate-400 mt-1">Participant Portal</div>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Help Centre'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 flex items-center gap-2.5 px-2 border-t border-slate-100">
-          <div className="w-8 h-8 rounded-full bg-linear-to-br from-sky-300 to-brand-400 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-slate-900 leading-none">
-              Participant
-            </p>
-            <button className="text-xs text-slate-400 hover:text-slate-600 mt-1 transition-colors">
-              View account
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto flex flex-col gap-5">
+    <div className="max-w-4xl mx-auto flex flex-col gap-5">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Library</h1>
               <p className="text-sm text-slate-500 mt-1">
@@ -211,9 +149,6 @@ export default function Library() {
                 </div>
               </div>
             ))}
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

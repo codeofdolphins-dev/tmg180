@@ -4,6 +4,10 @@ export {
   SELF_SIGNUP_ROLES,
   PASSWORD_RULES,
   AUTH_ERROR,
+  REGISTRATION_CONSENTS,
+  REQUIRED_CONSENT_IDS,
+  missingConsents,
+  consentRecord,
   checkPassword,
   normaliseEmail,
   isValidEmail,
@@ -18,3 +22,15 @@ export {
   canFinaliseDailyLog,
   isAddendumOnly,
 } from './evidence.js';
+export {
+  ANSWER_VISIBILITY,
+  PROFILE_SECTION_STATUS,
+  PROFILE_SECTIONS,
+  PROFILE_TOTAL_SECTIONS,
+  profileSection,
+  nextProfileSection,
+  isEmptyAnswer,
+  validateAnswerValue,
+  validateSectionAnswers,
+  isSectionComplete,
+} from './profile.js';

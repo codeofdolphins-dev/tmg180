@@ -1,13 +1,4 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
-  Settings,
-  Flower2,
   Sun,
   PersonStanding,
   Utensils,
@@ -16,25 +7,11 @@ import {
   Bus,
   Check,
   Lightbulb,
-  ArrowLeft,
-  ArrowRight,
+  TriangleAlert,
 } from 'lucide-react';
 
-import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
-import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
+import ProfileSectionFooter from '../components/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../hooks/profile';
 
 const MORNING_PLACEHOLDER =
   'For example:\n\n• I usually wake up around 7am.\n• I prepare breakfast independently.\n• I need help getting dressed.';
@@ -42,11 +19,12 @@ const MORNING_PLACEHOLDER =
 const EVENING_PLACEHOLDER =
   'For example:\n\n• I usually go to bed around 10pm.\n• I like a quiet room.\n• I need reminders to take my medication.';
 
+/** Values match the daily_activities options in @tmg180/shared. */
 const ACTIVITIES = [
-  { label: 'Meal Preparation', icon: Utensils, checked: false },
-  { label: 'Community Access', icon: ShoppingBag, checked: true },
-  { label: 'Household Chores', icon: BrushCleaning, checked: true },
-  { label: 'Public Transport', icon: Bus, checked: false },
+  { value: 'meal_preparation', label: 'Meal Preparation', icon: Utensils },
+  { value: 'community_access', label: 'Community Access', icon: ShoppingBag },
+  { value: 'household_chores', label: 'Household Chores', icon: BrushCleaning },
+  { value: 'public_transport', label: 'Public Transport', icon: Bus },
 ];
 
 const INFO_PARAGRAPHS = [
@@ -61,40 +39,29 @@ const HELP_PARAGRAPHS = [
   'You can update this information whenever things change.',
 ];
 
-function NavItem({ icon: Icon, label, active, small }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 px-4 text-left rounded-full transition-colors ${
-        small ? 'py-2 text-xs font-bold' : 'py-3 text-sm'
-      } ${
-        active
-          ? 'bg-purple-600/30 text-brand-700 font-bold'
-          : 'text-[#4d4354] hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={small ? 15 : 17} className="shrink-0" />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function RoutineField({ label, placeholder }) {
+function RoutineField({ label, placeholder, ...field }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-base text-[#434655]">{label}</p>
-      <div className="rounded-lg border border-slate-300 bg-white p-3.5 min-h-43">
-        <p className="text-base text-[#6b7280] whitespace-pre-line">{placeholder}</p>
-      </div>
+      <label htmlFor={field.name} className="text-base text-[#434655]">
+        {label}
+      </label>
+      <textarea
+        id={field.name}
+        placeholder={placeholder}
+        className="rounded-lg border border-slate-300 bg-white p-3.5 min-h-43 resize-none text-base text-[#0b1c30] placeholder:text-[#6b7280] outline-none focus:border-brand-600 transition-colors"
+        {...field}
+      />
     </div>
   );
 }
 
-function ActivityTile({ icon: Icon, label, checked }) {
+function ActivityTile({ icon: Icon, label, checked, onToggle }) {
   return (
-    <div
-      className={`flex items-center justify-between rounded-xl border px-4 py-4 ${
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={checked}
+      className={`flex items-center justify-between rounded-xl border px-4 py-4 text-left transition-colors ${
         checked ? 'bg-[#006c49]/5 border-emerald-700' : 'bg-white border-slate-200'
       }`}
     >
@@ -109,47 +76,18 @@ function ActivityTile({ icon: Icon, label, checked }) {
       ) : (
         <span className="w-4 h-4 rounded border border-slate-300 bg-white shrink-0" />
       )}
-    </div>
+    </button>
   );
 }
 
 export default function ProfileDailyLiving() {
-  const navigate = useNavigate();
+  const section = useSectionForm('daily-living');
+  const { status, position, error } = section;
+  const { register, watch, setValue } = section.form;
+  const selected = watch('daily_activities') ?? [];
+
   return (
-    <div className="min-h-screen flex bg-[#f8f9ff] font-sans text-slate-800">
-      <aside className="w-64 shrink-0 bg-[#f8f9ff]/70 backdrop-blur-sm border-r border-slate-100 flex flex-col py-6 px-6">
-        <div className="flex items-center gap-3 mb-10 px-1">
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-500 shadow flex items-center justify-center shrink-0">
-            <Flower2 size={20} className="text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-brand-600 leading-none">TMG180</div>
-            <div className="text-xs font-bold text-[#4d4354] mt-1">Participant Portal</div>
-          </div>
-        </div>
-
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'My Profile'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 flex flex-col gap-1">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} small />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 shrink-0 bg-[#f8f9ff] border-b border-slate-200/70 flex items-center justify-end px-10">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#434655] hover:bg-white transition-colors">
-            <Settings size={20} />
-          </button>
-        </header>
-
-        <main className="flex-1 px-10 py-8">
-          <div className="max-w-236 flex flex-col gap-8">
+    <div className="max-w-236 mx-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">
               <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
                 Daily Living
@@ -171,10 +109,12 @@ export default function ProfileDailyLiving() {
                     <RoutineField
                       label="Tell us about your morning routine."
                       placeholder={MORNING_PLACEHOLDER}
+                      {...register('morning_routine')}
                     />
                     <RoutineField
                       label="Tell us about your evening routine."
                       placeholder={EVENING_PLACEHOLDER}
+                      {...register('evening_routine')}
                     />
                   </div>
                 </section>
@@ -192,8 +132,18 @@ export default function ProfileDailyLiving() {
                     welcome support.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {ACTIVITIES.map((a) => (
-                      <ActivityTile key={a.label} {...a} />
+                    {ACTIVITIES.map(({ value, label, icon }) => (
+                      <ActivityTile
+                        key={value}
+                        icon={icon}
+                        label={label}
+                        checked={selected.includes(value)}
+                        onToggle={() =>
+                          setValue('daily_activities', toggleInList(selected, value), {
+                            shouldDirty: true,
+                          })
+                        }
+                      />
                     ))}
                   </div>
                 </section>
@@ -205,10 +155,20 @@ export default function ProfileDailyLiving() {
                     Personal Profile Status
                   </h3>
                   <div className="flex items-center justify-between">
-                    <span className="bg-[#dce9ff] rounded-full px-4 py-1.5 text-base font-medium text-[#434655]">
-                      In progress
+                    <span
+                      className={`rounded-full px-4 py-1.5 text-base font-medium ${
+                        status === 'complete'
+                          ? 'text-[#006c49] bg-emerald-100'
+                          : 'text-[#434655] bg-[#dce9ff]'
+                      }`}
+                    >
+                      {status === 'complete'
+                        ? 'Completed'
+                        : status === 'in_progress'
+                          ? 'In progress'
+                          : 'Not started'}
                     </span>
-                    <span className="text-lg text-[#434655]">03/11</span>
+                    <span className="text-lg text-[#434655]">{position}</span>
                   </div>
                 </section>
 
@@ -241,24 +201,17 @@ export default function ProfileDailyLiving() {
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-8 flex items-center justify-between">
-              <button onClick={() => navigate(PARTICIPANT_PATHS.profileMyGoals)} className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-base text-[#434655] hover:bg-slate-50 transition-colors">
-                <ArrowLeft size={16} />
-                Previous
-              </button>
-              <div className="flex items-center gap-4">
-                <button onClick={() => navigate(PARTICIPANT_PATHS.profile)} className="rounded-full border border-brand-600 bg-white px-8 py-3 text-base text-brand-600 hover:bg-brand-50 transition-colors">
-                  Save &amp; Exit
-                </button>
-                <button onClick={() => navigate(PARTICIPANT_PATHS.profileMobilityAccess)} className="flex items-center gap-2 rounded-full bg-brand-600 px-8 py-3 text-base text-white hover:bg-brand-700 transition-colors">
-                  Save &amp; Continue
-                  <ArrowRight size={16} />
-                </button>
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
+              >
+                <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                <span>{error.message}</span>
               </div>
-            </div>
-          </div>
-        </main>
-      </div>
+            )}
+
+            <ProfileSectionFooter {...section} />
     </div>
   );
 }

@@ -1,45 +1,39 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
-  Lock,
-  Settings,
-  Flower2,
   Accessibility,
   ChevronDown,
   Map,
   Lightbulb,
-  ArrowLeft,
-  ArrowRight,
-  Mail,
+  TriangleAlert,
 } from 'lucide-react';
 
-import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
-import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
+import ProfileSectionFooter from '../components/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../hooks/profile';
 
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
-
+/** Values match the mobility_equipment options in @tmg180/shared. */
 const EQUIPMENT = [
-  { label: 'Walker', active: true },
-  { label: 'Mobility Scooter', active: false },
-  { label: 'Crutches', active: false },
-  { label: 'Orthotics', active: false },
-  { label: 'Other', active: false },
-  { label: 'None', active: false },
+  { value: 'walker', label: 'Walker' },
+  { value: 'mobility_scooter', label: 'Mobility Scooter' },
+  { value: 'crutches', label: 'Crutches' },
+  { value: 'orthotics', label: 'Orthotics' },
+  { value: 'other', label: 'Other' },
+  { value: 'none', label: 'None' },
+];
+
+const TRAVEL_OPTIONS = [
+  { value: 'private_accessible_vehicle', label: 'Private Accessible Vehicle' },
+  { value: 'public_transport', label: 'Public Transport' },
+  { value: 'taxi_rideshare', label: 'Taxi / Rideshare' },
+  { value: 'community_transport', label: 'Community Transport' },
+  { value: 'walking', label: 'Walking' },
+  { value: 'other', label: 'Other' },
+];
+
+const TRANSFER_OPTIONS = [
+  { value: 'independent', label: 'Independent' },
+  { value: 'standby_supervision', label: 'Standby Supervision' },
+  { value: 'requires_1_1_assistance', label: 'Requires 1:1 Assistance' },
+  { value: 'requires_2_person_assistance', label: 'Requires 2-Person Assistance' },
+  { value: 'hoist_transfer', label: 'Hoist Transfer' },
 ];
 
 const ACCESS_PLACEHOLDER =
@@ -47,10 +41,12 @@ const ACCESS_PLACEHOLDER =
 
 const ENVIRONMENT_TOGGLES = [
   {
+    key: 'avoid_stairs',
     title: 'Avoid stairs or steep inclines?',
     helper: 'Select if this helps you access places more comfortably.',
   },
   {
+    key: 'rest_breaks',
     title: 'Need regular seating or rest breaks?',
     helper: 'Select if regular opportunities to rest are important to you.',
   },
@@ -62,88 +58,69 @@ const HELP_PARAGRAPHS = [
   'You can update this information whenever things change.',
 ];
 
-function NavItem({ icon: Icon, label, active, small }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 px-4 text-left rounded-full transition-colors ${
-        small ? 'py-2 text-xs font-bold' : 'py-3 text-sm'
-      } ${
-        active
-          ? 'bg-purple-600/30 text-brand-700 font-bold'
-          : 'text-[#4d4354] hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={small ? 15 : 17} className="shrink-0" />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function SelectField({ label, value }) {
+function SelectField({ label, placeholder, options, ...field }) {
   return (
     <div className="flex-1 flex flex-col gap-2">
-      <p className="text-sm font-semibold text-[#0b1c30]">{label}</p>
-      <div className="flex items-center justify-between rounded-xl border border-slate-300 bg-white px-4 py-3">
-        <span className="text-sm text-[#0b1c30]">{value}</span>
-        <ChevronDown size={18} className="text-slate-500 shrink-0" />
+      <label htmlFor={field.name} className="text-sm font-semibold text-[#0b1c30]">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          id={field.name}
+          className="w-full appearance-none rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-sm text-[#0b1c30] outline-none focus:border-brand-600 transition-colors"
+          {...field}
+        >
+          <option value="">{placeholder}</option>
+          {options.map(({ value, label: optionLabel }) => (
+            <option key={value} value={value}>
+              {optionLabel}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          size={18}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+        />
       </div>
     </div>
   );
 }
 
-function ToggleRow({ title, helper }) {
+function ToggleRow({ title, helper, on, onToggle }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-xl bg-[#e5eeff] px-4 py-4">
       <div>
         <p className="text-base font-medium text-[#0b1c30]">{title}</p>
         <p className="text-xs text-[#434655] mt-1">{helper}</p>
       </div>
-      <span className="relative w-12 h-6 rounded-full bg-brand-600 shrink-0">
-        <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-white" />
-      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={title}
+        onClick={onToggle}
+        className={`relative w-12 h-6 rounded-full shrink-0 transition-colors ${
+          on ? 'bg-brand-600' : 'bg-slate-300'
+        }`}
+      >
+        <span
+          className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${
+            on ? 'right-1' : 'left-1'
+          }`}
+        />
+      </button>
     </div>
   );
 }
 
 export default function ProfileMobilityAccess() {
-  const navigate = useNavigate();
+  const section = useSectionForm('mobility-access');
+  const { status, position, error } = section;
+  const { register, watch, setValue } = section.form;
+  const equipment = watch('mobility_equipment') ?? [];
+
   return (
-    <div className="min-h-screen flex bg-[#f8f9ff] font-sans text-slate-800">
-      <aside className="w-64 shrink-0 bg-[#f8f9ff]/70 backdrop-blur-sm border-r border-slate-100 flex flex-col py-6 px-6">
-        <div className="flex items-center gap-3 mb-10 px-1">
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-500 shadow flex items-center justify-center shrink-0">
-            <Flower2 size={20} className="text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-brand-600 leading-none">TMG180</div>
-            <div className="text-xs font-bold text-[#4d4354] mt-1">Participant Portal</div>
-          </div>
-        </div>
-
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'My Profile'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 flex flex-col gap-1">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} small />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 shrink-0 bg-[#f8f9ff] border-b border-slate-200/70 flex items-center justify-end px-10">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#434655] hover:bg-white transition-colors">
-            <Settings size={20} />
-          </button>
-        </header>
-
-        <main className="flex-1 px-10 py-8">
-          <div className="max-w-236 flex flex-col gap-8">
+    <div className="max-w-236 mx-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">
               <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
                 Mobility &amp; transport
@@ -164,42 +141,60 @@ export default function ProfileMobilityAccess() {
                     </h2>
                   </div>
                   <div className="flex flex-wrap gap-3">
-                    {EQUIPMENT.map((item) => (
-                      <button
-                        key={item.label}
-                        className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                          item.active
-                            ? 'bg-brand-600 text-white'
-                            : 'border border-slate-300 bg-white text-[#0b1c30] hover:bg-slate-50'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
+                    {EQUIPMENT.map(({ value, label }) => {
+                      const active = equipment.includes(value);
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() =>
+                            setValue('mobility_equipment', toggleInList(equipment, value), {
+                              shouldDirty: true,
+                            })
+                          }
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                            active
+                              ? 'bg-brand-600 text-white'
+                              : 'border border-slate-300 bg-white text-[#0b1c30] hover:bg-slate-50'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm font-semibold text-[#0b1c30]">
+                  <label htmlFor="access_requirements" className="text-sm font-semibold text-[#0b1c30]">
                     Specific Access Requirements
-                  </p>
+                  </label>
                   <p className="text-xs text-[#434655]">
                     Example: Need level access, wide doorways, or specific parking
                     requirements.
                   </p>
-                  <div className="rounded-xl border border-slate-300 bg-white p-4 h-79.5 mt-1">
-                    <p className="text-base text-[#6b7280] whitespace-pre-line mt-25">
-                      {ACCESS_PLACEHOLDER}
-                    </p>
-                  </div>
+                  <textarea
+                    id="access_requirements"
+                    placeholder={ACCESS_PLACEHOLDER}
+                    className="rounded-xl border border-slate-300 bg-white p-4 h-79.5 mt-1 resize-none text-base text-[#0b1c30] placeholder:text-[#6b7280] outline-none focus:border-brand-600 transition-colors"
+                    {...register('access_requirements')}
+                  />
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-6">
                   <SelectField
                     label="Preferred Travel Method"
-                    value="Private Accessible Vehicle"
+                    placeholder="Choose your preferred method"
+                    options={TRAVEL_OPTIONS}
+                    {...register('travel_method')}
                   />
-                  <SelectField label="Transfer Assistance" value="Requires 1:1 Assistance" />
+                  <SelectField
+                    label="Transfer Assistance"
+                    placeholder="Choose what applies to you"
+                    options={TRANSFER_OPTIONS}
+                    {...register('transfer_assistance')}
+                  />
                 </div>
 
                 <div>
@@ -210,9 +205,18 @@ export default function ProfileMobilityAccess() {
                     </h2>
                   </div>
                   <div className="flex flex-col gap-4">
-                    {ENVIRONMENT_TOGGLES.map((t) => (
-                      <ToggleRow key={t.title} {...t} />
-                    ))}
+                    {ENVIRONMENT_TOGGLES.map(({ key, title, helper }) => {
+                      const on = watch(key) ?? false;
+                      return (
+                        <ToggleRow
+                          key={key}
+                          title={title}
+                          helper={helper}
+                          on={on}
+                          onToggle={() => setValue(key, !on, { shouldDirty: true })}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </section>
@@ -223,10 +227,20 @@ export default function ProfileMobilityAccess() {
                     Personal Profile Status
                   </h3>
                   <div className="flex items-center justify-between">
-                    <span className="bg-[#dce9ff] rounded-full px-4 py-1.5 text-base font-medium text-[#434655]">
-                      In progress
+                    <span
+                      className={`rounded-full px-4 py-1.5 text-base font-medium ${
+                        status === 'complete'
+                          ? 'text-[#006c49] bg-emerald-100'
+                          : 'text-[#434655] bg-[#dce9ff]'
+                      }`}
+                    >
+                      {status === 'complete'
+                        ? 'Completed'
+                        : status === 'in_progress'
+                          ? 'In progress'
+                          : 'Not started'}
                     </span>
-                    <span className="text-lg text-[#434655]">04/11</span>
+                    <span className="text-lg text-[#434655]">{position}</span>
                   </div>
                 </section>
 
@@ -256,25 +270,17 @@ export default function ProfileMobilityAccess() {
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-8 flex items-center justify-between">
-              <button onClick={() => navigate(PARTICIPANT_PATHS.profileDailyLiving)} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-base text-[#434655] hover:bg-slate-50 transition-colors">
-                <ArrowLeft size={16} />
-                Previous
-              </button>
-              <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-base font-bold text-[#434655] hover:bg-slate-50 transition-colors">
-                  <Mail size={18} />
-                  Save Draft
-                </button>
-                <button className="flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-3 text-base font-bold text-white hover:bg-brand-700 transition-colors">
-                  Next Step
-                  <ArrowRight size={16} />
-                </button>
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
+              >
+                <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                <span>{error.message}</span>
               </div>
-            </div>
-          </div>
-        </main>
-      </div>
+            )}
+
+            <ProfileSectionFooter {...section} />
     </div>
   );
 }

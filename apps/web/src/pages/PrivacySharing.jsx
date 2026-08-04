@@ -1,14 +1,4 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  Activity,
-  HelpCircle,
-  Headset,
-  LogOut,
-  Search,
-  Bell,
-  Settings,
   ShieldCheck,
   Shield,
   SlidersHorizontal,
@@ -22,15 +12,6 @@ import {
   FileText,
   Info,
 } from 'lucide-react';
-import { useRoleNav } from '../navigation/useRoleNav';
-
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: Activity },
-  { label: 'Help Centre', icon: HelpCircle },
-];
 
 const SHARING_PREFERENCES = [
   {
@@ -125,76 +106,8 @@ function Toggle({ on }) {
 }
 
 export default function PrivacySharing() {
-  const go = useRoleNav('participant');
   return (
-    <div className="relative min-h-screen flex bg-white font-sans text-[#4d4354] overflow-hidden">
-      <div className="pointer-events-none absolute -top-52 -left-32 w-160 h-260 rounded-full bg-purple-600/10 blur-3xl" />
-      <div className="pointer-events-none absolute top-260 -right-32 w-192 h-314 rounded-full bg-[#d3e4fe]/30 blur-3xl" />
-
-      <aside className="relative w-72 shrink-0 bg-[#f8f9ff]/70 border-r border-purple-100/60 flex flex-col px-6 py-6">
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-10 h-10 rounded-full bg-teal-100 shadow-sm flex items-center justify-center text-teal-700 font-bold shrink-0">
-            T
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-[#7800ce] leading-none">TMG180</div>
-            <div className="text-xs font-semibold text-[#4d4354] mt-1">
-              Participant Portal
-            </div>
-          </div>
-        </div>
-
-        <nav className="mt-8 flex flex-col gap-2">
-          {NAV_ITEMS.map(({ label, icon: Icon }) => (
-            <button
-              key={label}
-              onClick={() => go(label)}
-              className="flex items-center gap-3 text-sm font-medium text-[#4d4354] rounded-full px-4 py-3 text-left hover:bg-white/70 transition-colors"
-            >
-              <Icon size={18} />
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-slate-200/70 flex flex-col gap-4">
-          <button className="flex items-center justify-center gap-2 bg-purple-600 text-[#f6e6ff] text-sm font-bold rounded-full py-3">
-            <Headset size={18} />
-            Get Support
-          </button>
-          <button
-            onClick={() => go('Logout')}
-            className="flex items-center gap-3 text-sm font-medium text-[#4d4354] rounded-full px-4 py-2 text-left"
-          >
-            <LogOut size={18} />
-            Log Out
-          </button>
-        </div>
-      </aside>
-
-      <div className="relative flex-1 flex flex-col min-w-0">
-        <header className="h-20 shrink-0 flex items-center justify-between px-10">
-          <span className="text-2xl font-bold text-[#7800ce]">TMG180</span>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2.5 bg-[#d3e4fe]/50 rounded-full px-4 py-2 w-64">
-              <Search size={16} className="text-[#4d4354] shrink-0" />
-              <span className="text-sm font-medium text-[#6b7280]">Search...</span>
-            </div>
-            <button className="text-[#4d4354]">
-              <Bell size={18} />
-            </button>
-            <button className="text-[#4d4354]">
-              <Settings size={20} />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-purple-600 p-0.5 shrink-0">
-              <div className="w-full h-full rounded-full bg-brand-100 flex items-center justify-center text-brand-700 text-sm font-bold">
-                P
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 px-10 pt-8 pb-16">
+    <>
           <div className="w-11 h-12 rounded-2xl bg-[#d3e4fe] shadow-sm flex items-center justify-center">
             <ShieldCheck size={24} className="text-[#7800ce]" />
           </div>
@@ -486,8 +399,6 @@ export default function PrivacySharing() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+    </>
   );
 }

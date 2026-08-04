@@ -1,12 +1,5 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
   Search,
-  HelpCircle,
-  Lock,
-  Settings,
   MapPin,
   Network,
   ChevronDown,
@@ -17,20 +10,7 @@ import {
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
 import { PARTICIPANT_PATHS } from '../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-];
-
-const BOTTOM_ITEMS = [
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -88,23 +68,6 @@ const WORKERS = [
     supportAreas: ['Personal Care', 'Medication Admin', 'Cooking'],
   },
 ];
-
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 text-sm px-3 py-2.5 text-left rounded-lg transition-colors ${
-        active
-          ? 'text-slate-900 font-semibold'
-          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-      }`}
-    >
-      <Icon size={17} className="shrink-0" />
-      <span>{label}</span>
-    </button>
-  );
-}
 
 function WorkerCard({ worker }) {
   const navigate = useNavigate();
@@ -228,44 +191,7 @@ function PageDot({ label, active }) {
 
 export default function BrowseVerifiedWorkers() {
   return (
-    <div className="min-h-screen flex bg-[#f4f5fa] font-sans text-slate-800">
-      <aside className="w-60 shrink-0 bg-white border-r border-slate-200/70 flex flex-col py-6 px-4">
-        <div className="mb-8 px-3">
-          <div className="text-xl font-extrabold text-brand-600 leading-none">TMG180</div>
-          <div className="text-xs text-slate-400 mt-1">Participant Portal</div>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Dashboard'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 flex flex-col gap-1">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
-          ))}
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center gap-4 px-8 py-4">
-          <div className="flex items-center gap-3 w-full max-w-md bg-slate-200/60 rounded-full px-4 py-2.5">
-            <Search size={16} className="text-slate-400 shrink-0" />
-            <span className="text-sm text-slate-400">Search resources...</span>
-          </div>
-          <div className="ml-auto flex items-center gap-3">
-            <button className="w-9 h-9 rounded-full flex items-center justify-center text-indigo-600 hover:bg-white transition-colors">
-              <Settings size={19} />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-400 ring-2 ring-white shadow flex items-center justify-center text-white text-sm font-bold">
-              A
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 px-8 pb-12 pt-4">
-          <div className="max-w-5xl mx-auto flex flex-col gap-6">
+    <div className="max-w-5xl mx-auto flex flex-col gap-6">
             <div>
               <p className="text-sm text-slate-400 mb-2">
                 Home <span className="mx-1">/</span>
@@ -337,9 +263,6 @@ export default function BrowseVerifiedWorkers() {
                 <ChevronRight size={16} />
               </button>
             </div>
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

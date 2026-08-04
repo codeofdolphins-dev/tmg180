@@ -1,29 +1,11 @@
 import {
-  LayoutDashboard,
-  User,
-  NotebookPen,
-  CalendarDays,
-  Search,
-  HelpCircle,
   Lock,
-  LogOut,
   Info,
   Eye,
   History,
   MessageSquarePlus,
 } from 'lucide-react';
 import Button from '../components/ui/Button';
-
-import { useRoleNav } from '../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'My Profile', icon: User },
-  { label: 'Daily Log', icon: NotebookPen },
-  { label: 'Monthly Snapshot', icon: CalendarDays },
-  { label: 'Browse Directory', icon: Search },
-  { label: 'Help Centre', icon: HelpCircle },
-  { label: 'Privacy & Sharing', icon: Lock },
-];
 
 const PREVIEW_SECTIONS = [
   {
@@ -46,53 +28,9 @@ const PREVIEW_SECTIONS = [
   },
 ];
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('participant');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
 export default function MonthlySnapshotSummary() {
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="mb-6 px-2">
-          <div className="text-lg font-black tracking-wider text-brand-700 leading-none">
-            TMG180
-          </div>
-          <div className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide">
-            Participant Portal
-          </div>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Monthly Snapshot'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4">
-          <button className="flex items-center gap-2.5 text-sm text-slate-500 hover:bg-slate-100 rounded-lg px-3 py-2.5 text-left transition-colors w-full">
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <main className="flex-1 p-6">
-          <div className="max-w-5xl mx-auto flex flex-col gap-5">
+    <div className="max-w-5xl mx-auto flex flex-col gap-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">
@@ -220,9 +158,6 @@ export default function MonthlySnapshotSummary() {
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

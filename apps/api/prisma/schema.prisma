@@ -1,20 +1,6 @@
-// TMG180 — net-new `tmg_*` tables, modelled from
-// md/TMG180_New_Database_Tables.md (25 May 2026).
-//
-// Conventions:
-//   - Models are PascalCase and unprefixed; @@map carries the real `tmg_*` name.
-//   - Fields are camelCase; @map carries the real snake_case column.
-//   - participant_id / worker_id / actor_id are plain Int with no FK — those
-//     rows live in the existing platform schema, which Prisma does not own yet.
-//   - Status columns stay VARCHAR (not Prisma enums) so this schema diffs
-//     cleanly against the SQL pack Deb already runs. Allowed values are in
-//     comments beside each field.
-//
-// Three things in the SQL pack cannot be expressed in Prisma schema and must
-// live in the migration SQL by hand:
-//   1. CHECK (intensity_rating BETWEEN 0 AND 4) on tmg_participant_checkin
-//   2. tmg_revoke_worker_access() + consent_revocation_trigger
-//   3. The tmg_banned_terms seed rows
+// Net-new `tmg_*` tables, from md/TMG180_New_Database_Tables.md.
+// Not expressible here, must go in migration SQL by hand: the
+// intensity_rating 0-4 CHECK, the consent_revocation_trigger, the banned-term seed.
 
 generator client {
   provider = "prisma-client"
@@ -26,409 +12,448 @@ datasource db {
 }
 
 // ============================================================
+// SECTION 0: ACCOUNTS
+// ============================================================
+// Not in the DB pack — it assumes an existing users table and leaves every
+// participant_id/worker_id an unconstrained INTEGER. One table for all three
+// actors: `roles` is an array because an account can hold more than one
+// workspace, while the *_role columns below record which one it acted as.
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password_hash String?   @db.VarChar(255)
+  full_name     String    @db.VarChar(255)
+  roles         String[]  @db.VarChar(50)
+  status        String    @default("active") @db.VarChar(50)
+  ndis_number   String?   @db.VarChar(50)
+  last_login_at DateTime? @db.Timestamptz
+  created_at    DateTime  @default(now()) @db.Timestamptz
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  profile                  ParticipantProfile?        @relation("ParticipantProfile")
+  intakes                  FcaIntake[]                @relation("ParticipantIntakes")
+  goals                    ParticipantGoal[]          @relation("ParticipantGoals")
+  checkins                 ParticipantCheckin[]       @relation("ParticipantCheckins")
+  snapshots                MonthlySnapshot[]          @relation("ParticipantSnapshots")
+  private_notes_authored   DailyNotePrivate[]         @relation("WorkerPrivateNotes")
+  private_notes_about      DailyNotePrivate[]         @relation("ParticipantPrivateNotes")
+  notes_authored           DailyNoteStructured[]      @relation("WorkerNotes")
+  notes_about              DailyNoteStructured[]      @relation("ParticipantNotes")
+  note_addenda             DailyNoteAddendum[]        @relation("NoteAddenda")
+  snapshot_addenda         SnapshotAddendum[]         @relation("SnapshotAddenda")
+  consents_given           Consent[]                  @relation("ParticipantConsents")
+  consents_held            Consent[]                  @relation("WorkerConsents")
+  invitations_sent         ExternalWorkerInvitation[] @relation("ParticipantInvitations")
+  invitations_revoked      ExternalWorkerInvitation[] @relation("InvitationRevocations")
+  external_notes           ExternalSupportNote[]      @relation("ParticipantExternalNotes")
+  invoices_raised          Invoice[]                  @relation("WorkerInvoices")
+  invoices_received        Invoice[]                  @relation("ParticipantInvoices")
+  invoice_audit_entries    InvoiceAudit[]             @relation("InvoiceAuditChanges")
+  notifications            Notification[]             @relation("UserNotifications")
+  audit_entries            AuditLog[]                 @relation("AuditActor")
+  deletion_requests        DeletionRequest[]          @relation("ParticipantDeletionRequests")
+  deletion_requests_closed DeletionRequest[]          @relation("DeletionRequestsProcessed")
+
+  @@index([status])
+  @@index([roles(ops: ArrayOps)], type: Gin)
+  @@map("tmg_users")
+}
+
+// ============================================================
 // SECTION 1: TERMINOLOGY AND LANGUAGE ENFORCEMENT
 // ============================================================
 
-/// Single source of truth for all UI text. React reads from here. No hardcoded strings.
 model TerminologyRegistry {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique @db.VarChar(255)
-  value     String
-  /// participant_portal | worker_portal | admin | shared
-  context   String?  @db.VarChar(100)
-  notes     String?
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id         Int      @id @default(autoincrement())
+  key        String   @unique @db.VarChar(255)
+  value      String
+  context    String?  @db.VarChar(100)
+  notes      String?
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
   @@index([context])
   @@map("tmg_terminology_registry")
 }
 
-/// Terms that must never appear in AI outputs or UI. Checked at the AI layer
-/// before any text is displayed.
 model BannedTerm {
   id          Int      @id @default(autoincrement())
-  bannedTerm  String   @unique @map("banned_term") @db.VarChar(255)
+  banned_term String   @unique @db.VarChar(255)
   replacement String   @db.VarChar(255)
   context     String?
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  created_at  DateTime @default(now()) @db.Timestamptz
 
   @@map("tmg_banned_terms")
 }
 
-/// Language the AI uses to describe progress without implying cure.
-/// Support-mediated functioning.
 model ImprovementMarker {
-  id         Int      @id @default(autoincrement())
-  /// functional_gain | stability | recovery_cost
-  markerType String   @map("marker_type") @db.VarChar(100)
-  markerText String   @map("marker_text")
-  /// NDIS functional domain
-  domainTag  String?  @map("domain_tag") @db.VarChar(50)
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id          Int      @id @default(autoincrement())
+  marker_type String   @db.VarChar(100)
+  marker_text String
+  domain_tag  String?  @db.VarChar(50)
+  created_at  DateTime @default(now()) @db.Timestamptz
 
   @@map("tmg_improvement_markers")
 }
 
-/// Support band rules for estimating participant support needs from intake
-/// and ongoing logs.
 model SupportBanding {
-  id                 Int      @id @default(autoincrement())
-  bandCode           String   @unique @map("band_code") @db.VarChar(50)
-  bandLabel          String   @map("band_label")
-  description        String?
-  /// Sessions per month
-  minFrequency       Int?     @map("min_frequency")
-  maxFrequency       Int?     @map("max_frequency")
-  /// 0-4 scale
-  intensityRangeLow  Int?     @map("intensity_range_low")
-  intensityRangeHigh Int?     @map("intensity_range_high")
-  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                   Int      @id @default(autoincrement())
+  band_code            String   @unique @db.VarChar(50)
+  band_label           String
+  description          String?
+  min_frequency        Int?
+  max_frequency        Int?
+  intensity_range_low  Int?
+  intensity_range_high Int?
+  created_at           DateTime @default(now()) @db.Timestamptz
 
   @@map("tmg_support_banding")
 }
 
-/// Translates NDIS clinical language to relational language and back.
-/// Used by the AI translation layer.
 model TranslatorTerm {
-  id               Int      @id @default(autoincrement())
-  ndisTerm         String   @map("ndis_term") @db.VarChar(255)
-  relationalTerm   String   @map("relational_term") @db.VarChar(255)
-  functionalDomain String?  @map("functional_domain") @db.VarChar(100)
-  context          String?
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                Int      @id @default(autoincrement())
+  ndis_term         String   @db.VarChar(255)
+  relational_term   String   @db.VarChar(255)
+  functional_domain String?  @db.VarChar(100)
+  context           String?
+  created_at        DateTime @default(now()) @db.Timestamptz
 
   @@map("tmg_translator_terms")
+}
+
+// ============================================================
+// SECTION 1B: PARTICIPANT PERSONAL PROFILE (Final Override P1-01..03)
+// ============================================================
+// Not in the DB pack — the pack only has the flat tmg_fca_intake row below.
+// These three tables are the Final Override's participant_profiles /
+// _sections / _answers: the profile is a living, resumable, participant-owned
+// document, distinct from the versioned FCA evidence artifact. Section and
+// question definitions live in @tmg180/shared (packages/shared/src/profile.js),
+// not here — answers are (question_key -> JSONB) rows, so section/question
+// changes are seed edits, never migrations. Section list follows the built UI
+// (Figma 29 July); ruling R-01 may swap two sections later.
+
+model ParticipantProfile {
+  id                 Int      @id @default(autoincrement())
+  participant_id     Int      @unique
+  status             String   @default("in_progress") @db.VarChar(50)
+  /// P1-01: "continue where I left off" — the last section saved.
+  last_section_key   String?  @db.VarChar(100)
+  completed_sections Int      @default(0)
+  total_sections     Int      @default(11)
+  created_at         DateTime @default(now()) @db.Timestamptz
+  updated_at         DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  participant User                        @relation("ParticipantProfile", fields: [participant_id], references: [id])
+  sections    ParticipantProfileSection[]
+
+  @@map("tmg_participant_profiles")
+}
+
+model ParticipantProfileSection {
+  id           Int       @id @default(autoincrement())
+  profile_id   Int
+  section_key  String    @db.VarChar(100)
+  /// not_started | in_progress | complete. Complete is sticky: once set it is
+  /// never demoted, even if a required answer is later cleared.
+  status       String    @default("not_started") @db.VarChar(50)
+  completed_at DateTime? @db.Timestamptz
+  updated_at   DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  profile ParticipantProfile         @relation(fields: [profile_id], references: [id])
+  answers ParticipantProfileAnswer[]
+
+  @@unique([profile_id, section_key])
+  @@map("tmg_participant_profile_sections")
+}
+
+model ParticipantProfileAnswer {
+  id           Int      @id @default(autoincrement())
+  section_id   Int
+  question_key String   @db.VarChar(100)
+  /// Typed by the question definition in @tmg180/shared, enforced by the API:
+  /// string | string[] | boolean | int | [{text, done}].
+  value        Json
+  /// P1-03: participant_private | share_with_consent | snapshot_only.
+  visibility   String   @default("participant_private") @db.VarChar(50)
+  created_at   DateTime @default(now()) @db.Timestamptz
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  section ParticipantProfileSection @relation(fields: [section_id], references: [id])
+
+  @@unique([section_id, question_key])
+  @@map("tmg_participant_profile_answers")
 }
 
 // ============================================================
 // SECTION 2: PARTICIPANT EVIDENCE ARCHITECTURE
 // ============================================================
 
-/// Participant FCA intake baseline. Everything on the platform connects back
-/// to this. Append-only after submission.
 model FcaIntake {
-  id            Int       @id @default(autoincrement())
-  participantId Int       @map("participant_id")
-  version       Int       @default(1)
-  /// draft | complete | archived
-  status        String?   @default("draft") @db.VarChar(50)
-  submittedAt   DateTime? @map("submitted_at") @db.Timestamptz
+  id             Int       @id @default(autoincrement())
+  participant_id Int
+  version        Int       @default(1)
+  status         String?   @default("draft") @db.VarChar(50)
+  submitted_at   DateTime? @db.Timestamptz
 
-  // Section 1: About the participant
-  personalityTags String[] @map("personality_tags")
-  meaningTags     String[] @map("meaning_tags")
+  personality_tags String[]
+  meaning_tags     String[]
 
-  // Section 2: Strengths
-  strengthsTags String[] @map("strengths_tags")
-  /// Things they want more of
-  goalsTags     String[] @map("goals_tags")
+  strengths_tags String[]
+  goals_tags     String[]
 
-  // Section 3: Functional impacts (NDIS six domains)
-  mobilityTags        String[] @map("mobility_tags")
-  mobilityNotes       String?  @map("mobility_notes")
-  communicationTags   String[] @map("communication_tags")
-  communicationNotes  String?  @map("communication_notes")
-  socialTags          String[] @map("social_tags")
-  socialNotes         String?  @map("social_notes")
-  selfcareTags        String[] @map("selfcare_tags")
-  selfcareNotes       String?  @map("selfcare_notes")
-  learningTags        String[] @map("learning_tags")
-  learningNotes       String?  @map("learning_notes")
-  selfmanagementTags  String[] @map("selfmanagement_tags")
-  selfmanagementNotes String?  @map("selfmanagement_notes")
+  mobility_tags        String[]
+  mobility_notes       String?
+  communication_tags   String[]
+  communication_notes  String?
+  social_tags          String[]
+  social_notes         String?
+  selfcare_tags        String[]
+  selfcare_notes       String?
+  learning_tags        String[]
+  learning_notes       String?
+  selfmanagement_tags  String[]
+  selfmanagement_notes String?
 
-  // Section 4: Community and health
-  communityTags String[] @map("community_tags")
-  healthTags    String[] @map("health_tags")
-  equipmentTags String[] @map("equipment_tags")
+  community_tags String[]
+  health_tags    String[]
+  equipment_tags String[]
 
-  // Section 5: Support patterns
-  supportPatternTags String[] @map("support_pattern_tags")
-  fluctuationNotes   String?  @map("fluctuation_notes")
+  support_pattern_tags String[]
+  fluctuation_notes    String?
 
-  // Section 6: Safety
-  safetyTags    String[] @map("safety_tags")
-  safetyNotes   String?  @map("safety_notes")
-  substanceTags String[] @map("substance_tags")
+  safety_tags    String[]
+  safety_notes   String?
+  substance_tags String[]
 
-  // Section 7: Relational compatibility
-  compatStyleTags    String[] @map("compat_style_tags")
-  compatGenderTags   String[] @map("compat_gender_tags")
-  compatFaithTags    String[] @map("compat_faith_tags")
-  compatIdentityTags String[] @map("compat_identity_tags")
-  compatAvoidTags    String[] @map("compat_avoid_tags")
+  compat_style_tags    String[]
+  compat_gender_tags   String[]
+  compat_faith_tags    String[]
+  compat_identity_tags String[]
+  compat_avoid_tags    String[]
 
-  // Section 8: Consent
-  /// Selected consent options
-  documentationConsent String[]  @map("documentation_consent")
-  consentDeclared      Boolean?  @default(false) @map("consent_declared")
-  consentDeclaredAt    DateTime? @map("consent_declared_at") @db.Timestamptz
+  documentation_consent String[]
+  consent_declared      Boolean?  @default(false)
+  consent_declared_at   DateTime? @db.Timestamptz
 
-  // NDIS linkage
-  /// Array of { goal_id, goal_text, domain }
-  ndisGoals                   Json?    @map("ndis_goals") @db.JsonB
-  /// From Notice of Impairments
-  impairmentCategories        String[] @map("impairment_categories")
-  noticeOfImpairmentsUploaded Boolean? @default(false) @map("notice_of_impairments_uploaded")
+  ndis_goals                     Json?
+  impairment_categories          String[]
+  notice_of_impairments_uploaded Boolean? @default(false)
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  goals ParticipantGoal[]
+  participant User              @relation("ParticipantIntakes", fields: [participant_id], references: [id])
+  goals       ParticipantGoal[]
 
-  @@index([participantId])
+  @@index([participant_id])
   @@index([status])
   @@map("tmg_fca_intake")
 }
 
-/// Goals extracted from FCA intake. These appear as selectable options in the
-/// daily note UI. Linked to NDIS domains.
 model ParticipantGoal {
-  id              Int      @id @default(autoincrement())
-  participantId   Int      @map("participant_id")
-  intakeId        Int?     @map("intake_id")
-  goalText        String   @map("goal_text")
-  /// mobility | communication | social | selfcare | learning | selfmanagement
-  ndisDomain      String?  @map("ndis_domain") @db.VarChar(100)
-  ndisDomainLabel String?  @map("ndis_domain_label")
-  goalOrder       Int?     @default(1) @map("goal_order")
-  isActive        Boolean? @default(true) @map("is_active")
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                Int      @id @default(autoincrement())
+  participant_id    Int
+  intake_id         Int?
+  goal_text         String
+  ndis_domain       String?  @db.VarChar(100)
+  ndis_domain_label String?
+  goal_order        Int?     @default(1)
+  is_active         Boolean? @default(true)
+  created_at        DateTime @default(now()) @db.Timestamptz
 
-  intake FcaIntake? @relation(fields: [intakeId], references: [id])
+  participant User       @relation("ParticipantGoals", fields: [participant_id], references: [id])
+  intake      FcaIntake? @relation(fields: [intake_id], references: [id])
 
-  @@index([participantId])
-  @@index([participantId, isActive])
+  @@index([participant_id])
+  @@index([participant_id, is_active])
   @@map("tmg_participant_goals")
 }
 
-/// WCPS Layer A. Worker private narrative notes. NEVER accessible by
-/// participant, other workers, or admin. Legal only.
 model DailyNotePrivate {
-  id               Int       @id @default(autoincrement())
-  workerId         Int       @map("worker_id")
-  participantId    Int       @map("participant_id")
-  sessionDate      DateTime  @map("session_date") @db.Date
-  startTime        DateTime? @map("start_time") @db.Time
-  endTime          DateTime? @map("end_time") @db.Time
-  durationMinutes  Int?      @map("duration_minutes")
-  serviceType      String?   @map("service_type") @db.VarChar(100)
-  location         String?   @db.VarChar(255)
-  /// NEVER shared. WCPS only.
-  privateNarrative String?   @map("private_narrative")
-  /// NEVER shared unless legal requirement
-  safetyNarrative  String?   @map("safety_narrative")
-  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  /// Append-only: no updates allowed after submission
-  isLocked         Boolean?  @default(true) @map("is_locked")
+  id                Int       @id @default(autoincrement())
+  worker_id         Int
+  participant_id    Int
+  session_date      DateTime  @db.Date
+  start_time        DateTime? @db.Time
+  end_time          DateTime? @db.Time
+  duration_minutes  Int?
+  service_type      String?   @db.VarChar(100)
+  location          String?   @db.VarChar(255)
+  private_narrative String?
+  safety_narrative  String?
+  created_at        DateTime  @default(now()) @db.Timestamptz
+  is_locked         Boolean?  @default(true)
 
-  structuredNotes DailyNoteStructured[]
+  worker           User                  @relation("WorkerPrivateNotes", fields: [worker_id], references: [id])
+  participant      User                  @relation("ParticipantPrivateNotes", fields: [participant_id], references: [id])
+  structured_notes DailyNoteStructured[]
 
-  @@index([workerId, sessionDate])
+  @@index([worker_id, session_date])
   @@map("tmg_daily_note_private")
 }
 
-/// Structured support event log. Flows into the participant snapshot.
-/// Visible to participant. Append-only.
 model DailyNoteStructured {
-  id              Int      @id @default(autoincrement())
-  privateNoteId   Int?     @map("private_note_id")
-  workerId        Int      @map("worker_id")
-  participantId   Int      @map("participant_id")
-  sessionDate     DateTime @map("session_date") @db.Date
-  durationMinutes Int?     @map("duration_minutes")
-  serviceType     String?  @map("service_type") @db.VarChar(100)
-  location        String?  @db.VarChar(255)
+  id               Int      @id @default(autoincrement())
+  private_note_id  Int?
+  worker_id        Int
+  participant_id   Int
+  session_date     DateTime @db.Date
+  duration_minutes Int?
+  service_type     String?  @db.VarChar(100)
+  location         String?  @db.VarChar(255)
 
-  // Goal links (mandatory - 1-3 from participant goals)
-  goalIds       Int[]    @map("goal_ids")
-  /// Cannot submit without goals
-  goalValidated Boolean? @default(false) @map("goal_validated")
+  goal_ids       Int[]
+  goal_validated Boolean? @default(false)
 
-  // Functional domain tags (mandatory - 1-3)
-  domainTags      String[] @map("domain_tags") @db.VarChar(50)
-  /// Cannot submit without domains
-  domainValidated Boolean? @default(false) @map("domain_validated")
+  domain_tags      String[] @db.VarChar(50)
+  domain_validated Boolean? @default(false)
 
-  /// Section 3: What was hard today — TT-* tags from the canonical schema
-  impactTags String[] @map("impact_tags")
+  impact_tags       String[]
+  support_type_tags String[]
 
-  /// Section 4: Support delivered
-  supportTypeTags String[] @map("support_type_tags")
+  outcome_tags String[]
+  outcome_text String?
 
-  // Section 5: Outcome micro-block
-  outcomeTags String[] @map("outcome_tags")
-  /// "Today, with support, the participant was able to..."
-  outcomeText String?  @map("outcome_text")
+  baseline_comparison String?  @db.VarChar(50)
+  baseline_factors    String[]
+  baseline_notes      String?
 
-  // Section 6: Baseline comparison
-  /// typical | more_support | less_support | different_support
-  baselineComparison String?  @map("baseline_comparison") @db.VarChar(50)
-  baselineFactors    String[] @map("baseline_factors")
-  baselineNotes      String?  @map("baseline_notes")
+  participant_voice String?
+  safety_note       String?
 
-  /// Section 7: Participant voice (visible to participant)
-  participantVoice String? @map("participant_voice")
-  /// Public safety note (not the private narrative)
-  safetyNote       String? @map("safety_note")
+  status       String?  @default("submitted") @db.VarChar(50)
+  submitted_at DateTime @default(now()) @db.Timestamptz
+  is_locked    Boolean? @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz
 
-  /// submitted | locked
-  status      String?  @default("submitted") @db.VarChar(50)
-  submittedAt DateTime @default(now()) @map("submitted_at") @db.Timestamptz
-  /// Append-only after submission
-  isLocked    Boolean? @default(true) @map("is_locked")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  worker       User                @relation("WorkerNotes", fields: [worker_id], references: [id])
+  participant  User                @relation("ParticipantNotes", fields: [participant_id], references: [id])
+  private_note DailyNotePrivate?   @relation(fields: [private_note_id], references: [id])
+  addenda      DailyNoteAddendum[]
+  invoices     Invoice[]
 
-  privateNote DailyNotePrivate?   @relation(fields: [privateNoteId], references: [id])
-  addenda     DailyNoteAddendum[]
-  invoices    Invoice[]
-
-  @@index([participantId, sessionDate])
-  @@index([workerId, sessionDate])
+  @@index([participant_id, session_date])
+  @@index([worker_id, session_date])
   @@map("tmg_daily_note_structured")
 }
 
-/// Addenda to locked notes. The only way to add context after submission.
-/// The original note is never modified.
 model DailyNoteAddendum {
-  id           Int      @id @default(autoincrement())
-  noteId       Int?     @map("note_id")
-  /// worker_id or participant_id
-  addedBy      Int      @map("added_by")
-  /// worker | participant
-  addedByRole  String   @map("added_by_role") @db.VarChar(50)
-  addendumText String   @map("addendum_text")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id            Int      @id @default(autoincrement())
+  note_id       Int?
+  added_by      Int
+  added_by_role String   @db.VarChar(50)
+  addendum_text String
+  created_at    DateTime @default(now()) @db.Timestamptz
 
-  note DailyNoteStructured? @relation(fields: [noteId], references: [id])
+  author User                 @relation("NoteAddenda", fields: [added_by], references: [id])
+  note   DailyNoteStructured? @relation(fields: [note_id], references: [id])
 
   @@map("tmg_daily_note_addendum")
 }
 
-/// Participant self-reporting. Weekly or post-session. Feeds into monthly
-/// snapshot AI generation.
 model ParticipantCheckin {
-  id            Int      @id @default(autoincrement())
-  participantId Int      @map("participant_id")
-  /// this_week | today | after_support
-  checkinPeriod String?  @map("checkin_period") @db.VarChar(50)
-  checkinDate   DateTime @map("checkin_date") @db.Date
+  id             Int      @id @default(autoincrement())
+  participant_id Int
+  checkin_period String?  @db.VarChar(50)
+  checkin_date   DateTime @db.Date
 
-  /// Section B2: What showed up
-  impactTags  String[] @map("impact_tags")
-  impactNotes String?  @map("impact_notes")
+  impact_tags  String[]
+  impact_notes String?
 
-  /// Section B3: Intensity rating — DB CHECK enforces 0-4
-  intensityRating Int? @map("intensity_rating")
+  intensity_rating Int?
 
-  /// Section B4: What helped
-  helpedTags  String[] @map("helped_tags")
-  helpedNotes String?  @map("helped_notes")
+  helped_tags  String[]
+  helped_notes String?
 
-  /// Section B5: Recovery cost — none | little | a_lot | days
-  recoveryLevel String? @map("recovery_level") @db.VarChar(100)
-  recoveryNotes String? @map("recovery_notes")
+  recovery_level String? @db.VarChar(100)
+  recovery_notes String?
 
-  /// Section B6: Goals check-in
-  goalsCheckinTags String[] @map("goals_checkin_tags")
-  goalsNotes       String?  @map("goals_notes")
+  goals_checkin_tags String[]
+  goals_notes        String?
 
-  /// Section B7: In my own words
-  ownWords String? @map("own_words")
+  own_words String?
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  isLocked  Boolean? @default(true) @map("is_locked")
+  created_at DateTime @default(now()) @db.Timestamptz
+  is_locked  Boolean? @default(true)
 
-  @@index([participantId, checkinDate])
+  participant User @relation("ParticipantCheckins", fields: [participant_id], references: [id])
+
+  @@index([participant_id, checkin_date])
   @@map("tmg_participant_checkin")
 }
 
-/// Three-layer monthly snapshot. AI generated from daily notes and check-ins.
-/// Participant approves before locking. Append-only after approval.
 model MonthlySnapshot {
-  id            Int    @id @default(autoincrement())
-  participantId Int    @map("participant_id")
-  /// Format: 2026-05
-  monthYear     String @map("month_year") @db.VarChar(7)
-  version       Int?   @default(1)
+  id             Int    @id @default(autoincrement())
+  participant_id Int
+  month_year     String @db.VarChar(7)
+  version        Int?   @default(1)
 
-  // Generation
-  /// Daily note IDs included
-  generatedFromNotes    Int[]     @map("generated_from_notes")
-  /// Check-in IDs included
-  generatedFromCheckins Int[]     @map("generated_from_checkins")
-  generatedAt           DateTime? @map("generated_at") @db.Timestamptz
+  generated_from_notes    Int[]
+  generated_from_checkins Int[]
+  generated_at            DateTime? @db.Timestamptz
 
-  // Layer 1: Participant-first plain language
-  participantStory    String? @map("participant_story")
-  whatMattered        String? @map("what_mattered")
-  whatGotInWay        String? @map("what_got_in_way")
-  whatHelped          String? @map("what_helped")
-  recoveryCost        String? @map("recovery_cost")
-  nextMonthIntentions String? @map("next_month_intentions")
+  participant_story     String?
+  what_mattered         String?
+  what_got_in_way       String?
+  what_helped           String?
+  recovery_cost         String?
+  next_month_intentions String?
 
-  // Layer 2: Functional meaning
-  participationDomains   String[] @map("participation_domains")
-  mainFunctionalImpacts  String?  @map("main_functional_impacts")
-  frequencyPattern       String?  @map("frequency_pattern")
-  recoveryCostTrend      String?  @map("recovery_cost_trend")
-  supportsThatHelped     String?  @map("supports_that_helped")
-  whenSupportUnavailable String?  @map("when_support_unavailable")
+  participation_domains    String[]
+  main_functional_impacts  String?
+  frequency_pattern        String?
+  recovery_cost_trend      String?
+  supports_that_helped     String?
+  when_support_unavailable String?
 
-  // Layer 3: NDIS evidence view
-  mobilitySummary       String? @map("mobility_summary")
-  communicationSummary  String? @map("communication_summary")
-  socialSummary         String? @map("social_summary")
-  selfcareSummary       String? @map("selfcare_summary")
-  learningSummary       String? @map("learning_summary")
-  selfmanagementSummary String? @map("selfmanagement_summary")
+  mobility_summary       String?
+  communication_summary  String?
+  social_summary         String?
+  selfcare_summary       String?
+  learning_summary       String?
+  selfmanagement_summary String?
 
-  // Impairment linkage (NDIS Act 2013 amended 2024 requirement)
-  impairmentCategory String? @map("impairment_category")
-  impairmentLinkage  String? @map("impairment_linkage")
-  goalLinkage        String? @map("goal_linkage")
+  impairment_category String?
+  impairment_linkage  String?
+  goal_linkage        String?
 
-  // Outcome highlights
-  outcomeTags       String[] @map("outcome_tags")
-  outcomeHighlights String?  @map("outcome_highlights")
+  outcome_tags       String[]
+  outcome_highlights String?
 
-  /// Non-linear functioning statement (MANDATORY in every snapshot)
-  nonlinearStatement String @default("Capacity varied across the month, consistent with non-linear functioning. Participation improved with support scaffolding. This reflects supports working, not removal of impairment.") @map("nonlinear_statement")
+  nonlinear_statement String @default("Capacity varied across the month, consistent with non-linear functioning. Participation improved with support scaffolding. This reflects supports working, not removal of impairment.")
 
-  // Participant approval
-  /// draft | under_review | approved | locked
-  status                String?   @default("draft") @db.VarChar(50)
-  participantApproved   Boolean?  @default(false) @map("participant_approved")
-  participantApprovedAt DateTime? @map("participant_approved_at") @db.Timestamptz
-  participantAddendum   String?   @map("participant_addendum")
-  lockedAt              DateTime? @map("locked_at") @db.Timestamptz
+  status                  String?   @default("draft") @db.VarChar(50)
+  participant_approved    Boolean?  @default(false)
+  participant_approved_at DateTime? @db.Timestamptz
+  participant_addendum    String?
+  locked_at               DateTime? @db.Timestamptz
 
-  // Export
-  exportedAt   DateTime? @map("exported_at") @db.Timestamptz
-  exportFormat String?   @map("export_format") @db.VarChar(50)
+  exported_at   DateTime? @db.Timestamptz
+  export_format String?   @db.VarChar(50)
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  addenda SnapshotAddendum[]
+  participant User               @relation("ParticipantSnapshots", fields: [participant_id], references: [id])
+  addenda     SnapshotAddendum[]
 
-  @@unique([participantId, monthYear, version], map: "idx_snapshot_unique")
-  @@index([participantId, monthYear])
+  @@unique([participant_id, month_year, version], map: "idx_snapshot_unique")
+  @@index([participant_id, month_year])
   @@map("tmg_monthly_snapshot")
 }
 
-/// Addenda to approved locked snapshots. Corrections via addendum only.
-/// The original is never modified.
 model SnapshotAddendum {
-  id           Int      @id @default(autoincrement())
-  snapshotId   Int?     @map("snapshot_id")
-  addedBy      Int      @map("added_by")
-  addedByRole  String   @map("added_by_role") @db.VarChar(50)
-  addendumText String   @map("addendum_text")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id            Int      @id @default(autoincrement())
+  snapshot_id   Int?
+  added_by      Int
+  added_by_role String   @db.VarChar(50)
+  addendum_text String
+  created_at    DateTime @default(now()) @db.Timestamptz
 
-  snapshot MonthlySnapshot? @relation(fields: [snapshotId], references: [id])
+  author   User             @relation("SnapshotAddenda", fields: [added_by], references: [id])
+  snapshot MonthlySnapshot? @relation(fields: [snapshot_id], references: [id])
 
   @@map("tmg_snapshot_addendum")
 }
@@ -437,39 +462,33 @@ model SnapshotAddendum {
 // SECTION 3: CONSENT ARCHITECTURE
 // ============================================================
 
-/// Full audit trail of all consent grants and revocations. Append-only —
-/// changes create new records.
 model Consent {
-  id            Int       @id @default(autoincrement())
-  participantId Int       @map("participant_id")
-  /// NULL for platform-wide consent
-  workerId      Int?      @map("worker_id")
-  /// worker_access | documentation | external_worker | data_sharing
-  consentType   String    @map("consent_type") @db.VarChar(100)
-  /// granted | revoked | pending
-  status        String    @db.VarChar(50)
-  grantedAt     DateTime? @map("granted_at") @db.Timestamptz
-  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz
-  revokedReason String?   @map("revoked_reason")
+  id             Int       @id @default(autoincrement())
+  participant_id Int
+  worker_id      Int?
+  consent_type   String    @db.VarChar(100)
+  status         String    @db.VarChar(50)
+  granted_at     DateTime? @db.Timestamptz
+  revoked_at     DateTime? @db.Timestamptz
+  revoked_reason String?
 
-  // Scope of consent
-  canViewIntake   Boolean? @default(false) @map("can_view_intake")
-  canViewSnapshot Boolean? @default(false) @map("can_view_snapshot")
-  canAddDailyNote Boolean? @default(false) @map("can_add_daily_note")
-  canViewCheckins Boolean? @default(false) @map("can_view_checkins")
+  can_view_intake    Boolean? @default(false)
+  can_view_snapshot  Boolean? @default(false)
+  can_add_daily_note Boolean? @default(false)
+  can_view_checkins  Boolean? @default(false)
 
-  // Audit
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  /// Append-only: consent changes create new records, never update old ones
-  supersededById Int? @map("superseded_by")
+  superseded_by Int?
 
-  supersededBy Consent?  @relation("ConsentSupersession", fields: [supersededById], references: [id])
-  supersedes   Consent[] @relation("ConsentSupersession")
+  participant  User      @relation("ParticipantConsents", fields: [participant_id], references: [id])
+  worker       User?     @relation("WorkerConsents", fields: [worker_id], references: [id])
+  successor    Consent?  @relation("ConsentSupersession", fields: [superseded_by], references: [id])
+  predecessors Consent[] @relation("ConsentSupersession")
 
-  @@index([participantId, status])
-  @@index([workerId, status])
+  @@index([participant_id, status])
+  @@index([worker_id, status])
   @@map("tmg_consent")
 }
 
@@ -477,76 +496,62 @@ model Consent {
 // SECTION 4: EXTERNAL WORKER ACCESS LAYER (Layer D)
 // ============================================================
 
-/// Secure token-based invitations for external workers. 72 hour expiry.
-/// Single use. Participant controlled.
 model ExternalWorkerInvitation {
-  id            Int     @id @default(autoincrement())
-  participantId Int     @map("participant_id")
-  workerName    String  @map("worker_name") @db.VarChar(255)
-  workerEmail   String  @map("worker_email") @db.VarChar(255)
-  /// e.g. personal trainer, physiotherapist
-  workerRole    String? @map("worker_role") @db.VarChar(255)
-  /// Hashed secure token
-  tokenHash     String  @unique @map("token_hash") @db.VarChar(255)
-  /// pending | accepted | expired | revoked
-  status        String? @default("pending") @db.VarChar(50)
+  id             Int     @id @default(autoincrement())
+  participant_id Int
+  worker_name    String  @db.VarChar(255)
+  worker_email   String  @db.VarChar(255)
+  worker_role    String? @db.VarChar(255)
+  token_hash     String  @unique @db.VarChar(255)
+  status         String? @default("pending") @db.VarChar(50)
 
-  // Expiry
-  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  expiresAt  DateTime? @default(dbgenerated("(now() + '72:00:00'::interval)")) @map("expires_at") @db.Timestamptz
-  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz
-  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz
-  /// participant_id who revoked
-  revokedBy  Int?      @map("revoked_by")
+  created_at  DateTime  @default(now()) @db.Timestamptz
+  expires_at  DateTime? @default(dbgenerated("(now() + '72:00:00'::interval)")) @db.Timestamptz
+  accepted_at DateTime? @db.Timestamptz
+  revoked_at  DateTime? @db.Timestamptz
+  revoked_by  Int?
 
-  // Usage
-  noteSubmitted   Boolean?  @default(false) @map("note_submitted")
-  noteSubmittedAt DateTime? @map("note_submitted_at") @db.Timestamptz
+  note_submitted    Boolean?  @default(false)
+  note_submitted_at DateTime? @db.Timestamptz
 
-  notes ExternalSupportNote[]
+  participant User                  @relation("ParticipantInvitations", fields: [participant_id], references: [id])
+  revoker     User?                 @relation("InvitationRevocations", fields: [revoked_by], references: [id])
+  notes       ExternalSupportNote[]
 
-  @@index([participantId])
-  @@index([tokenHash])
+  @@index([participant_id])
+  @@index([token_hash])
   @@index([status])
   @@map("tmg_external_worker_invitations")
 }
 
-/// Notes submitted by external workers via invitation. The participant must
-/// approve before it enters the record.
 model ExternalSupportNote {
-  id                 Int    @id @default(autoincrement())
-  invitationId       Int?   @map("invitation_id")
-  participantId      Int    @map("participant_id")
-  externalWorkerName String @map("external_worker_name") @db.VarChar(255)
-  externalWorkerRole String @map("external_worker_role") @db.VarChar(255)
+  id                   Int    @id @default(autoincrement())
+  invitation_id        Int?
+  participant_id       Int
+  external_worker_name String @db.VarChar(255)
+  external_worker_role String @db.VarChar(255)
 
-  // Note content (simplified template)
-  sessionDate      DateTime @map("session_date") @db.Date
-  durationMinutes  Int?     @map("duration_minutes")
-  /// What they worked on
-  supportTypeTags  String[] @map("support_type_tags")
-  /// How the participant presented
-  presentationTags String[] @map("presentation_tags")
-  /// Optional one sentence outcome
-  outcomeText      String?  @map("outcome_text")
-  /// Optional safety note
-  safetyNote       String?  @map("safety_note")
+  session_date      DateTime @db.Date
+  duration_minutes  Int?
+  support_type_tags String[]
+  presentation_tags String[]
+  outcome_text      String?
+  safety_note       String?
 
-  // Participant review and approval
-  status                String?   @default("pending_review") @db.VarChar(50)
-  participantReviewedAt DateTime? @map("participant_reviewed_at") @db.Timestamptz
-  participantApproved   Boolean?  @map("participant_approved")
-  rejectionReason       String?   @map("rejection_reason")
+  status                  String?   @default("pending_review") @db.VarChar(50)
+  participant_reviewed_at DateTime? @db.Timestamptz
+  participant_approved    Boolean?
+  rejection_reason        String?
 
-  /// Append-only after submission
-  submittedAt DateTime @default(now()) @map("submitted_at") @db.Timestamptz
-  isLocked    Boolean? @default(true) @map("is_locked")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  submitted_at DateTime @default(now()) @db.Timestamptz
+  is_locked    Boolean? @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz
 
-  invitation ExternalWorkerInvitation? @relation(fields: [invitationId], references: [id])
+  participant User                      @relation("ParticipantExternalNotes", fields: [participant_id], references: [id])
+  invitation  ExternalWorkerInvitation? @relation(fields: [invitation_id], references: [id])
 
-  @@index([participantId, sessionDate])
-  @@index([participantId, status])
+  @@index([participant_id, session_date])
+  @@index([participant_id, status])
   @@map("tmg_external_support_notes")
 }
 
@@ -554,68 +559,60 @@ model ExternalSupportNote {
 // SECTION 5: INVOICE AND PAYMENT WORKFLOW
 // ============================================================
 
-/// NDIS invoice workflow. Worker creates, submits to plan manager.
-/// Full status tracking and audit trail.
 model Invoice {
-  id            Int @id @default(autoincrement())
-  workerId      Int @map("worker_id")
-  participantId Int @map("participant_id")
+  id             Int @id @default(autoincrement())
+  worker_id      Int
+  participant_id Int
 
-  // Session reference
-  dailyNoteId     Int?     @map("daily_note_id")
-  serviceDate     DateTime @map("service_date") @db.Date
-  durationMinutes Int      @map("duration_minutes")
+  daily_note_id    Int?
+  service_date     DateTime @db.Date
+  duration_minutes Int
 
-  // NDIS line item
-  /// e.g. 01_011_0107_1_1
-  supportItemNumber String?  @map("support_item_number") @db.VarChar(50)
-  supportItemName   String?  @map("support_item_name")
-  supportCategory   String?  @map("support_category") @db.VarChar(100)
-  unitPrice         Decimal? @map("unit_price") @db.Decimal(10, 2)
-  /// Hours or units
-  quantity          Decimal? @db.Decimal(10, 2)
-  gstApplicable     Boolean? @default(false) @map("gst_applicable")
-  totalAmount       Decimal? @map("total_amount") @db.Decimal(10, 2)
+  support_item_number String?  @db.VarChar(50)
+  support_item_name   String?
+  support_category    String?  @db.VarChar(100)
+  unit_price          Decimal? @db.Decimal(10, 2)
+  quantity            Decimal? @db.Decimal(10, 2)
+  gst_applicable      Boolean? @default(false)
+  total_amount        Decimal? @db.Decimal(10, 2)
 
-  // Plan management
-  planManagerName       String? @map("plan_manager_name") @db.VarChar(255)
-  planManagerEmail      String? @map("plan_manager_email") @db.VarChar(255)
-  participantNdisNumber String? @map("participant_ndis_number") @db.VarChar(50)
+  plan_manager_name       String? @db.VarChar(255)
+  plan_manager_email      String? @db.VarChar(255)
+  participant_ndis_number String? @db.VarChar(50)
 
-  // Status tracking
-  /// draft | submitted | approved | paid | rejected
-  status          String?   @default("draft") @db.VarChar(50)
-  submittedAt     DateTime? @map("submitted_at") @db.Timestamptz
-  approvedAt      DateTime? @map("approved_at") @db.Timestamptz
-  paidAt          DateTime? @map("paid_at") @db.Timestamptz
-  rejectedAt      DateTime? @map("rejected_at") @db.Timestamptz
-  rejectionReason String?   @map("rejection_reason")
+  status           String?   @default("draft") @db.VarChar(50)
+  submitted_at     DateTime? @db.Timestamptz
+  approved_at      DateTime? @db.Timestamptz
+  paid_at          DateTime? @db.Timestamptz
+  rejected_at      DateTime? @db.Timestamptz
+  rejection_reason String?
 
-  // Audit
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  dailyNote DailyNoteStructured? @relation(fields: [dailyNoteId], references: [id])
-  auditLog  InvoiceAudit[]
+  worker      User                 @relation("WorkerInvoices", fields: [worker_id], references: [id])
+  participant User                 @relation("ParticipantInvoices", fields: [participant_id], references: [id])
+  daily_note  DailyNoteStructured? @relation(fields: [daily_note_id], references: [id])
+  audit_log   InvoiceAudit[]
 
-  @@index([workerId, serviceDate])
-  @@index([participantId])
+  @@index([worker_id, service_date])
+  @@index([participant_id])
   @@index([status])
   @@map("tmg_invoices")
 }
 
-/// Append-only audit trail for invoice status changes.
 model InvoiceAudit {
-  id             Int      @id @default(autoincrement())
-  invoiceId      Int?     @map("invoice_id")
-  previousStatus String?  @map("previous_status") @db.VarChar(50)
-  newStatus      String?  @map("new_status") @db.VarChar(50)
-  changedBy      Int?     @map("changed_by")
-  changedByRole  String?  @map("changed_by_role") @db.VarChar(50)
-  notes          String?
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id              Int      @id @default(autoincrement())
+  invoice_id      Int?
+  previous_status String?  @db.VarChar(50)
+  new_status      String?  @db.VarChar(50)
+  changed_by      Int?
+  changed_by_role String?  @db.VarChar(50)
+  notes           String?
+  created_at      DateTime @default(now()) @db.Timestamptz
 
-  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+  changer User?    @relation("InvoiceAuditChanges", fields: [changed_by], references: [id])
+  invoice Invoice? @relation(fields: [invoice_id], references: [id])
 
   @@map("tmg_invoice_audit")
 }
@@ -624,31 +621,24 @@ model InvoiceAudit {
 // SECTION 6: NOTIFICATION SYSTEM
 // ============================================================
 
-/// Platform notification system. All notification types for all user roles.
 model Notification {
-  id            Int    @id @default(autoincrement())
-  recipientId   Int    @map("recipient_id")
-  /// participant | worker | admin
-  recipientRole String @map("recipient_role") @db.VarChar(50)
+  id                Int     @id @default(autoincrement())
+  recipient_id      Int
+  recipient_role    String  @db.VarChar(50)
+  notification_type String  @db.VarChar(100)
+  title             String
+  body              String
+  reference_id      Int?
+  reference_type    String? @db.VarChar(100)
 
-  /// compliance_expiry_30 | compliance_expiry_7 | compliance_expired |
-  /// snapshot_ready | note_submitted | consent_granted | consent_revoked |
-  /// external_note_pending | invoice_status
-  notificationType String @map("notification_type") @db.VarChar(100)
+  is_read    Boolean?  @default(false)
+  read_at    DateTime? @db.Timestamptz
+  created_at DateTime  @default(now()) @db.Timestamptz
 
-  title         String
-  body          String
-  /// Related record ID
-  referenceId   Int?    @map("reference_id")
-  /// daily_note | snapshot | invoice | compliance
-  referenceType String? @map("reference_type") @db.VarChar(100)
+  recipient User @relation("UserNotifications", fields: [recipient_id], references: [id])
 
-  isRead    Boolean?  @default(false) @map("is_read")
-  readAt    DateTime? @map("read_at") @db.Timestamptz
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
-
-  @@index([recipientId, recipientRole, isRead])
-  @@index([notificationType, createdAt])
+  @@index([recipient_id, recipient_role, is_read])
+  @@index([notification_type, created_at])
   @@map("tmg_notifications")
 }
 
@@ -656,44 +646,38 @@ model Notification {
 // SECTION 7: DATA RETENTION AND AUDIT
 // ============================================================
 
-/// Append-only audit trail for all significant platform actions.
-/// 7 year retention minimum.
 model AuditLog {
-  id         BigInt  @id @default(autoincrement())
-  /// User who performed the action
-  actorId    Int?    @map("actor_id")
-  actorRole  String? @map("actor_role") @db.VarChar(50)
-  /// e.g. consent_granted | note_submitted | snapshot_approved
-  action     String  @db.VarChar(100)
-  /// e.g. participant | note | snapshot
-  targetType String? @map("target_type") @db.VarChar(100)
-  targetId   Int?    @map("target_id")
-  /// Additional context
-  details    Json?   @db.JsonB
-  ipAddress  String? @map("ip_address") @db.Inet
+  id          BigInt   @id @default(autoincrement())
+  actor_id    Int?
+  actor_role  String?  @db.VarChar(50)
+  action      String   @db.VarChar(100)
+  target_type String?  @db.VarChar(100)
+  target_id   Int?
+  details     Json?
+  ip_address  String?  @db.Inet
+  created_at  DateTime @default(now()) @db.Timestamptz
 
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  actor User? @relation("AuditActor", fields: [actor_id], references: [id])
 
-  @@index([actorId, createdAt])
-  @@index([targetType, targetId, createdAt])
-  @@index([action, createdAt])
+  @@index([actor_id, created_at])
+  @@index([target_type, target_id, created_at])
+  @@index([action, created_at])
   @@map("tmg_audit_log")
 }
 
-/// Participant data deletion requests. Subject to the 7 year legal
-/// retention requirement.
 model DeletionRequest {
-  id              Int       @id @default(autoincrement())
-  participantId   Int       @map("participant_id")
-  requestedAt     DateTime  @default(now()) @map("requested_at") @db.Timestamptz
-  /// pending | approved | partial | completed
-  status          String?   @default("pending") @db.VarChar(50)
-  /// Records under legal hold cannot be deleted
-  legalHold       Boolean?  @default(false) @map("legal_hold")
-  legalHoldReason String?   @map("legal_hold_reason")
-  processedAt     DateTime? @map("processed_at") @db.Timestamptz
-  processedBy     Int?      @map("processed_by")
-  notes           String?
+  id                Int       @id @default(autoincrement())
+  participant_id    Int
+  requested_at      DateTime  @default(now()) @db.Timestamptz
+  status            String?   @default("pending") @db.VarChar(50)
+  legal_hold        Boolean?  @default(false)
+  legal_hold_reason String?
+  processed_at      DateTime? @db.Timestamptz
+  processed_by      Int?
+  notes             String?
+
+  participant User  @relation("ParticipantDeletionRequests", fields: [participant_id], references: [id])
+  processor   User? @relation("DeletionRequestsProcessed", fields: [processed_by], references: [id])
 
   @@map("tmg_deletion_requests")
 }

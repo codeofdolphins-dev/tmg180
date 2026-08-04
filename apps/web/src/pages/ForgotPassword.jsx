@@ -1,9 +1,32 @@
-import { Key, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Key, Mail, ArrowRight, ArrowLeft, LoaderCircle, TriangleAlert } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { isValidEmail } from '@tmg180/shared';
+import { useForgotPassword } from '../hooks/auth';
 import { PUBLIC_PATHS } from '../routes/paths';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  const forgotPassword = useForgotPassword();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({ defaultValues: { email: '' } });
+
+  const onSubmit = async ({ email }) => {
+    try {
+      await forgotPassword.mutateAsync(email);
+      // The API answers the same way whether or not the address is registered,
+      // so the next screen is the same either way.
+      navigate(PUBLIC_PATHS.checkEmail, { state: { email } });
+    } catch {
+      // forgotPassword.error renders in the banner below.
+    }
+  };
+
+  const busy = isSubmitting || forgotPassword.isPending;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-100 via-indigo-50 to-sky-100 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
@@ -21,27 +44,50 @@ export default function ForgotPassword() {
           </p>
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Email Address
-          </label>
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-3">
-            <Mail size={16} className="text-slate-400 shrink-0" />
-            <input
-              type="email"
-              placeholder="hello@tmg180.com"
-              className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 flex-1 min-w-0"
-            />
-          </div>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {forgotPassword.error && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm mb-5"
+            >
+              <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+              <span>{forgotPassword.error.message}</span>
+            </div>
+          )}
 
-        <button
-          onClick={() => navigate(PUBLIC_PATHS.checkEmail)}
-          className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 text-white text-sm font-semibold rounded-lg py-3.5 mb-5 transition-opacity"
-        >
-          Send reset link
-          <ArrowRight size={16} />
-        </button>
+          <div className="mb-5">
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+              Email Address
+            </label>
+            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-3 focus-within:border-brand-600 transition-colors">
+              <Mail size={16} className="text-slate-400 shrink-0" />
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="hello@tmg180.com"
+                className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 flex-1 min-w-0"
+                {...register('email', {
+                  required: 'Enter your email address.',
+                  validate: (value) => isValidEmail(value) || 'Enter a valid email address.',
+                })}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-xs text-rose-600 mt-1.5">{errors.email.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg py-3.5 mb-5 transition-opacity"
+          >
+            {busy ? <LoaderCircle size={16} className="animate-spin" /> : null}
+            {busy ? 'Sending…' : 'Send reset link'}
+            {!busy && <ArrowRight size={16} />}
+          </button>
+        </form>
 
         <button
           onClick={() => navigate(PUBLIC_PATHS.signIn)}

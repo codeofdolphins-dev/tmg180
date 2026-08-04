@@ -1,45 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, LoaderCircle, TriangleAlert } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store';
-import { authService, USING_MOCK_AUTH } from '../services/auth';
+import { isValidEmail } from '@tmg180/shared';
+import { useSignIn } from '../hooks/auth';
 import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from '../routes/paths';
 
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
-  const signIn = useAuthStore((s) => s.signIn);
-  const status = useAuthStore((s) => s.status);
-  const error = useAuthStore((s) => s.error);
-  const clearError = useAuthStore((s) => s.clearError);
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const signIn = useSignIn();
   const [showPassword, setShowPassword] = useState(false);
-  const submitting = status === 'submitting';
 
-  // A stale error from a previous visit shouldn't greet the next one.
-  useEffect(() => clearError, [clearError]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({ defaultValues: { email: '', password: '' } });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (submitting) return;
-
+  const onSubmit = async ({ email, password }) => {
     try {
-      const { role } = await signIn(email, password);
-      if (!role) {
-        // More than one workspace on the account — the person chooses.
-        navigate(PUBLIC_PATHS.chooseWorkspace, { replace: true });
-        return;
-      }
+      const { role } = await signIn.mutateAsync({ email, password });
+
+      // Roles are server-issued, so there is always one to land on directly.
       // Return them to the page the guard bounced them from, if it was theirs.
       const from = location.state?.from?.pathname;
       const target = from?.startsWith(`/${role}/`) ? from : DASHBOARD_BY_ROLE[role];
       navigate(target, { replace: true });
     } catch {
-      // The store holds the message; the banner below renders it.
+      // signIn.error renders in the banner below.
     }
   };
+
+  const busy = isSubmitting || signIn.isPending;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex items-center justify-center px-6 font-sans text-slate-800">
@@ -49,14 +42,14 @@ export default function SignIn() {
           Welcome back to your account.
         </p>
 
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          {error && (
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+          {signIn.error && (
             <div
               role="alert"
               className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
             >
               <TriangleAlert size={16} className="shrink-0 mt-0.5" />
-              <span>{error.message}</span>
+              <span>{signIn.error.message}</span>
             </div>
           )}
 
@@ -68,16 +61,19 @@ export default function SignIn() {
               <Mail size={16} className="text-slate-400 shrink-0" />
               <input
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 flex-1 min-w-0"
+                {...register('email', {
+                  required: 'Enter your email address.',
+                  validate: (value) => isValidEmail(value) || 'Enter a valid email address.',
+                })}
               />
             </div>
+            {errors.email && (
+              <p className="text-xs text-rose-600 mt-1.5 px-1">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
@@ -97,14 +93,11 @@ export default function SignIn() {
               <Lock size={16} className="text-slate-400 shrink-0" />
               <input
                 id="password"
-                name="password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 flex-1 min-w-0"
+                {...register('password', { required: 'Enter your password.' })}
               />
               <button
                 type="button"
@@ -115,49 +108,27 @@ export default function SignIn() {
                 {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
               </button>
             </div>
+            {errors.password && (
+              <p className="text-xs text-rose-600 mt-1.5 px-1">{errors.password.message}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={submitting || !email || !password}
+            disabled={busy}
             className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full py-3.5 mt-2 transition-opacity"
           >
-            {submitting && <LoaderCircle size={16} className="animate-spin" />}
-            {submitting ? 'Signing in…' : 'Sign In'}
+            {busy && <LoaderCircle size={16} className="animate-spin" />}
+            {busy ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
-        {USING_MOCK_AUTH && import.meta.env.DEV && (
-          <DemoAccounts
-            onPick={({ email: demoEmail, password: demoPassword }) => {
-              setEmail(demoEmail);
-              setPassword(demoPassword);
-              clearError();
-            }}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-/** Dev-only shortcut into the mock accounts. Never rendered in a build. */
-function DemoAccounts({ onPick }) {
-  return (
-    <div className="mt-7 border-t border-slate-100 pt-4">
-      <p className="text-xs font-medium text-slate-400 mb-2">Demo accounts (dev only)</p>
-      <div className="flex flex-col gap-1">
-        {authService.listDemoAccounts().map((account) => (
-          <button
-            key={account.email}
-            type="button"
-            onClick={() => onPick(account)}
-            className="flex items-center justify-between gap-3 text-xs text-slate-500 hover:text-brand-600 transition-colors"
-          >
-            <span className="truncate">{account.email}</span>
-            <span className="shrink-0 text-slate-400">{account.roles.join(' + ')}</span>
-          </button>
-        ))}
+        <button
+          onClick={() => navigate(PUBLIC_PATHS.signUp)}
+          className="w-full text-center text-sm text-slate-500 hover:text-slate-700 transition-colors mt-5"
+        >
+          New to TMG180? <span className="font-medium text-brand-600">Create an account</span>
+        </button>
       </div>
     </div>
   );

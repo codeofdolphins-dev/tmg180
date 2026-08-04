@@ -7,7 +7,7 @@
  * @property {() => (Tokens|null)|Promise<Tokens|null>} read
  * @property {(tokens: Tokens|null) => void|Promise<void>} write
  *
- * @typedef {{ accessToken: string, refreshToken: string }} Tokens
+ * @typedef {{ accessToken: string }} Tokens
  */
 
 const STORAGE_KEY = 'tmg180-tokens';

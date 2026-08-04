@@ -24,10 +24,21 @@ export const env = {
 
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET', { allowDevDefault: 'dev-access-secret' }),
-    refreshSecret: required('JWT_REFRESH_SECRET', { allowDevDefault: 'dev-refresh-secret' }),
     accessTtl: process.env.ACCESS_TOKEN_TTL ?? '15m',
-    refreshTtl: process.env.REFRESH_TOKEN_TTL ?? '30d',
   },
+
+  /** Where password-reset links point — the web app, not the API. */
+  appUrl: process.env.APP_URL ?? 'http://localhost:5173',
+
+  /** Password-reset link lifetime. Short by design. */
+  passwordResetTtlMinutes: Number(process.env.PASSWORD_RESET_TTL_MINUTES ?? 60),
+
+  /**
+   * SMTP is not configured yet. Until it is, reset links are written to the
+   * server log in development so the flow is testable; in production a missing
+   * transport is a hard failure rather than a silently dropped email.
+   */
+  smtpUrl: process.env.SMTP_URL ?? null,
 
   corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
     .split(',')

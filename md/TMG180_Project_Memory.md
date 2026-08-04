@@ -82,7 +82,68 @@ Layout:
 
 Demo logins (dev only, listed on the sign-in screen): `alex@tmg180.test` / `Participant1`, `sam@tmg180.test` / `Worker1234`, `admin@tmg180.test` / `Admin12345`, `both@tmg180.test` / `Both12345` (two workspaces — exercises the picker).
 
-Still to do: sign-up screens; wiring Forgot/Reset/Create-New-Password to `authService` (backend methods exist, screens are still static); session expiry/refresh UX; then the real tables. **Open for Sue/Deb**: MFA (Gaps Analysis calls for it, nothing specifies it), whether workers may hold a participant account, and the Create Account frame.
+### Registration (built 2026-08-04)
+
+Backend is now real: TypeScript + Prisma, `tmg_users` (roles array, nullable `password_hash` for invited accounts, `status`, `ndis_number`), migration `20260804060241_init` applied against local Postgres. `POST /api/v1/auth/sign-up` is live and **web is switched off the mock** (`apps/web/.env` → `VITE_AUTH_BACKEND=api`; `.env.example` committed).
+
+**The registration principle**: registration collects the minimum to create an account — name, email, password, participant-or-worker, consent. Nothing else. The heavy data gathering is deliberately *inside* the workspace, because P1-01 specs the Personal Profile as resumable across sessions (`last_section_key`) and P1-03 defaults every answer to `participant_private`; and the approved Learning Hub wording puts worker onboarding after workspace entry. An account is not a place to accumulate participant record content (Technical Brief §7).
+
+Decisions taken with Jiten (2026-08-04): no email verification yet (sign up straight in); Create Account collects the minimum + consent only (no NDIS number, no preferred name); **a new worker gets full workspace access immediately**. That last one cuts against the Learning Hub's "Complete onboarding to publish your profile (opt-in) and access tools" — if that copy stays, the gate has to come back. Flag to Sue.
+
+Consent is recorded append-only in `tmg_audit_log` (`action: 'account_created'`, details carry `{id, version}` per consent + actor IP). `REGISTRATION_CONSENTS` in `@tmg180/shared` is the single source for both the checkbox label and the audit record, so an acceptance can always be tied to exact wording. **The two consent strings are provisional and need Sue's sign-off** — one is the platform-provider disclosure the Gaps Analysis marks URGENT.
+
+Verified end to end against the live DB: 201 + session on sign-up, bcrypt `$2b$12`, versioned consent rows in the audit log; 409 `email_taken` (via the unique index, so the race is handled), 400 `weak_password` / `invalid_email` / missing-name / missing-consent (with `details.missing`), admin self-signup refused; sign-in round trip, case-insensitive email, `/me`, and refresh all good.
+
+### Personal Profile is dynamic end-to-end (2026-08-04)
+
+The participant My Profile section (hub + all 11 section pages) is fully backend-powered: P1-01 (one living profile, `last_section_key` resume), P1-02 (section structure — but seeded in code, see below), P1-03 (per-answer `visibility`, default `participant_private` — column exists and defaults; no UI control yet).
+
+**Three new tables** (migration `20260804170000_participant_profile_tables`): `tmg_participant_profiles` (1:1 user; status, `last_section_key`, `completed_sections`/`total_sections`), `tmg_participant_profile_sections` (per-section status; complete is **sticky** — never demoted once earned, Jiten's call), `tmg_participant_profile_answers` (`question_key` → JSONB `value` + `visibility`). **Section/question definitions live in `packages/shared/src/profile.js`, not the DB** — same pattern as `REGISTRATION_CONSENTS`. Adding/renaming sections or questions is a seed edit, never a migration; when ruling R-01 lands, that file is the only thing to change. `FcaIntake` untouched: it remains the internal `FCA_BASELINE` evidence artifact, distinct from the living profile.
+
+**API** (participant-role-only, always scoped to `req.user.id`): `GET /api/v1/participant/profile` (auto-creates on first visit) and `PATCH /api/v1/participant/profile/sections/:sectionKey` — the single write; upserts answers (empty value deletes the row), recomputes section status + profile progress + `last_section_key` in one transaction. Drafts are never blocked: validation rejects only malformed values (wrong type, not-an-option, out-of-range); completeness just decides status. Completion rule: all `required` questions answered (only `preferred_name` and `primary_aspiration` are required); a section with no required questions completes on its first answer.
+
+**Web**: `services/profile/` (seam) + `hooks/profile.js` — `useProfile()` (one query holds the whole profile), `useSaveSection()` (response replaces the cache), `useSectionForm(key)` (RHF prefilled from saved answers, `keepDirtyValues` so refetches never wipe typing, and save actions for every Figma button idiom: `saveDraft` / `saveAndExit` / `saveAndContinue`; Previous never saves). Hub reads real progress: per-card badges, N-of-11, Continue → `last_section_key`. All previously-inert Save Draft / Next Step buttons now save; W-06's dead "Next Step" on 11/11 is now "Save & Finish" → hub. Duplicate Volunteering/Community Groups chips on Social deduplicated. Hub's inert "Save & Exit" banner button removed (nothing to save from the hub).
+
+Verified live: create→draft→complete→sticky-complete lifecycle, steps array, toggles/selects/chips/scale, per-field 400s with details, unknown-section 404, 401 without token, 403 for worker role. Test participant with data: `flowtest@example.com` / `Password1!` (3/11 complete).
+
+### What blocks the rest of onboarding
+
+**The data has nowhere to go.** Two schema gaps, both needed before the existing screens can be wired:
+
+- **Participant profile** — schema has `FcaIntake` (flat tag arrays, per the DB pack), but the built UI is section-based (About Me collects Preferred Name / Pronouns / free text, progress `01/11`). That matches the Override's `participant_profiles` + `_sections` + `_answers` (with per-answer visibility), which does not exist. Build authority puts the Override above the DB pack — recommend adding those three tables and keeping `FcaIntake` as the internal `FCA_BASELINE` derivation that the AI intake-summary endpoint and `ParticipantGoal.intake_id` already depend on. **Needs a ruling** (compounded by the known Figma-11 vs Override-11 section mismatch).
+- **Worker** — nothing exists at all: P3-01 `worker_relational_profiles` (7 prompts), P3-03 `worker_profile_supporting_details`, plus governance standing and policy acknowledgements, which the DB pack never specified.
+
+### Auth complete, fully backend-powered (2026-08-04)
+
+**There is no mock auth anywhere.** `mockAuthBackend.js` is deleted; `apps/web/src/services/auth/index.js` calls the API and nothing else. A screen that looks signed in without a server session is worse than one that fails loudly.
+
+**Frontend stack from here on: react-hook-form + TanStack Query + react-select.** Applied to the auth screens only — the other ~65 screens keep their current idiom and get converted as each is worked on. (react-select isn't installed yet: no auth screen has a select. It comes in with the first screen that needs one, e.g. Pronouns on About Me.)
+
+Split of responsibilities: **TanStack Query owns server state** (`src/hooks/auth.js` — `useSignIn / useSignUp / useForgotPassword / useResetPassword / useResetTokenCheck / useSessionSync`), **zustand owns session state only** (`user / roles / role / isAuthenticated` + `setSession / selectRole / signOut`). The store no longer holds `status` or `error` — those come from the mutation. `signOut` clears the whole query cache, so one person's data never survives into the next sign-in on a shared device.
+
+`useSessionSync` (mounted in `App.jsx`) re-validates a persisted session against `/auth/me` on load — localStorage says who *was* signed in; only the server knows if that's still true.
+
+API endpoints: `sign-up · sign-in · refresh · sign-out · me · forgot-password · reset-password/:token (GET verify) · reset-password (POST)`. New tables: `tmg_refresh_tokens` (opaque token, SHA-256 at rest — sign-out is now real revocation, not the old client-side no-op) and `tmg_password_resets` (single-use, one hour, hash at rest; completing a reset revokes every refresh session).
+
+Reset link → `${APP_URL}/create-new-password?token=…`. The link is checked *before* the form renders, so a dead link lands on Link Expired rather than failing after someone types a new password. Link Expired now branches on `state.reason`: the Figma frame's copy is about participant-revoked share links, which is wrong for an expired reset link.
+
+**No email transport is configured.** `src/services/mailer.ts` logs the reset link to the server console in development and *throws in production* — an unsent reset email must be a visible failure, not a participant silently locked out. Wiring a provider means implementing `deliver` and nothing else.
+
+**Security deliberately deferred (Jiten's call, 2026-08-04): flow first.** Removed after building them: rate limiting on the auth routes, refresh-token rotation with replay detection, and the per-request `sessions_valid_from` check in `requireAuth`. Consequences to re-open in the security pass — `requireAuth` is stateless, so a suspended account or a reset password leaves an already-issued access token usable for up to its 15-minute TTL (revocation takes effect at refresh); there is no brute-force protection on sign-in or reset; no MFA. All of this belongs to the "Cybersecurity and Privacy Specification" the Gaps Analysis lists as unwritten and HIGH.
+
+Verified end to end against the live database — 39 assertions across two suites: sign-up/sign-in/me, the api-client's 401→refresh→retry path, typed error codes, sign-out revoking server-side, the full reset round trip (verify → reset → single-use → old password dead → new password works), and dead tokens being cleared from storage with `onAuthLost` firing.
+
+### Sessions and reset tokens simplified to stateless JWTs (2026-08-04)
+
+**Jiten's call: flow first, sessions later.** `tmg_refresh_tokens` and `tmg_password_resets` — built and verified the same day (see above) — were removed one session later as unnecessary complexity for a flow that isn't live yet. Migration `20260804070000_remove_refresh_tokens_and_password_resets` drops both tables; `RefreshToken`/`PasswordReset` are gone from `schema.prisma`.
+
+What changed: sign-in/sign-up now return a single `accessToken` (no `refreshToken`); `POST /auth/refresh` and `POST /auth/sign-out` are gone (`sign-out` is purely client-side — the token store is cleared, nothing to revoke). `services/tokens.ts` signs both the access token and the password-reset token as JWTs off the same secret (`signResetToken` / `decodeResetToken`, reset payload carries `purpose: 'password_reset'` so the two can't be swapped for each other). `forgotPassword` no longer writes a DB row — the emailed link's token *is* the proof.
+
+Traded away, deliberately, and worth re-opening in the security pass: a reset link can't be revoked early or enforced single-use (it's valid to replay until it expires); there's no more server-side session to kill on sign-out or on password change (an already-issued access token stays usable for its 15-minute TTL regardless). `apps/web` (`@tmg180/api-client`, `authStore.js`) updated to match — `TokenStore` now only holds `accessToken`; a 401 on an authenticated call clears the token and fires `onAuthLost` directly (no refresh-and-retry).
+
+Verified against the live DB: sign-up → forgot-password (link logged to console) → verify-token → reset-password → sign-in with the new password, `/me` with the fresh token, invalid-token rejection, and `/auth/refresh` + `/auth/sign-out` both 404 as expected.
+
+**Open for Sue/Deb**: MFA, whether a worker may also hold a participant account, the two consent strings, and the two schema rulings above.
 
 Fixed in passing: `ChooseWorkspace` said "TMG180 Governance Admin" — a banned term — now "TMG180 Platform Admin". **Still outstanding**: `AdminProfile.jsx:33` has a "Governance Admin" card title.
 

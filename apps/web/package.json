@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/react-query": "^5.101.4",
     "@tmg180/api-client": "workspace:*",
     "@tmg180/shared": "workspace:*",
     "@tmg180/terminology": "workspace:*",
     "lucide-react": "^1.27.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-hook-form": "^7.84.0",
     "react-router-dom": "^7.18.1",
     "tailwindcss": "^4.3.3",
     "zustand": "^5.0.14"

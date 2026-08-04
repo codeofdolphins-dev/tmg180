@@ -7,6 +7,7 @@ import { ROLES } from '../store';
 
 export const PUBLIC_PATHS = {
   signIn: '/sign-in',
+  signUp: '/sign-up',
   forgotPassword: '/forgot-password',
   checkEmail: '/check-email',
   resetPassword: '/reset-password',

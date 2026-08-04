@@ -3,7 +3,8 @@ import { ROLES } from '../store';
 import { PUBLIC_PATHS } from './paths';
 import RequireRole, { RequireSession, RootRedirect } from './RequireRole';
 import { publicRoutes, sessionRoutes } from './publicRoutes';
-import { participantRoutes } from './participantRoutes';
+import { participantRoutes, participantStandaloneRoutes } from './participantRoutes';
+import ParticipantLayout from '../components/layout/ParticipantLayout';
 import { workerRoutes } from './workerRoutes';
 import { adminRoutes } from './adminRoutes';
 
@@ -23,7 +24,13 @@ export default function AppRoutes() {
       </Route>
 
       <Route path="/participant" element={<RequireRole role={ROLES.PARTICIPANT} />}>
-        {participantRoutes.map(({ path, element }) => (
+        {/* Shared portal chrome; pages render into its <Outlet />. */}
+        <Route element={<ParticipantLayout />}>
+          {participantRoutes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
+        </Route>
+        {participantStandaloneRoutes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
         ))}
       </Route>

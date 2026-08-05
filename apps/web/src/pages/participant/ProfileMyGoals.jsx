@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 
 import { useFieldArray } from 'react-hook-form';
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { useSectionForm } from '../../hooks/participant/profile';
 
 const GOAL_EXAMPLES = [
   '• Becoming more independent at home',

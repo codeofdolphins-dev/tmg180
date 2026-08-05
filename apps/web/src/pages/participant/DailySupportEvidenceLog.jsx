@@ -15,7 +15,7 @@ import {
   Save,
   Clock,
 } from 'lucide-react';
-import Button from '../components/ui/Button';
+import Button from '../../components/ui/Button';
 
 const FUNCTIONAL_DOMAINS = [
   { label: 'Social', icon: Users },

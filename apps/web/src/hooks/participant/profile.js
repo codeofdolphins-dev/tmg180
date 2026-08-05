@@ -8,9 +8,9 @@ import {
   nextProfileSection,
   profileSection,
 } from '@tmg180/shared';
-import { queryClient } from '../lib/queryClient';
-import { PARTICIPANT_PATHS } from '../routes/paths';
-import { profileService } from '../services/profile';
+import { queryClient } from '../../lib/queryClient';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
+import { profileService } from '../../services/participant/profile';
 
 /**
  * Server state for the Personal Profile. One query holds the whole profile

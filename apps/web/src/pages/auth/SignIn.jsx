@@ -3,14 +3,15 @@ import { Mail, Lock, Eye, EyeOff, LoaderCircle, TriangleAlert } from 'lucide-rea
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isValidEmail } from '@tmg180/shared';
-import { useSignIn } from '../hooks/auth';
-import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from '../routes/paths';
+import { useAuthStore } from '../../store';
+import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from '../../routes/paths';
 
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
-  const signIn = useSignIn();
+  const signIn = useAuthStore((s) => s.signIn);
   const [showPassword, setShowPassword] = useState(false);
+  const [failure, setFailure] = useState(null);
 
   const {
     register,
@@ -19,20 +20,21 @@ export default function SignIn() {
   } = useForm({ defaultValues: { email: '', password: '' } });
 
   const onSubmit = async ({ email, password }) => {
+    setFailure(null);
     try {
-      const { role } = await signIn.mutateAsync({ email, password });
+      const role = await signIn(email, password);
 
       // Roles are server-issued, so there is always one to land on directly.
       // Return them to the page the guard bounced them from, if it was theirs.
       const from = location.state?.from?.pathname;
       const target = from?.startsWith(`/${role}/`) ? from : DASHBOARD_BY_ROLE[role];
       navigate(target, { replace: true });
-    } catch {
-      // signIn.error renders in the banner below.
+    } catch (error) {
+      setFailure(error);
     }
   };
 
-  const busy = isSubmitting || signIn.isPending;
+  const busy = isSubmitting;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex items-center justify-center px-6 font-sans text-slate-800">
@@ -43,13 +45,13 @@ export default function SignIn() {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-          {signIn.error && (
+          {failure && (
             <div
               role="alert"
               className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
             >
               <TriangleAlert size={16} className="shrink-0 mt-0.5" />
-              <span>{signIn.error.message}</span>
+              <span>{failure.message}</span>
             </div>
           )}
 

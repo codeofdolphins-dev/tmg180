@@ -18,8 +18,8 @@ export class ApiError extends Error {
         public message = "Something went wrong!!!",
         public data: unknown = null,
         public errors: unknown[] = [],
-        // Stable machine-readable code. @tmg180/api-client switches on this,
-        // so it travels in the error envelope alongside the message.
+        // Stable machine-readable code, carried in the error envelope
+        // alongside the message.
         public code?: string
     ) {
         super(message);

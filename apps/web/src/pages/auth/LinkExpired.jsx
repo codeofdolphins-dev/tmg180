@@ -1,8 +1,8 @@
 import { Home, KeyRound } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Button from '../components/ui/Button';
-import LinkExpiredIllustration from '../components/ui/LinkExpiredIllustration';
-import { PUBLIC_PATHS } from '../routes/paths';
+import Button from '../../components/ui/Button';
+import LinkExpiredIllustration from '../../components/ui/LinkExpiredIllustration';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 /**
  * Two links can land here. The Figma frame is written for a participant-revoked

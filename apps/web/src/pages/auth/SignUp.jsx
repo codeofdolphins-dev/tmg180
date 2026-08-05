@@ -15,8 +15,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { ROLES, REGISTRATION_CONSENTS, checkPassword, isValidEmail } from '@tmg180/shared';
-import { useSignUp } from '../hooks/auth';
-import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from '../routes/paths';
+import { useAuthStore } from '../../store';
+import { PUBLIC_PATHS, DASHBOARD_BY_ROLE } from '../../routes/paths';
 
 /**
  * Create Account. No Figma frame exists for this screen — TITLE.md logged its
@@ -45,8 +45,9 @@ const WORKSPACE_CHOICES = [
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const signUp = useSignUp();
+  const signUp = useAuthStore((s) => s.signUp);
   const [showPassword, setShowPassword] = useState(false);
+  const [failure, setFailure] = useState(null);
 
   const {
     register,
@@ -62,15 +63,16 @@ export default function SignUp() {
   const { rules } = checkPassword(password);
 
   const onSubmit = async (values) => {
+    setFailure(null);
     try {
-      const { role } = await signUp.mutateAsync(values);
+      const role = await signUp(values);
       navigate(DASHBOARD_BY_ROLE[role], { replace: true });
-    } catch {
-      // signUp.error renders in the banner below.
+    } catch (error) {
+      setFailure(error);
     }
   };
 
-  const busy = isSubmitting || signUp.isPending;
+  const busy = isSubmitting;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex items-center justify-center px-6 py-12 font-sans text-slate-800">
@@ -81,13 +83,13 @@ export default function SignUp() {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-          {signUp.error && (
+          {failure && (
             <div
               role="alert"
               className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm"
             >
               <TriangleAlert size={16} className="shrink-0 mt-0.5" />
-              <span>{signUp.error.message}</span>
+              <span>{failure.message}</span>
             </div>
           )}
 

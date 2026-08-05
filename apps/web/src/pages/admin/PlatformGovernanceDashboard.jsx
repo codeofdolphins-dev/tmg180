@@ -14,7 +14,7 @@ import {
   FilePenLine,
   TrendingUp,
 } from 'lucide-react';
-import GovernanceSidebar, { GOV_NAV_ITEMS } from '../components/layout/GovernanceSidebar';
+import GovernanceSidebar, { GOV_NAV_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
 
 const NAV_ITEMS = [
   ...GOV_NAV_ITEMS,

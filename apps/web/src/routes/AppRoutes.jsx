@@ -2,11 +2,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROLES } from '../store';
 import { PUBLIC_PATHS } from './paths';
 import RequireRole, { RequireSession, RootRedirect } from './RequireRole';
-import { publicRoutes, sessionRoutes } from './publicRoutes';
-import { participantRoutes, participantStandaloneRoutes } from './participantRoutes';
-import ParticipantLayout from '../components/layout/ParticipantLayout';
-import { workerRoutes } from './workerRoutes';
-import { adminRoutes } from './adminRoutes';
+import { publicRoutes, sessionRoutes } from './auth/publicRoutes';
+import { participantRoutes, participantStandaloneRoutes } from './participant/participantRoutes';
+import ParticipantLayout from '../components/layout/participant/ParticipantLayout';
+import { workerRoutes } from './worker/workerRoutes';
+import { adminRoutes } from './admin/adminRoutes';
 
 export default function AppRoutes() {
   return (

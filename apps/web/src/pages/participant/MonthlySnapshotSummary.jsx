@@ -5,7 +5,7 @@ import {
   History,
   MessageSquarePlus,
 } from 'lucide-react';
-import Button from '../components/ui/Button';
+import Button from '../../components/ui/Button';
 
 const PREVIEW_SECTIONS = [
   {

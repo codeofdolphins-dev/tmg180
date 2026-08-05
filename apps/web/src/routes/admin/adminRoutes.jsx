@@ -1,18 +1,18 @@
-import PlatformGovernanceDashboard from '../pages/PlatformGovernanceDashboard';
-import WorkersReport from '../pages/WorkersReport';
-import ReportDetail from '../pages/ReportDetail';
-import AddNewReport from '../pages/AddNewReport';
-import GovernanceStanding from '../pages/GovernanceStanding';
-import Policies from '../pages/Policies';
-import PolicyVersionDetail from '../pages/PolicyVersionDetail';
-import IncidentsComplaints from '../pages/IncidentsComplaints';
-import TicketDetail from '../pages/TicketDetail';
-import ParticipantOverview from '../pages/ParticipantOverview';
-import ConsentAuditLog from '../pages/ConsentAuditLog';
-import SettingsPage from '../pages/SettingsPage';
-import AdminProfile from '../pages/AdminProfile';
-import PermissionDeniedAdmin from '../pages/PermissionDeniedAdmin';
-import { ADMIN_PATHS as P, rel } from './paths';
+import PlatformGovernanceDashboard from '../../pages/admin/PlatformGovernanceDashboard';
+import WorkersReport from '../../pages/admin/WorkersReport';
+import ReportDetail from '../../pages/admin/ReportDetail';
+import AddNewReport from '../../pages/admin/AddNewReport';
+import GovernanceStanding from '../../pages/admin/GovernanceStanding';
+import Policies from '../../pages/admin/Policies';
+import PolicyVersionDetail from '../../pages/admin/PolicyVersionDetail';
+import IncidentsComplaints from '../../pages/admin/IncidentsComplaints';
+import TicketDetail from '../../pages/admin/TicketDetail';
+import ParticipantOverview from '../../pages/admin/ParticipantOverview';
+import ConsentAuditLog from '../../pages/admin/ConsentAuditLog';
+import SettingsPage from '../../pages/admin/SettingsPage';
+import AdminProfile from '../../pages/admin/AdminProfile';
+import PermissionDeniedAdmin from '../../pages/admin/PermissionDeniedAdmin';
+import { ADMIN_PATHS as P, rel } from '../paths';
 
 /** Platform Governance — metadata-only admin portal. */
 export const adminRoutes = [

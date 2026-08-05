@@ -10,8 +10,8 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 const SHARE_PLACEHOLDER =
   'Share anything that helps us understand your day-to-day health or wellbeing.';

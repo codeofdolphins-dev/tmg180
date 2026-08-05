@@ -1,9 +1,9 @@
 import { Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import WorkspaceLayout from '../components/layout/WorkspaceLayout';
-import ExportIllustration from '../components/ui/ExportIllustration';
-import Button from '../components/ui/Button';
-import { WORKER_PATHS } from '../routes/paths';
+import WorkspaceLayout from '../../components/layout/worker/WorkspaceLayout';
+import ExportIllustration from '../../components/ui/ExportIllustration';
+import Button from '../../components/ui/Button';
+import { WORKER_PATHS } from '../../routes/paths';
 
 export default function EmptyExport() {
   const navigate = useNavigate();

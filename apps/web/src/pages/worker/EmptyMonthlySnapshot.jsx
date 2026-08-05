@@ -1,9 +1,9 @@
 import { NotebookPen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import WorkspaceLayout from '../components/layout/WorkspaceLayout';
-import SnapshotIllustration from '../components/ui/SnapshotIllustration';
-import Button from '../components/ui/Button';
-import { WORKER_PATHS } from '../routes/paths';
+import WorkspaceLayout from '../../components/layout/worker/WorkspaceLayout';
+import SnapshotIllustration from '../../components/ui/SnapshotIllustration';
+import Button from '../../components/ui/Button';
+import { WORKER_PATHS } from '../../routes/paths';
 
 export default function EmptyMonthlySnapshot() {
   const navigate = useNavigate();

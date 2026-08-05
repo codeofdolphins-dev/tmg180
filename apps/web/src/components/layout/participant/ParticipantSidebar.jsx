@@ -6,9 +6,11 @@ import {
   Search,
   HelpCircle,
   Lock,
+  LogOut,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { PARTICIPANT_PATHS as P } from '../../routes/paths';
+import { PARTICIPANT_PATHS as P, PUBLIC_PATHS } from '../../../routes/paths';
+import { useAuthStore } from '../../../store';
 
 /**
  * Fixed participant portal sidebar (Figma: Participant Dashboard frame — the
@@ -23,7 +25,7 @@ const NAV_ITEMS = [
   { label: 'Daily Log', icon: NotebookPen, path: P.dailyLog },
   { label: 'Monthly Snapshot', icon: CalendarDays, path: P.snapshot },
   {
-    label: 'Verified Profiles Directory',
+    label: 'Verified Workers',
     icon: Search,
     path: P.browseWorkers,
     match: [P.browseWorkers, P.directory],
@@ -60,6 +62,12 @@ function NavItem({ icon: Icon, label, active, wide, onClick }) {
 export default function ParticipantSidebar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const signOut = useAuthStore((s) => s.signOut);
+
+  const logout = () => {
+    signOut();
+    navigate(PUBLIC_PATHS.signIn, { replace: true });
+  };
 
   return (
     <aside className="fixed inset-y-0 left-0 z-20 w-64 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6 overflow-y-auto">
@@ -91,6 +99,7 @@ export default function ParticipantSidebar() {
             wide
           />
         ))}
+        <NavItem icon={LogOut} label="Logout" onClick={logout} wide />
       </div>
     </aside>
   );

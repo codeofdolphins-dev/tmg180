@@ -9,7 +9,7 @@ import {
   Languages,
   Sparkles,
 } from 'lucide-react';
-import Button from '../components/ui/Button';
+import Button from '../../components/ui/Button';
 
 const SUPPORT_FOCUS = [
   'Daily living',

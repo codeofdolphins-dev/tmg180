@@ -13,8 +13,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { checkPassword } from '@tmg180/shared';
-import { useResetFlow } from '../hooks/useResetFlow';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { useResetFlow } from '../../hooks/auth/useResetFlow';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 /** Target of the emailed reset link: /create-new-password?token=… */
 export default function CreateNewPassword() {

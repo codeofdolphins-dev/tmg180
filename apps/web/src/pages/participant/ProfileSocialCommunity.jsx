@@ -1,7 +1,7 @@
 import { Users, Shapes, Check, Lightbulb, TriangleAlert } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 const ACTIVITIES_PLACEHOLDER =
   'For example: spending time with friends, attending community events, playing sport, volunteering, or participating in hobbies.';

@@ -1,7 +1,7 @@
 import { Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store';
-import { PARTICIPANT_PATHS } from '../../routes/paths';
+import { useAuthStore } from '../../../store';
+import { PARTICIPANT_PATHS } from '../../../routes/paths';
 
 /** "Andrew Joseph" -> "AJ". Falls back to the Figma persona initial. */
 function initials(name) {

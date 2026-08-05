@@ -10,8 +10,8 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 const MORNING_PLACEHOLDER =
   'For example:\n\n• I usually wake up around 7am.\n• I prepare breakfast independently.\n• I need help getting dressed.';

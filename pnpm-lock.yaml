@@ -72,15 +72,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.101.4
         version: 5.101.4(react@19.2.8)
-      '@tmg180/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
       '@tmg180/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@tmg180/terminology':
-        specifier: workspace:*
-        version: link:../../packages/terminology
       lucide-react:
         specifier: ^1.27.0
         version: 1.28.0(react@19.2.8)
@@ -115,12 +109,6 @@ importers:
       vite:
         specifier: ^8.1.1
         version: 8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)
-
-  packages/api-client:
-    dependencies:
-      '@tmg180/shared':
-        specifier: workspace:*
-        version: link:../shared
 
   packages/shared: {}
 

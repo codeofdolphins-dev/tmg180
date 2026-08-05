@@ -13,8 +13,8 @@ import {
   LifeBuoy,
   Disc,
 } from 'lucide-react';
-import { ROLES } from '../../store';
-import { useRoleNav } from '../../navigation/useRoleNav';
+import { ROLES } from '../../../store';
+import { useRoleNav } from '../../../navigation/useRoleNav';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard },

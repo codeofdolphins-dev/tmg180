@@ -10,8 +10,8 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 /** Values match the current_situation options in @tmg180/shared. */
 const SITUATIONS = [

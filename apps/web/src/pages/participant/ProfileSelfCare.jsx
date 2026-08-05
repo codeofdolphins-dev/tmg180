@@ -7,8 +7,8 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 /** Values match the personal_care / medication_routine options in @tmg180/shared. */
 const PERSONAL_CARE_OPTIONS = [

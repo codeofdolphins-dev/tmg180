@@ -1,7 +1,7 @@
 import { SlidersHorizontal, ChevronDown, UserCircle, Settings } from 'lucide-react';
-import GovernanceLayout from '../components/layout/GovernanceLayout';
-import { GOV_NAV_ITEMS } from '../components/layout/GovernanceSidebar';
-import Button from '../components/ui/Button';
+import GovernanceLayout from '../../components/layout/admin/GovernanceLayout';
+import { GOV_NAV_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
+import Button from '../../components/ui/Button';
 
 const NAV_ITEMS = [...GOV_NAV_ITEMS, { label: 'Settings', icon: Settings }];
 const BOTTOM_ITEMS = [{ label: 'Admin Profile', icon: UserCircle }];

@@ -1,7 +1,7 @@
 import { Speech, BrainCog, Lightbulb, TriangleAlert } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { useSectionForm } from '../../hooks/participant/profile';
 
 /** Values match the preferred_communication options in @tmg180/shared. */
 const COMM_METHODS = [

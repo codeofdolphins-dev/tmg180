@@ -1,15 +1,15 @@
-import SignIn from '../pages/SignIn';
-import SignUp from '../pages/SignUp';
-import ForgotPassword from '../pages/ForgotPassword';
-import CheckYourEmail from '../pages/CheckYourEmail';
-import ResetPassword from '../pages/ResetPassword';
-import CreateNewPassword from '../pages/CreateNewPassword';
-import PasswordUpdated from '../pages/PasswordUpdated';
-import RoleSelection from '../pages/RoleSelection';
-import ChooseWorkspace from '../pages/ChooseWorkspace';
-import LinkExpired from '../pages/LinkExpired';
-import SomethingWentWrong from '../pages/SomethingWentWrong';
-import { PUBLIC_PATHS as P } from './paths';
+import SignIn from '../../pages/auth/SignIn';
+import SignUp from '../../pages/auth/SignUp';
+import ForgotPassword from '../../pages/auth/ForgotPassword';
+import CheckYourEmail from '../../pages/auth/CheckYourEmail';
+import ResetPassword from '../../pages/auth/ResetPassword';
+import CreateNewPassword from '../../pages/auth/CreateNewPassword';
+import PasswordUpdated from '../../pages/auth/PasswordUpdated';
+import RoleSelection from '../../pages/auth/RoleSelection';
+import ChooseWorkspace from '../../pages/auth/ChooseWorkspace';
+import LinkExpired from '../../pages/auth/LinkExpired';
+import SomethingWentWrong from '../../pages/auth/SomethingWentWrong';
+import { PUBLIC_PATHS as P } from '../paths';
 
 /** Auth flow + share-link/system states. No session required. */
 export const publicRoutes = [

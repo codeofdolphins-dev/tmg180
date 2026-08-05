@@ -1,7 +1,7 @@
 import { UserPen, ChevronDown, Lightbulb, TriangleAlert } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { useSectionForm } from '../../hooks/participant/profile';
 
 const YOUR_INFORMATION_LINES = [
   'Your Personal Profile belongs to you.',

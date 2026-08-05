@@ -11,8 +11,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { checkPassword } from '@tmg180/shared';
-import { useResetFlow } from '../hooks/useResetFlow';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { useResetFlow } from '../../hooks/auth/useResetFlow';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 /**
  * The compact variant of the reset screen (a separate Figma frame from Create

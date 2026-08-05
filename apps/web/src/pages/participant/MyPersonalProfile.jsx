@@ -15,7 +15,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import { PROFILE_SECTION_STATUS } from '@tmg180/shared';
-import { SECTION_PATHS, useProfile } from '../hooks/profile';
+import { SECTION_PATHS, useProfile } from '../../hooks/participant/profile';
 
 /**
  * Hub cards in seed order. `key` ties each card to its section in
@@ -244,7 +244,10 @@ export default function MyPersonalProfile() {
             </button>
           </div>
         </div>
-        <div className="w-70.75 h-39.75 shrink-0 rounded-xl bg-linear-to-br from-[#2563eb] via-[#5b8def] to-[#9db8f5] shadow-md" />
+        {/* <div className="w-70.75 h-39.75 shrink-0 rounded-xl bg-linear-to-br from-[#2563eb] via-[#5b8def] to-[#9db8f5] shadow-md" /> */}
+        <div className="w-70.75 h-39.75 overflow-hidden rounded-xl">
+          <img src="/images/img.jpg" alt="" className='w-full h-full object-cover' />
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">

@@ -1,24 +1,24 @@
-import WorkerDashboard from '../pages/WorkerDashboard';
-import WorkerOnboarding from '../pages/WorkerOnboarding';
-import WorkerProfile from '../pages/WorkerProfile';
-import WorkerSettings from '../pages/WorkerSettings';
-import Calendar from '../pages/Calendar';
-import ParticipantsISupport from '../pages/ParticipantsISupport';
-import NoConsentAccess from '../pages/NoConsentAccess';
-import EmptyDailyLogs from '../pages/EmptyDailyLogs';
-import DailyLogForm from '../pages/DailyLogForm';
-import ApprovedSnapshots from '../pages/ApprovedSnapshots';
-import EmptyMonthlySnapshot from '../pages/EmptyMonthlySnapshot';
-import EmptyExport from '../pages/EmptyExport';
-import LearningHub from '../pages/LearningHub';
-import LearningHubResource from '../pages/LearningHubResource';
-import Resources from '../pages/Resources';
-import WorkerGovernanceStanding from '../pages/WorkerGovernanceStanding';
-import GovernanceItemDetail from '../pages/GovernanceItemDetail';
-import HelpCentre from '../pages/HelpCentre';
-import EmptyFavourites from '../pages/EmptyFavourites';
-import PermissionDeniedWorker from '../pages/PermissionDeniedWorker';
-import { WORKER_PATHS as P, rel } from './paths';
+import WorkerDashboard from '../../pages/worker/WorkerDashboard';
+import WorkerOnboarding from '../../pages/worker/WorkerOnboarding';
+import WorkerProfile from '../../pages/worker/WorkerProfile';
+import WorkerSettings from '../../pages/worker/WorkerSettings';
+import Calendar from '../../pages/worker/Calendar';
+import ParticipantsISupport from '../../pages/worker/ParticipantsISupport';
+import NoConsentAccess from '../../pages/worker/NoConsentAccess';
+import EmptyDailyLogs from '../../pages/worker/EmptyDailyLogs';
+import DailyLogForm from '../../pages/worker/DailyLogForm';
+import ApprovedSnapshots from '../../pages/worker/ApprovedSnapshots';
+import EmptyMonthlySnapshot from '../../pages/worker/EmptyMonthlySnapshot';
+import EmptyExport from '../../pages/worker/EmptyExport';
+import LearningHub from '../../pages/worker/LearningHub';
+import LearningHubResource from '../../pages/worker/LearningHubResource';
+import Resources from '../../pages/worker/Resources';
+import WorkerGovernanceStanding from '../../pages/worker/WorkerGovernanceStanding';
+import GovernanceItemDetail from '../../pages/worker/GovernanceItemDetail';
+import HelpCentre from '../../pages/worker/HelpCentre';
+import EmptyFavourites from '../../pages/worker/EmptyFavourites';
+import PermissionDeniedWorker from '../../pages/worker/PermissionDeniedWorker';
+import { WORKER_PATHS as P, rel } from '../paths';
 
 /** Worker Workspace — self-employed support workers. */
 export const workerRoutes = [

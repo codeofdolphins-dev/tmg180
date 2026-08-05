@@ -1,7 +1,7 @@
 import { User, History, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore, ROLES as APP_ROLES } from '../store';
-import { DASHBOARD_BY_ROLE } from '../routes/paths';
+import { useAuthStore, ROLES as APP_ROLES } from '../../store';
+import { DASHBOARD_BY_ROLE } from '../../routes/paths';
 
 const ROLES = [
   {

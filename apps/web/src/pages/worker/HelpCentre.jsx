@@ -8,8 +8,8 @@ import {
   GraduationCap,
   ChevronDown,
 } from 'lucide-react';
-import WorkspaceLayout from '../components/layout/WorkspaceLayout';
-import { WORKSPACE_NAV_ITEMS_LOWER, WORKSPACE_HELP_ICON } from '../components/layout/WorkspaceSidebar';
+import WorkspaceLayout from '../../components/layout/worker/WorkspaceLayout';
+import { WORKSPACE_NAV_ITEMS_LOWER, WORKSPACE_HELP_ICON } from '../../components/layout/worker/WorkspaceSidebar';
 
 const LOWER_NAV_ITEMS = WORKSPACE_NAV_ITEMS_LOWER.filter((item) => item.label !== 'Help');
 const BOTTOM_NAV_ITEMS = [{ label: 'Help', icon: WORKSPACE_HELP_ICON }];

@@ -1,6 +1,6 @@
 import { User, NotebookPen, ArrowRight, TrendingUp, Files } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PARTICIPANT_PATHS } from '../routes/paths';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
 
 const SNAPSHOT_BARS = [29, 43, 58, 48, 72, 82, 67];
 

@@ -1,6 +1,6 @@
 import { RefreshCw, Headset, Info } from 'lucide-react';
-import ErrorIllustration from '../components/ui/ErrorIllustration';
-import Button from '../components/ui/Button';
+import ErrorIllustration from '../../components/ui/ErrorIllustration';
+import Button from '../../components/ui/Button';
 
 export default function SomethingWentWrong() {
   return (

@@ -17,9 +17,9 @@ import {
   Save,
   Send,
 } from 'lucide-react';
-import Button from '../components/ui/Button';
+import Button from '../../components/ui/Button';
 
-import { useRoleNav } from '../navigation/useRoleNav';
+import { useRoleNav } from '../../navigation/useRoleNav';
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard },
   { label: 'Participants', icon: Users },

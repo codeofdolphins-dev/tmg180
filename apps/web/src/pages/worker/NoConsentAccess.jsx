@@ -8,9 +8,9 @@ import {
   User,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import WorkspaceLayout from '../components/layout/WorkspaceLayout';
-import Button from '../components/ui/Button';
-import { WORKER_PATHS } from '../routes/paths';
+import WorkspaceLayout from '../../components/layout/worker/WorkspaceLayout';
+import Button from '../../components/ui/Button';
+import { WORKER_PATHS } from '../../routes/paths';
 
 const SUGGESTIONS = [
   {

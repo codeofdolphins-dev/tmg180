@@ -12,14 +12,14 @@ import {
   TrendingUp,
   Lock,
 } from 'lucide-react';
-import GovernanceLayout from '../components/layout/GovernanceLayout';
-import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
-import MetricCard from '../components/ui/MetricCard';
-import Avatar from '../components/ui/Avatar';
-import { PolicyTrendChart, IncidentRateChart } from '../components/ui/TrendCharts';
+import GovernanceLayout from '../../components/layout/admin/GovernanceLayout';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import MetricCard from '../../components/ui/MetricCard';
+import Avatar from '../../components/ui/Avatar';
+import { PolicyTrendChart, IncidentRateChart } from '../../components/ui/TrendCharts';
 import { useNavigate } from 'react-router-dom';
-import { ADMIN_PATHS } from '../routes/paths';
+import { ADMIN_PATHS } from '../../routes/paths';
 
 const METADATA_ITEMS = [
   { icon: ShieldCheck, text: 'Worker verification records' },

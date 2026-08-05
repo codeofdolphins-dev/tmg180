@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useResetPassword, useResetTokenCheck } from './auth';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { api } from '../../lib/apiClient';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 /**
  * Shared behaviour for the two screens that consume a reset link (Create New
@@ -15,31 +15,50 @@ export function useResetFlow() {
   const [params] = useSearchParams();
   const token = params.get('token');
 
-  const check = useResetTokenCheck(token);
-  const reset = useResetPassword();
-
-  const invalid = !token || check.isError;
+  const [isChecking, setIsChecking] = useState(Boolean(token));
+  const [isValid, setIsValid] = useState(false);
+  const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     // The Link Expired frame is written for revoked share links, so tell it
     // which kind of link failed and it swaps to reset-appropriate copy.
-    if (invalid) {
+    const expired = () =>
       navigate(PUBLIC_PATHS.linkExpired, { replace: true, state: { reason: 'password_reset' } });
+
+    if (!token) {
+      expired();
+      return;
     }
-  }, [invalid, navigate]);
+
+    let active = true;
+    api.auth
+      .verifyResetToken(token)
+      .then(() => {
+        if (!active) return;
+        setIsValid(true);
+        setIsChecking(false);
+      })
+      .catch(() => {
+        if (active) expired();
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [token, navigate]);
 
   const submit = async (password) => {
-    await reset.mutateAsync({ token, password });
-    navigate(PUBLIC_PATHS.passwordUpdated, { replace: true });
+    setIsSaving(true);
+    setError(null);
+    try {
+      await api.auth.resetPassword(token, password);
+      navigate(PUBLIC_PATHS.passwordUpdated, { replace: true });
+    } catch (failure) {
+      setError(failure);
+      setIsSaving(false);
+    }
   };
 
-  return {
-    token,
-    /** True while the link is being checked — hold the form until it clears. */
-    isChecking: Boolean(token) && check.isPending,
-    isValid: check.isSuccess,
-    submit,
-    error: reset.error,
-    isSaving: reset.isPending,
-  };
+  return { token, isChecking, isValid, submit, error, isSaving };
 }

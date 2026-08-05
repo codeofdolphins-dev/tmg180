@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
-import WorkspaceLayout from '../components/layout/WorkspaceLayout';
-import FavouriteIllustration from '../components/ui/FavouriteIllustration';
-import Button from '../components/ui/Button';
+import WorkspaceLayout from '../../components/layout/worker/WorkspaceLayout';
+import FavouriteIllustration from '../../components/ui/FavouriteIllustration';
+import Button from '../../components/ui/Button';
 
 export default function EmptyFavourites() {
   return (

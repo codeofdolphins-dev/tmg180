@@ -13,11 +13,11 @@ import {
   FileText,
   Shield,
 } from 'lucide-react';
-import Button from '../components/ui/Button';
+import Button from '../../components/ui/Button';
 
 import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../navigation/useRoleNav';
-import { WORKER_PATHS } from '../routes/paths';
+import { useRoleNav } from '../../navigation/useRoleNav';
+import { WORKER_PATHS } from '../../routes/paths';
 const NAV_ITEMS = [
   { label: 'Calendar', icon: Calendar },
   { label: 'Participants I support', icon: Users },

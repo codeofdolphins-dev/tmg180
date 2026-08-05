@@ -14,9 +14,9 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ROLES } from '../../store';
-import { WORKER_PATHS } from '../../routes/paths';
-import { useRoleNav } from '../../navigation/useRoleNav';
+import { ROLES } from '../../../store';
+import { WORKER_PATHS } from '../../../routes/paths';
+import { useRoleNav } from '../../../navigation/useRoleNav';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard },

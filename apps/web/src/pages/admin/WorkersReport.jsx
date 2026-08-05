@@ -11,8 +11,8 @@ import {
   Eye,
   ArrowRight,
 } from 'lucide-react';
-import GovernanceSidebar from '../components/layout/GovernanceSidebar';
-import Button from '../components/ui/Button';
+import GovernanceSidebar from '../../components/layout/admin/GovernanceSidebar';
+import Button from '../../components/ui/Button';
 
 const STATS = [
   { label: 'Active workers', value: '1,248', icon: Users, tone: 'purple' },

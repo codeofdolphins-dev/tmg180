@@ -7,8 +7,8 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 
-import ProfileSectionFooter from '../components/ProfileSectionFooter';
-import { toggleInList, useSectionForm } from '../hooks/profile';
+import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 
 const SAFE_PLACEHOLDER =
   'For example: Speak calmly, give me extra time to respond, avoid crowded spaces, or contact a trusted person.';

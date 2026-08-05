@@ -12,12 +12,12 @@ import {
   ClipboardCheck,
   ChevronDown,
 } from 'lucide-react';
-import GovernanceLayout from '../components/layout/GovernanceLayout';
-import { GOV_BOTTOM_ITEMS } from '../components/layout/GovernanceSidebar';
-import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
-import InfoTile from '../components/ui/InfoTile';
-import VersionTimeline from '../components/ui/VersionTimeline';
+import GovernanceLayout from '../../components/layout/admin/GovernanceLayout';
+import { GOV_BOTTOM_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import InfoTile from '../../components/ui/InfoTile';
+import VersionTimeline from '../../components/ui/VersionTimeline';
 
 const VERSION_HISTORY = [
   {

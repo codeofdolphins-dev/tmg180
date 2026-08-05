@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
-import { useSessionSync } from './hooks/auth';
+import { useAuthStore } from './store';
 
 /**
  * Re-validates any persisted session against the API before the app settles.
@@ -8,18 +9,16 @@ import { useSessionSync } from './hooks/auth';
  * from localStorage to route, and a revoked session signs itself out the moment
  * the answer arrives.
  */
-function SessionSync({ children }) {
-  useSessionSync();
-  return children;
-}
-
 function App() {
+  useEffect(() => {
+    const { isAuthenticated, refreshSession } = useAuthStore.getState();
+    if (isAuthenticated) refreshSession();
+  }, []);
+
   return (
-    <SessionSync>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </SessionSync>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

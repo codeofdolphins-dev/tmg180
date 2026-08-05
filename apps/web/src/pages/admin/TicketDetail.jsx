@@ -11,14 +11,14 @@ import {
   Activity,
   Calendar,
 } from 'lucide-react';
-import GovernanceLayout from '../components/layout/GovernanceLayout';
-import Badge from '../components/ui/Badge';
-import Button from '../components/ui/Button';
-import TicketStatTile from '../components/ui/TicketStatTile';
-import Avatar from '../components/ui/Avatar';
-import Timeline from '../components/ui/Timeline';
+import GovernanceLayout from '../../components/layout/admin/GovernanceLayout';
+import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
+import TicketStatTile from '../../components/ui/TicketStatTile';
+import Avatar from '../../components/ui/Avatar';
+import Timeline from '../../components/ui/Timeline';
 import { useNavigate } from 'react-router-dom';
-import { ADMIN_PATHS } from '../routes/paths';
+import { ADMIN_PATHS } from '../../routes/paths';
 
 const ACTIVITY = [
   {

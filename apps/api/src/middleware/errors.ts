@@ -3,8 +3,7 @@ import { ApiError } from '../utils/apiResponse.js';
 
 /**
  * One error envelope for every failure: { error: { code, message, details } }.
- * @tmg180/api-client parses exactly this shape, so web and mobile get
- * identical error handling for free.
+ * The web client parses exactly this shape (apps/web/src/lib/apiClient.js).
  *
  * Throw these from a controller wrapped in `asyncHandler` — it forwards the
  * rejection to `errorHandler` below.

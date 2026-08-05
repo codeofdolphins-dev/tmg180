@@ -16,7 +16,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-import { useRoleNav } from '../navigation/useRoleNav';
+import { useRoleNav } from '../../navigation/useRoleNav';
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard },
   { label: 'Calendar', icon: Calendar },

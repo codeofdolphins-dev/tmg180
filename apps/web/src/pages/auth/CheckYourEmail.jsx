@@ -1,16 +1,30 @@
+import { useState } from 'react';
 import { MailCheck, LoaderCircle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useForgotPassword } from '../hooks/auth';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { api } from '../../lib/apiClient';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 export default function CheckYourEmail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const resend = useForgotPassword();
+  const [status, setStatus] = useState('idle'); // 'idle' | 'sending' | 'sent'
+  const [failure, setFailure] = useState(null);
 
   // Carried from Forgot Password. Someone landing here directly still sees a
   // sensible screen, just without the address.
   const email = location.state?.email ?? null;
+
+  const resend = async () => {
+    setStatus('sending');
+    setFailure(null);
+    try {
+      await api.auth.forgotPassword(email);
+      setStatus('sent');
+    } catch (error) {
+      setFailure(error);
+      setStatus('idle');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex flex-col font-sans text-slate-800">
@@ -49,25 +63,25 @@ export default function CheckYourEmail() {
           </button>
 
           <div className="w-full border-t border-slate-100 mt-6 pt-5">
-            {resend.isSuccess ? (
+            {status === 'sent' ? (
               <p className="text-sm text-emerald-600">Sent. Check your inbox again in a moment.</p>
             ) : (
               <p className="text-sm text-slate-500">
                 Didn&apos;t receive the email?{' '}
                 <button
                   type="button"
-                  disabled={!email || resend.isPending}
-                  onClick={() => resend.mutate(email)}
+                  disabled={!email || status === 'sending'}
+                  onClick={resend}
                   className="font-medium text-brand-600 hover:text-brand-800 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1"
                 >
-                  {resend.isPending && <LoaderCircle size={13} className="animate-spin" />}
+                  {status === 'sending' && <LoaderCircle size={13} className="animate-spin" />}
                   Click to resend
                 </button>
               </p>
             )}
-            {resend.error && (
+            {failure && (
               <p role="alert" className="text-xs text-rose-600 mt-2">
-                {resend.error.message}
+                {failure.message}
               </p>
             )}
           </div>

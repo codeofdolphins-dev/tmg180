@@ -1,6 +1,6 @@
 import { Check, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 export default function PasswordUpdated() {
   const navigate = useNavigate();

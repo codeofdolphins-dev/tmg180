@@ -1,10 +1,10 @@
 import { Settings, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import TopBar from '../components/layout/TopBar';
-import Card from '../components/ui/Card';
-import LockIllustration from '../components/ui/LockIllustration';
-import Button from '../components/ui/Button';
-import { PARTICIPANT_PATHS } from '../routes/paths';
+import TopBar from '../../components/layout/participant/TopBar';
+import Card from '../../components/ui/Card';
+import LockIllustration from '../../components/ui/LockIllustration';
+import Button from '../../components/ui/Button';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
 
 export default function PermissionDeniedParticipant() {
   const navigate = useNavigate();

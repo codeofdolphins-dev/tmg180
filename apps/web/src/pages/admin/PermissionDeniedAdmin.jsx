@@ -1,9 +1,9 @@
 import { Lock, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../components/layout/DashboardLayout';
-import Card from '../components/ui/Card';
-import IconTile from '../components/ui/IconTile';
-import Button from '../components/ui/Button';
+import DashboardLayout from '../../components/layout/DashboardLayout';
+import Card from '../../components/ui/Card';
+import IconTile from '../../components/ui/IconTile';
+import Button from '../../components/ui/Button';
 
 export default function PermissionDeniedAdmin() {
   const navigate = useNavigate();

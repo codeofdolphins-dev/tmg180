@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { PARTICIPANT_PATHS } from '../routes/paths';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
 
 const SUPPORT_AREAS = [
   'Daily living',

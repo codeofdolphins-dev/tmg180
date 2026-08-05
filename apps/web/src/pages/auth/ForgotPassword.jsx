@@ -1,13 +1,14 @@
+import { useState } from 'react';
 import { Key, Mail, ArrowRight, ArrowLeft, LoaderCircle, TriangleAlert } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { isValidEmail } from '@tmg180/shared';
-import { useForgotPassword } from '../hooks/auth';
-import { PUBLIC_PATHS } from '../routes/paths';
+import { api } from '../../lib/apiClient';
+import { PUBLIC_PATHS } from '../../routes/paths';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
-  const forgotPassword = useForgotPassword();
+  const [failure, setFailure] = useState(null);
 
   const {
     register,
@@ -16,17 +17,18 @@ export default function ForgotPassword() {
   } = useForm({ defaultValues: { email: '' } });
 
   const onSubmit = async ({ email }) => {
+    setFailure(null);
     try {
-      await forgotPassword.mutateAsync(email);
+      await api.auth.forgotPassword(email);
       // The API answers the same way whether or not the address is registered,
       // so the next screen is the same either way.
       navigate(PUBLIC_PATHS.checkEmail, { state: { email } });
-    } catch {
-      // forgotPassword.error renders in the banner below.
+    } catch (error) {
+      setFailure(error);
     }
   };
 
-  const busy = isSubmitting || forgotPassword.isPending;
+  const busy = isSubmitting;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-100 via-indigo-50 to-sky-100 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
@@ -45,13 +47,13 @@ export default function ForgotPassword() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {forgotPassword.error && (
+          {failure && (
             <div
               role="alert"
               className="flex items-start gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-4 py-3 text-sm mb-5"
             >
               <TriangleAlert size={16} className="shrink-0 mt-0.5" />
-              <span>{forgotPassword.error.message}</span>
+              <span>{failure.message}</span>
             </div>
           )}
 

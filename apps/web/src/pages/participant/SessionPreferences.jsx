@@ -64,7 +64,7 @@ function SectionCard({ icon: Icon, iconTone, title, subtitle, options }) {
         >
           <Icon size={15} />
         </div>
-        <h2 className="text-sm font-bold text-slate-900">{title}</h2>
+        <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
       </div>
       {subtitle && <p className="text-xs text-slate-500 mb-4 ml-10.5">{subtitle}</p>}
       <div className={`flex flex-wrap gap-2 ${subtitle ? '' : 'mt-4'}`}>
@@ -89,8 +89,8 @@ export default function SessionPreferences() {
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Session Preferences</h1>
-              <p className="text-sm text-slate-500 mt-1">
+              <h1 className="text-3xl font-bold text-slate-900">Session Preferences</h1>
+              <p className="text-base text-slate-500 mt-1">
                 Set preferences for your filters and planning.
               </p>
             </div>

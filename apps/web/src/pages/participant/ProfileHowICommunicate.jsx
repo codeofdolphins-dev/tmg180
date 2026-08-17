@@ -79,7 +79,7 @@ export default function ProfileHowICommunicate() {
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-6">
             <div>
-              <h1 className="text-[32px] font-semibold text-slate-900">Communication</h1>
+              <h1 className="text-3xl font-bold text-slate-900">Communication</h1>
               <p className="text-base text-slate-600 mt-2 max-w-2xl">
                 Tell us how you prefer to communicate and anything that helps conversations
                 feel comfortable and easy for you.
@@ -91,7 +91,7 @@ export default function ProfileHowICommunicate() {
                 <div className="bg-white rounded-xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <div className="flex items-center gap-3 mb-6">
                     <Speech size={22} className="text-brand-600 shrink-0" />
-                    <h2 className="text-2xl font-semibold text-slate-900">
+                    <h2 className="text-xl font-semibold text-slate-900">
                       Preferred Communication
                     </h2>
                   </div>
@@ -115,7 +115,7 @@ export default function ProfileHowICommunicate() {
                 <div className="bg-white rounded-xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <div className="flex items-center gap-3 mb-6">
                     <BrainCog size={22} className="text-brand-600 shrink-0" />
-                    <h2 className="text-2xl font-semibold text-slate-900">
+                    <h2 className="text-xl font-semibold text-slate-900">
                       Communication Preferences
                     </h2>
                   </div>
@@ -177,7 +177,7 @@ export default function ProfileHowICommunicate() {
                 </div>
 
                 <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                  <h3 className="text-base font-bold text-[#006c49] mb-3">Your Information</h3>
+                  <h3 className="text-base font-semibold text-[#006c49] mb-3">Your Information</h3>
                   <div className="flex flex-col gap-4">
                     {YOUR_INFORMATION.map((line) => (
                       <p key={line} className="text-base text-slate-600">
@@ -190,7 +190,7 @@ export default function ProfileHowICommunicate() {
                 <div className="bg-[#ffddb8] rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <Lightbulb size={18} className="text-[#2a1700] shrink-0" />
-                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                    <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
                   </div>
                   <div className="flex flex-col gap-4">
                     {NEED_HELP.map((line) => (

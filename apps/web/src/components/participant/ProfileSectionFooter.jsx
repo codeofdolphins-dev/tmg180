@@ -26,7 +26,7 @@ export default function ProfileSectionFooter({
     <div className="border-t border-slate-200 pt-8 flex items-center justify-between">
       <button
         onClick={goPrevious}
-        className="flex items-center gap-2 bg-white border border-slate-200 text-[#434655] text-base rounded-full px-8 py-3 hover:bg-slate-50 transition-colors"
+        className="flex items-center gap-2 bg-white border border-slate-200 text-[#434655] text-sm rounded-full px-8 py-3 hover:bg-slate-50 transition-colors"
       >
         <ArrowLeft size={16} />
         Previous
@@ -35,7 +35,7 @@ export default function ProfileSectionFooter({
         <button
           onClick={saveDraft}
           disabled={isSaving}
-          className="flex items-center gap-2 bg-white border border-slate-200 text-[#434655] text-base rounded-full px-6 py-3 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 bg-white border border-slate-200 text-[#434655] text-sm rounded-full px-6 py-3 hover:bg-slate-50 disabled:opacity-50 transition-colors"
         >
           <Mail size={18} />
           Save Draft
@@ -43,14 +43,14 @@ export default function ProfileSectionFooter({
         <button
           onClick={saveAndExit}
           disabled={isSaving}
-          className="bg-white border border-brand-200 text-brand-600 text-base rounded-full px-8 py-3 hover:bg-brand-50 disabled:opacity-50 transition-colors"
+          className="bg-white border border-brand-200 text-brand-600 text-sm rounded-full px-8 py-3 hover:bg-brand-50 disabled:opacity-50 transition-colors"
         >
           Save &amp; Exit
         </button>
         <button
           onClick={saveAndContinue}
           disabled={isSaving}
-          className="flex items-center gap-2 bg-brand-600 text-white text-base rounded-full px-8 py-3 shadow-md hover:bg-brand-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-8 py-3 shadow-md hover:bg-brand-700 disabled:opacity-50 transition-colors"
         >
           {isSaving && <LoaderCircle size={16} className="animate-spin" />}
           {continueLabel}

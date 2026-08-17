@@ -46,7 +46,7 @@ function CardTitle({ icon: Icon, title }) {
   return (
     <div className="flex items-center gap-2 mb-4">
       <Icon size={16} className="text-brand-600" />
-      <h2 className="text-sm font-bold text-slate-900">{title}</h2>
+      <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
     </div>
   );
 }
@@ -87,7 +87,7 @@ export default function WorkerDirectoryProfile() {
                   <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-slate-900">Sarah Miller</h1>
+                  <h1 className="text-3xl font-bold text-slate-900">Sarah Miller</h1>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mt-1.5">
                     <span className="flex items-center gap-1.5">
                       <MapPin size={13} className="text-slate-400" />
@@ -164,7 +164,7 @@ export default function WorkerDirectoryProfile() {
 
                   <div className="flex items-center gap-2 mb-3">
                     <Calendar size={15} className="text-brand-600" />
-                    <h3 className="text-sm font-bold text-slate-900">
+                    <h3 className="text-base font-semibold text-slate-900">
                       Typical Availability
                     </h3>
                   </div>
@@ -204,7 +204,7 @@ export default function WorkerDirectoryProfile() {
                 <div className="w-11 h-11 rounded-full bg-brand-600 flex items-center justify-center mb-3">
                   <MessageSquare size={18} className="text-white" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900">Contact</h3>
+                <h3 className="text-base font-semibold text-slate-900">Contact</h3>
                 <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-4">
                   Outside Platform
                 </p>

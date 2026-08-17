@@ -16,11 +16,7 @@ export class ApiError extends Error {
     constructor(
         public statusCode: number,
         public message = "Something went wrong!!!",
-        public data: unknown = null,
-        public errors: unknown[] = [],
-        // Stable machine-readable code, carried in the error envelope
-        // alongside the message.
-        public code?: string
+        public data: unknown = null
     ) {
         super(message);
     }

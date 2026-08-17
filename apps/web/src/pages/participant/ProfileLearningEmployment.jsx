@@ -111,7 +111,7 @@ export default function ProfileLearningEmployment() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+        <h1 className="text-3xl font-bold text-[#0b1c30]">
           Learning &amp; Employment
         </h1>
         <p className="text-base text-[#434655] max-w-2xl">
@@ -124,7 +124,7 @@ export default function ProfileLearningEmployment() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
         <div className="flex flex-col gap-6">
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
-            <h2 className="text-2xl font-semibold text-[#0b1c30] mb-3">
+            <h2 className="text-xl font-semibold text-[#0b1c30] mb-3">
               Current Situation
             </h2>
             <p className="text-sm text-[#434655] mb-5">
@@ -149,7 +149,7 @@ export default function ProfileLearningEmployment() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
-            <h2 className="text-2xl font-semibold text-[#0b1c30] mb-3">Your Goals</h2>
+            <h2 className="text-xl font-semibold text-[#0b1c30] mb-3">Your Goals</h2>
             <p className="text-sm text-[#434655] mb-4">
               What would you like to achieve over the next 12 months?
             </p>
@@ -162,7 +162,7 @@ export default function ProfileLearningEmployment() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
-            <h2 className="text-2xl font-semibold text-[#0b1c30] mb-3">
+            <h2 className="text-xl font-semibold text-[#0b1c30] mb-3">
               Support I'd Like
             </h2>
             <p className="text-base text-[#434655] mb-5">
@@ -185,7 +185,7 @@ export default function ProfileLearningEmployment() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
-            <h2 className="text-2xl font-semibold text-[#0b1c30] mb-3">
+            <h2 className="text-xl font-semibold text-[#0b1c30] mb-3">
               Skills I'd Like to Develop
             </h2>
             <p className="text-base text-[#434655] mb-4">
@@ -203,7 +203,7 @@ export default function ProfileLearningEmployment() {
 
         <div className="flex flex-col gap-6">
           <section className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-sm font-bold text-brand-600 mb-4">
+            <h3 className="text-base font-semibold text-brand-600 mb-4">
               Personal Profile Status
             </h3>
             <div className="flex items-center justify-between">
@@ -225,7 +225,7 @@ export default function ProfileLearningEmployment() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
-            <h3 className="text-base font-bold text-[#006c49] mb-3">
+            <h3 className="text-base font-semibold text-[#006c49] mb-3">
               Your Information
             </h3>
             <div className="flex flex-col gap-3">
@@ -240,7 +240,7 @@ export default function ProfileLearningEmployment() {
           <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb size={18} className="text-[#2a1700]" />
-              <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+              <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
             </div>
             <div className="flex flex-col gap-4">
               {HELP_PARAGRAPHS.map((p) => (

@@ -28,7 +28,7 @@ export default function DailySupportEvidenceLog() {
     <div className="max-w-5xl mx-auto flex flex-col gap-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 leading-snug">
+                <h1 className="text-3xl font-bold text-slate-900 leading-snug">
                   Daily Support Evidence Log
                 </h1>
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full mt-2">
@@ -67,7 +67,7 @@ export default function DailySupportEvidenceLog() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Target size={16} className="text-brand-600" />
-                    <h2 className="text-sm font-bold text-slate-900">Focus Areas</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Focus Areas</h2>
                   </div>
 
                   <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-2">
@@ -101,7 +101,7 @@ export default function DailySupportEvidenceLog() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <ClipboardList size={16} className="text-sky-600" />
-                    <h2 className="text-sm font-bold text-slate-900">Support Details</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Support Details</h2>
                   </div>
 
                   <div className="flex flex-col gap-4">
@@ -141,7 +141,7 @@ export default function DailySupportEvidenceLog() {
                     strokeWidth={1}
                     className="absolute -top-3 -right-3 text-white/40"
                   />
-                  <h3 className="relative text-sm font-bold text-fuchsia-700 mb-3">
+                  <h3 className="text-base relative font-semibold text-fuchsia-700 mb-3">
                     Participant Voice
                   </h3>
                   <div className="relative bg-white rounded-xl rounded-tl-none p-4 text-sm text-slate-700 italic">
@@ -152,7 +152,7 @@ export default function DailySupportEvidenceLog() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp size={15} className="text-sky-600" />
-                    <h3 className="text-sm font-bold text-sky-700">
+                    <h3 className="text-base font-semibold text-sky-700">
                       Baseline Comparison
                     </h3>
                   </div>
@@ -166,18 +166,18 @@ export default function DailySupportEvidenceLog() {
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-slate-900 mt-2">Notes &amp; Addendums</h2>
+            <h2 className="text-xl font-semibold text-slate-900 mt-2">Notes &amp; Addendums</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               <div className="bg-white border border-slate-200 rounded-2xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Edit3 size={15} className="text-slate-500" />
-                  <h3 className="text-sm font-bold text-slate-900">Add Note</h3>
+                  <h3 className="text-base font-semibold text-slate-900">Add Note</h3>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       Note Content
                     </label>
                     <textarea
@@ -187,7 +187,7 @@ export default function DailySupportEvidenceLog() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       Reason for Note
                     </label>
                     <input
@@ -216,7 +216,7 @@ export default function DailySupportEvidenceLog() {
               <div className="bg-white border border-slate-200 rounded-2xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <History size={15} className="text-slate-500" />
-                  <h3 className="text-sm font-bold text-slate-900">History</h3>
+                  <h3 className="text-base font-semibold text-slate-900">History</h3>
                 </div>
 
                 <div className="relative pl-4">

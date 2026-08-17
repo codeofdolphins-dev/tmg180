@@ -82,7 +82,7 @@ function WorkerCard({ worker }) {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h3 className="text-lg font-bold text-slate-900 truncate">{worker.name}</h3>
+              <h3 className="text-base font-semibold text-slate-900 truncate">{worker.name}</h3>
               <BadgeCheck size={17} className="text-emerald-600 shrink-0" />
             </div>
             <p className="text-sm italic text-slate-500 leading-relaxed mt-1">
@@ -197,7 +197,7 @@ export default function BrowseVerifiedWorkers() {
                 Home <span className="mx-1">/</span>
                 <span className="text-slate-600">Browse Verified Workers</span>
               </p>
-              <h1 className="text-4xl font-bold text-slate-900">Browse Verified Workers</h1>
+              <h1 className="text-3xl font-bold text-slate-900">Browse Verified Workers</h1>
               <p className="text-base text-slate-500 mt-2">
                 Connect with experienced support professionals in your community.
               </p>

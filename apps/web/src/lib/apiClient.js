@@ -12,16 +12,31 @@ import { useAuthStore } from '../store';
 const BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api/v1`;
 const TOKEN_KEY = 'tmg180-token';
 
-/** The API answered with an error. `code` is the server's stable string. */
+/**
+ * The API's response envelope, on success and failure alike:
+ *
+ *   { statusCode: 200, message: 'log in successful', data: { ... }, success: true }
+ *   { statusCode: 400, message: 'Email not registered!!!', data: null, success: false }
+ *
+ * `request` unwraps `data` on success and throws `ApiError` on failure, so
+ * callers never see the envelope.
+ */
+
+/** The API answered with an error: `status` (HTTP), `message`, optional `data`. */
 export class ApiError extends Error {
-  constructor(status, code, message, details) {
+  constructor(status, message, data = null) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
-    this.code = code;
-    this.details = details;
+    this.data = data;
   }
 }
+
+const isEnvelope = (payload) =>
+  payload !== null && typeof payload === 'object' && 'success' in payload && 'statusCode' in payload;
+
+/** Endpoints not yet on the envelope answer with the bare payload — pass it through. */
+const unwrap = (payload) => (isEnvelope(payload) ? payload.data : payload);
 
 // localStorage throws in private mode; a missing token just means unauthenticated.
 const readToken = () => {
@@ -67,18 +82,18 @@ async function request(method, path, { body, signOutOn401 = true } = {}) {
   if (response.status === 204) return null;
 
   const payload = await response.json().catch(() => null);
-  if (!response.ok) {
+  if (!response.ok || payload?.success === false) {
     throw new ApiError(
-      response.status,
-      payload?.error?.code ?? 'unknown_error',
-      payload?.error?.message ?? response.statusText,
-      payload?.error?.details
+      payload?.statusCode ?? response.status,
+      // A non-JSON failure (proxy down, HTML error page) still needs words.
+      payload?.message ?? (response.statusText || 'Something went wrong.'),
+      payload?.data ?? null
     );
   }
-  return payload;
+  return unwrap(payload);
 }
 
-/** Sign-in and sign-up both answer with { user, accessToken }. */
+/** Sign-in and sign-up both answer with data: { user, accessToken }. */
 async function authenticate(path, body) {
   const { user, accessToken } = await request('POST', path, { body, signOutOn401: false });
   writeToken(accessToken);

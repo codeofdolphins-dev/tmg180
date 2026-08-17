@@ -63,7 +63,7 @@ export default function RelationalWorkerProfile() {
                 </span>
               </div>
               <div className="pt-4">
-                <h1 className="text-5xl font-bold text-brand-600">Sarah Mitchell</h1>
+                <h1 className="text-3xl font-bold text-brand-600">Sarah Mitchell</h1>
                 <div className="flex flex-wrap items-center gap-2.5 mt-4">
                   <span className="text-sm font-semibold text-brand-700 bg-purple-100 rounded-full px-4 py-1.5">
                     Relational Worker
@@ -86,7 +86,7 @@ export default function RelationalWorkerProfile() {
             <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-6 items-start">
               <div className="flex flex-col gap-6">
                 <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-7">
-                  <h2 className="text-2xl font-bold text-brand-600 mb-4">
+                  <h2 className="text-xl font-semibold text-brand-600 mb-4">
                     A little about me
                   </h2>
                   <p className="text-base text-slate-600 leading-relaxed mb-6">
@@ -111,7 +111,7 @@ export default function RelationalWorkerProfile() {
                 <div className="bg-white border-2 border-brand-600 rounded-2xl shadow-sm p-7">
                   <div className="flex items-center gap-2.5 mb-4">
                     <Heart size={22} className="text-brand-600" />
-                    <h2 className="text-2xl font-bold text-brand-600">
+                    <h2 className="text-xl font-semibold text-brand-600">
                       Best Working Relationship
                     </h2>
                   </div>
@@ -160,7 +160,7 @@ export default function RelationalWorkerProfile() {
                 <div className="bg-white border-2 border-emerald-700 rounded-2xl shadow-sm p-6">
                   <div className="flex items-start gap-2 mb-4">
                     <Star size={20} className="text-emerald-800 mt-1 shrink-0" />
-                    <h2 className="text-xl font-bold text-emerald-800 leading-snug">
+                    <h2 className="text-xl font-semibold text-emerald-800 leading-snug">
                       What participants appreciate
                     </h2>
                   </div>
@@ -184,7 +184,7 @@ export default function RelationalWorkerProfile() {
             <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-7">
               <div className="flex items-center gap-2.5 mb-6">
                 <Calendar size={20} className="text-brand-600" />
-                <h2 className="text-2xl font-bold text-brand-600">Weekly Availability</h2>
+                <h2 className="text-xl font-semibold text-brand-600">Weekly Availability</h2>
               </div>
               <div className="grid grid-cols-[3rem_repeat(7,1fr)] gap-y-4 items-center">
                 <span />
@@ -215,7 +215,7 @@ export default function RelationalWorkerProfile() {
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
               <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-7">
-                <h2 className="text-2xl font-bold text-brand-600 mb-5">
+                <h2 className="text-xl font-semibold text-brand-600 mb-5">
                   Experience &amp; Skills
                 </h2>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
@@ -252,7 +252,7 @@ export default function RelationalWorkerProfile() {
               </div>
 
               <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-7">
-                <h2 className="text-2xl font-bold text-brand-600 mb-5">Credentials</h2>
+                <h2 className="text-xl font-semibold text-brand-600 mb-5">Credentials</h2>
                 <div className="flex flex-col gap-3">
                   {CREDENTIALS.map(({ icon: Icon, title, detail }) => (
                     <div

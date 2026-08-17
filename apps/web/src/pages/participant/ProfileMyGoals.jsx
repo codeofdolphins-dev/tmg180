@@ -45,7 +45,7 @@ export default function ProfileMyGoals() {
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-6">
             <div>
-              <h1 className="text-[32px] font-semibold text-slate-900">My Goals</h1>
+              <h1 className="text-3xl font-bold text-slate-900">My Goals</h1>
               <p className="text-base text-slate-600 mt-2 max-w-2xl">
                 Tell us about the goals that are important to you and what you would like to
                 work towards. Your goals can change over time, and you can update them
@@ -59,7 +59,7 @@ export default function ProfileMyGoals() {
                   <div className="text-sm font-medium text-slate-600 tracking-wide">
                     Primary Aspiration
                   </div>
-                  <h2 className="text-2xl font-semibold text-slate-900 mt-2 mb-4">
+                  <h2 className="text-xl font-semibold text-slate-900 mt-2 mb-4">
                     What are you currently working towards?
                   </h2>
                   <textarea
@@ -72,7 +72,7 @@ export default function ProfileMyGoals() {
 
                 <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-semibold text-slate-900">
+                    <h2 className="text-xl font-semibold text-slate-900">
                       Steps Towards My Goal
                     </h2>
                     <button
@@ -134,7 +134,7 @@ export default function ProfileMyGoals() {
                     className="absolute -right-4 top-8 text-white/10"
                     strokeWidth={1}
                   />
-                  <h2 className="relative text-2xl font-semibold text-white">Remember</h2>
+                  <h2 className="text-xl relative font-semibold text-white">Remember</h2>
                   <p className="relative text-base text-[#b4c5ff] mt-2">
                     Goals can change over time.
                     <br />
@@ -167,7 +167,7 @@ export default function ProfileMyGoals() {
                 </div>
 
                 <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                  <h3 className="text-base font-bold text-[#006c49] mb-3">Your Information</h3>
+                  <h3 className="text-base font-semibold text-[#006c49] mb-3">Your Information</h3>
                   <div className="flex flex-col gap-4">
                     {YOUR_INFORMATION.map((line) => (
                       <p key={line} className="text-base text-slate-600">
@@ -180,7 +180,7 @@ export default function ProfileMyGoals() {
                 <div className="bg-[#ffddb8] rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <Lightbulb size={18} className="text-[#2a1700] shrink-0" />
-                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                    <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
                   </div>
                   <div className="flex flex-col gap-1">
                     {NEED_HELP.map((line) => (

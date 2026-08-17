@@ -33,10 +33,10 @@ export default function MonthlySnapshotSummary() {
     <div className="max-w-5xl mx-auto flex flex-col gap-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">
+                <h1 className="text-3xl font-bold text-slate-900">
                   Monthly Snapshot Summary
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-base text-slate-500 mt-1">
                   Review your locked snapshot and append any additional context needed.
                 </p>
               </div>
@@ -64,7 +64,7 @@ export default function MonthlySnapshotSummary() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <Eye size={16} className="text-slate-500" />
-                  <h2 className="text-base font-bold text-slate-900">Snapshot Preview</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Snapshot Preview</h2>
                 </div>
 
                 {PREVIEW_SECTIONS.map((s) => (
@@ -78,7 +78,7 @@ export default function MonthlySnapshotSummary() {
 
                 <div className="flex items-center gap-2 mt-2">
                   <History size={16} className="text-slate-500" />
-                  <h2 className="text-base font-bold text-slate-900">Addendum History</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Addendum History</h2>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-xl p-4 flex gap-4">
@@ -108,12 +108,12 @@ export default function MonthlySnapshotSummary() {
                   <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
                     <MessageSquarePlus size={15} className="text-white" />
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900">Add Addendum</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Add Addendum</h2>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       Date Added
                     </label>
                     <input
@@ -125,7 +125,7 @@ export default function MonthlySnapshotSummary() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       Reason for Addendum
                     </label>
                     <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-500 outline-none focus:border-brand-600">
@@ -137,7 +137,7 @@ export default function MonthlySnapshotSummary() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       Addendum Note
                     </label>
                     <textarea

@@ -42,6 +42,24 @@
   }
 }
 
+/*
+ * Participant portal type scale. The app root is 18px; the participant frames
+ * are drawn at a 16px scale, so inside the portal Tailwind's text-* sizes
+ * resolve to their standard px values (text-sm 14, text-base 16, text-3xl 30…)
+ * without touching auth / worker / admin. Line-heights are ratios and follow.
+ */
+.participant-portal {
+  --text-xs: 0.6667rem;
+  --text-sm: 0.7778rem;
+  --text-base: 0.8889rem;
+  --text-lg: 1rem;
+  --text-xl: 1.1111rem;
+  --text-2xl: 1.3333rem;
+  --text-3xl: 1.6667rem;
+  --text-4xl: 2rem;
+  --text-5xl: 2.6667rem;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;

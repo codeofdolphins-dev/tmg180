@@ -17,6 +17,7 @@ export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   isProduction: process.env.NODE_ENV === 'production',
   port: Number(process.env.PORT ?? 4000),
+  BCRYPT_SALT: Number(process.env.BCRYPT_SALT ?? 12),
 
   databaseUrl: required('DATABASE_URL', {
     allowDevDefault: 'postgresql://postgres:postgres@localhost:5432/tmg180?schema=public',

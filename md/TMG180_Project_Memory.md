@@ -2,7 +2,7 @@
 
 Living context file maintained by Claude Code across working sessions. This is the **canonical copy** — the assistant's private memory holds only a pointer here. Update this file (not the private memory) as the build progresses.
 
-Last updated: 2026-08-03.
+Last updated: 2026-08-17 (design reference section — 12 Aug Figma handover).
 
 ## What TMG180 is
 
@@ -16,13 +16,11 @@ Core domain: participant-owned append-only evidence chain — Personal Profile /
 
 ## Codebase status (as of 2026-08-03, post gap-build)
 
-- **69 static screen mockups** complete: React 19 + Vite 8 + Tailwind v4 + lucide-react + react-router 7, plain JSX (no TS), **pnpm** as package manager, oxlint.
-- The 23 screens missing from the Figma canonical page were built 2026-08-03 (participant dashboard/daily log/exports/privacy, worker dashboard/snapshots/learning hub/governance standing, MyPersonalProfile + 11 sections, BrowseVerifiedWorkers + RelationalWorkerProfile) — see the UPDATE note in [TMG180_Figma_Frame_Inventory.md](frontend/TMG180_Figma_Frame_Inventory.md). Built from exported PNGs + extracted text specs (`TMG docs/figma/outlines/`); banned-term substitutions were applied where Figma copy violated the registry (logged in that inventory's tables + agent reports).
-- Still unbuilt by design: state variants (snapshot Generating/Locked/Addendum, submitted daily-log states), separate worker Help Centre, 8 mobile layouts.
-- **Role-based navigation is live (2026-08-03 refactor)** — the `PageSwitcher` dev overlay was removed and replaced with real auth-flow + sidebar navigation (see "App architecture" below). Mock data still hardcoded per page; no backend yet.
+- **69 screens** built: React 19 + Vite 8 + Tailwind v4 + lucide-react + react-router 7, plain JSX (no TS), **pnpm** as package manager, oxlint. Every screen was built against the pre-12-Aug design; the frame → page mapping and what each screen still needs vs the current design are in [frontend/TMG180_Figma_Reference.md](frontend/TMG180_Figma_Reference.md) (§2 mapping, §5 gaps).
+- Still unbuilt by design: state variants (snapshot Generating/Locked/Addendum, submitted daily-log states), separate worker Help Centre, 8 mobile layouts. Not built at all vs the current design: participant check-in (M-04), Overview + What Matters To Me profile sections, Create Account success/email-taken states.
+- **Role-based navigation is live (2026-08-03 refactor)** — the `PageSwitcher` dev overlay was removed and replaced with real auth-flow + sidebar navigation (see "App architecture" below). Most pages still hardcode mock data; auth + participant profile are backend-powered.
 - Git repo initialised; `main` is the only branch.
 - Spec docs converted to markdown live in this folder — start with [INDEX.md](INDEX.md).
-- Known Figma copy typos reproduced verbatim (flag to Sue/Deb): "here are no right or wrong answers.", "Share only what you're feel comfortable sharing.", duplicated chips on Social & Community. Also the hub's card labels ("Mobility & transport", "Social participation") differ from the section pages' own titles — mirrored as designed.
 
 ## Monorepo layout (2026-08-03 conversion)
 
@@ -42,7 +40,7 @@ md/               specs (unmoved)
 - **oxlint moved to the root** (`.oxlintrc.json` stayed at root, oxlint is now a root devDependency); `pnpm lint` covers the whole workspace.
 - **Dev**: `pnpm dev` runs web (:5173) + api (:4000) in parallel; Vite proxies `/api` → `:4000` so the browser is same-origin and needs no CORS preflight.
 - **Mobile readiness**: API is versioned (`/api/v1`) and uses **bearer access + refresh tokens, not cookies**, specifically so React Native can reuse `@tmg180/api-client` unchanged — only the token store swaps (localStorage → expo-secure-store). CORS allows requests with no `Origin` (mobile) and allowlists browser origins from `CORS_ORIGINS`.
-- Error envelope is uniform: `{ error: { code, message, details } }`; 5xx messages are scrubbed before leaving the server. `@tmg180/api-client` parses exactly this.
+- **Response envelope (since 2026-08-17, Jiten's backend refactor)**: every response is `{ statusCode, message, data, success }` — success `{ statusCode: 200, message: 'log in successful', data: {...}, success: true }`, failure `{ message: 'Email not registered!!!', statusCode: 400, data: null, success: false }` (`ApiResponse` / `ApiError` + `catchResponse` in `apps/api/src/utils/apiResponse.ts`; no `code` field). `apps/web/src/lib/apiClient.js` unwraps `data` on success and throws `ApiError(status, message, data)` on failure; endpoints not yet wrapped (profile, terminology, verify-reset-token) pass through as raw payloads. Sign-up body field is `full_name` (not `name`).
 
 ### API status (scaffold only)
 
@@ -59,19 +57,19 @@ Web still runs entirely on hardcoded mock data — `apps/web/src/lib/apiClient.j
 
 - **Global state**: zustand 5 (chosen over Redux for footprint). `src/store/authStore.js` — persisted (`localStorage: tmg180-auth`, schema v2) session `{ user, roles, role, isAuthenticated, status, error }` with `signIn / signUp / selectRole / signOut / clearError`. `roles` = what the account holds (backend-issued); `role` = workspace currently open, always a member of `roles`. `ROLES` enum: `participant | worker | admin`. See "Auth" below.
 - **Routes segregated by role, one file each** in `src/routes/`: `publicRoutes.jsx` (auth flow + role selection + link-expired/error), `participantRoutes.jsx` (26), `workerRoutes.jsx` (20), `adminRoutes.jsx` (14). Paths are role-prefixed (`/participant/*`, `/worker/*`, `/admin/*`) with **`src/routes/paths.js` as the single source of truth**. `AppRoutes.jsx` composes them under `RequireRole` guard branches (`src/routes/RequireRole.jsx`): unauthenticated → `/sign-in`, no role → `/role-selection`, wrong role → own dashboard; `/` = `RootRedirect`, `*` → `/error`. HelpCentre is registered under both participant and worker prefixes (single built page for two frames).
-- **Navigation flow**: Sign In → Role Selection (or Choose Workspace) → `selectRole(role)` → role dashboard. Full auth loop wired (forgot → check email → reset → updated → sign-in).
+- **Navigation flow**: Sign In → (multi-role only) workspace chooser → `selectRole(role)` → role dashboard. Two chooser pages exist (RoleSelection, ChooseWorkspace) but neither is currently reachable — sign-in lands on `roles[0]`; the design (D-01) wants ONE dynamic chooser. Full auth loop wired (forgot → check email → reset → updated → sign-in).
 - **Sidebar wiring**: pages keep their own Figma-faithful sidebars; navigation resolves **by label** via `src/navigation/navMaps.js` (label → path per role, `Sign Out`/`Logout` clears session) + `useRoleNav(role)` hook (`src/navigation/useRoleNav.js`). Unmapped labels are intentional no-ops (screen not built). 42 pages + the 3 shared sidebars are wired; also: profile hub section cards, Previous/Continue chain across the 11 profile sections (hub-order), back-buttons on detail pages, empty-state CTAs, View Profile cards, permission-denied `Go back`.
-- **Known mapping judgement calls**: hub card "My support network" → Decision Making section page (no dedicated page; Figma hub/section mismatch pending Sue/Deb ruling); worker "Daily Logs" lands on the empty-state page (`EmptyDailyLogs`) until a real list screen exists; admin "Reports" → Add New Report.
+- **Known mapping judgement calls**: hub card "My support network" → Decision Making section page (confirmed by R-01: My support network folds into decision_making); worker "Daily Logs" lands on the empty-state page (`EmptyDailyLogs`) until a real list screen exists; admin "Reports" → Add New Report.
 
 ## Auth (build started 2026-08-03)
 
-**Canon is near-silent on auth** — the Final Override register says nothing about it; TITLE.md lists the 9 auth frames and flags "no Create Account screen" as open question #1; the Gaps Analysis lists an unwritten "Cybersecurity and Privacy Specification" (MFA, AES-256 at rest, TLS, 72-hour breach notification) as HIGH. There is **no users table** in the 21 net-new `tmg_*` tables. So auth is infrastructure we own, built to the Technical Brief §7 constraint that the three data layers are *architecturally separated, not just permission-gated*.
+**Canon is near-silent on auth** — the Final Override register says nothing about it (the 12 Aug Build Guide now specifies Create Account M-01 and password rules); the Gaps Analysis lists an unwritten "Cybersecurity and Privacy Specification" (MFA, AES-256 at rest, TLS, 72-hour breach notification) as HIGH. There is **no users table** in the 21 net-new `tmg_*` tables. So auth is infrastructure we own, built to the Technical Brief §7 constraint that the three data layers are *architecturally separated, not just permission-gated*.
 
 Decisions taken with Jiten (2026-08-03):
 
 1. **Roles are backend-issued, never user-chosen.** Previously any signed-in user could click "Enter Admin" on Role Selection. Now `roles[]` comes from the account; Role Selection / Choose Workspace only render workspaces the account holds; one role skips the picker entirely; `selectRole()` refuses anything outside `roles` and returns `false`.
 2. **No auth DB tables until the backend phase.** Accounts are served by a mock backend in `apps/web/src/services/auth/` that mirrors the future API's payloads and error codes exactly.
-3. **Sign-up screens will be built** (participant + worker; admin is provisioned, never self-served — `SELF_SIGNUP_ROLES` in `@tmg180/shared`). This overrides TITLE.md's guess that account creation is "handled externally" — tell Sue/Deb a Create Account frame is now needed in Figma.
+3. **Sign-up screens will be built** (participant + worker; admin is provisioned, never self-served — `SELF_SIGNUP_ROLES` in `@tmg180/shared`). The Create Account frames now exist in the current Figma (M-01, 5 states — see the Figma reference).
 
 Layout:
 
@@ -98,7 +96,7 @@ Verified end to end against the live DB: 201 + session on sign-up, bcrypt `$2b$1
 
 The participant My Profile section (hub + all 11 section pages) is fully backend-powered: P1-01 (one living profile, `last_section_key` resume), P1-02 (section structure — but seeded in code, see below), P1-03 (per-answer `visibility`, default `participant_private` — column exists and defaults; no UI control yet).
 
-**Three new tables** (migration `20260804170000_participant_profile_tables`): `tmg_participant_profiles` (1:1 user; status, `last_section_key`, `completed_sections`/`total_sections`), `tmg_participant_profile_sections` (per-section status; complete is **sticky** — never demoted once earned, Jiten's call), `tmg_participant_profile_answers` (`question_key` → JSONB `value` + `visibility`). **Section/question definitions live in `packages/shared/src/profile.js`, not the DB** — same pattern as `REGISTRATION_CONSENTS`. Adding/renaming sections or questions is a seed edit, never a migration; when ruling R-01 lands, that file is the only thing to change. `FcaIntake` untouched: it remains the internal `FCA_BASELINE` evidence artifact, distinct from the living profile.
+**Three new tables** (migration `20260804170000_participant_profile_tables`): `tmg_participant_profiles` (1:1 user; status, `last_section_key`, `completed_sections`/`total_sections`), `tmg_participant_profile_sections` (per-section status; complete is **sticky** — never demoted once earned, Jiten's call), `tmg_participant_profile_answers` (`question_key` → JSONB `value` + `visibility`). **Section/question definitions live in `packages/shared/src/profile.js`, not the DB** — same pattern as `REGISTRATION_CONSENTS`. Adding/renaming sections or questions is a seed edit, never a migration. **R-01 has now landed (12 Aug)** — the seed still holds the pre-12-Aug 11 with hyphenated keys and must move to the Override 11 (see "Design reference" → R-01), which also means a one-off remap of existing `section_key` / `last_section_key` rows. `FcaIntake` untouched: it remains the internal `FCA_BASELINE` evidence artifact, distinct from the living profile.
 
 **API** (participant-role-only, always scoped to `req.user.id`): `GET /api/v1/participant/profile` (auto-creates on first visit) and `PATCH /api/v1/participant/profile/sections/:sectionKey` — the single write; upserts answers (empty value deletes the row), recomputes section status + profile progress + `last_section_key` in one transaction. Drafts are never blocked: validation rejects only malformed values (wrong type, not-an-option, out-of-range); completeness just decides status. Completion rule: all `required` questions answered (only `preferred_name` and `primary_aspiration` are required); a section with no required questions completes on its first answer.
 
@@ -108,10 +106,9 @@ Verified live: create→draft→complete→sticky-complete lifecycle, steps arra
 
 ### What blocks the rest of onboarding
 
-**The data has nowhere to go.** Two schema gaps, both needed before the existing screens can be wired:
-
-- **Participant profile** — schema has `FcaIntake` (flat tag arrays, per the DB pack), but the built UI is section-based (About Me collects Preferred Name / Pronouns / free text, progress `01/11`). That matches the Override's `participant_profiles` + `_sections` + `_answers` (with per-answer visibility), which does not exist. Build authority puts the Override above the DB pack — recommend adding those three tables and keeping `FcaIntake` as the internal `FCA_BASELINE` derivation that the AI intake-summary endpoint and `ParticipantGoal.intake_id` already depend on. **Needs a ruling** (compounded by the known Figma-11 vs Override-11 section mismatch).
+- **Participant profile** — resolved by the three profile tables above (2026-08-04); `FcaIntake` stays as the internal `FCA_BASELINE` derivation that the AI intake-summary endpoint and `ParticipantGoal.intake_id` depend on. Remaining work is the R-01 re-seed, not schema.
 - **Worker** — nothing exists at all: P3-01 `worker_relational_profiles` (7 prompts), P3-03 `worker_profile_supporting_details`, plus governance standing and policy acknowledgements, which the DB pack never specified.
+- **Participant check-in (M-04)** — Prisma model `ParticipantCheckin` → `tmg_participant_checkin` exists (intensity, impact/helped/recovery tags+notes, own_words, is_locked) but no controller/route/page. Contract per the Build Guide: `POST/GET?from=&to=/PATCH /api/participant/checkins` (ours: under `/api/v1`), participant-authenticated only, same-day PATCH until midnight, enforced in middleware.
 
 ### Auth complete, fully backend-powered (2026-08-04)
 
@@ -167,9 +164,15 @@ Screens intentionally mirror individual Figma frames — sidebars/labels/logos v
 
 ## Design reference
 
-- Figma file: https://www.figma.com/design/NvZmofeFew3VeREx6JBarF/?node-id=1169-2 — file key `NvZmofeFew3VeREx6JBarF`, last modified 2026-07-29 (post-Final-Override). Canonical page = **"Final Design Main Page"** (node `1169:2`, 83 frames); pages "Some add pages", "New", "Page 2", "Page 3" are deprecated drafts — never build from them.
-- **Access:** readable via Figma REST API with Jiten's personal access token (provided in-session 2026-08-03; not stored on disk — ask for it when needed). All 83 canonical frames exported as PNGs to `C:\Users\Kalyan\Desktop\Office\TMG180\TMG docs\figma\`.
-- **Frame ↔ page mapping, gaps (23 unbuilt screens), and 4 design-vs-docs conflicts:** see [TMG180_Figma_Frame_Inventory.md](frontend/TMG180_Figma_Frame_Inventory.md). Biggest open ruling: Figma's 11 profile sections differ from the Final Override seed's 11 (Learning & employment + Self-care vs Overview + What Matters To Me).
+**Fresh start 2026-08-17 (Jiten's call): the ONLY design source is the client's 12 Aug Figma file. Everything about the previous file was retired to `md/archive/` and its exports deleted — never reference the old file key, its PNGs, its inventory or the 4 Aug audit when building.**
+
+- **Figma:** `TMG` — key **`afqPpGbttWc85160MpjoTT`** — https://www.figma.com/design/afqPpGbttWc85160MpjoTT/TMG (read at version `2386813351910390576`, 2026-08-12). Pages: **v2 — 02+03 All Screens** (`1137:6`, 22 dev-ready frames — build from; overrides main-page frames it covers), **v2 — 01 Design System** (`0:1`), **v2 — 04 Flow Map** (`124:2`), **Final Design Main Page** (`1169:2`, 83 frames — existing screens build from here unless superseded), **zz Archive** (never).
+- **Build-from document:** [TMG180_Developer_Build_Guide_2026-08-12.md](TMG180_Developer_Build_Guide_2026-08-12.md) (Saf). **Single design reference for dev:** [frontend/TMG180_Figma_Reference.md](frontend/TMG180_Figma_Reference.md) — pages + rules, every frame → built page (and which v2 frame supersedes which), verbatim v2 copy, design-system components/type/palette, sized build gaps.
+- **Local exports** (all from this file): `C:\Users\Kalyan\Desktop\Office\TMG180\TMG docs\figma\` → `main-page/` (41 of 83 PNGs; 42 pending — Figma image-render quota for Jiten's token returned `Retry-After ≈ 4.6 days` on 2026-08-17, list in that folder's README; outlines for all 83 exist), `v2-screens/` (22 + Flow Map), `design-system/` (12), `outlines/` (layer + text dumps). Filename = `Frame_Name__nodeId.png`. Finish the 42 with another token or wait for the quota.
+- **Access:** Figma REST API with Jiten's personal access token — provided in-session (2026-08-17), never stored on disk; ask when needed. Variables endpoint needs an Enterprise scope we lack; palette/type are recorded in the reference doc (violet-600 `#7c3aed`, slate, green/amber/red 100/700, Inter).
+- **Rulings now settled by the design** (quote IDs in tickets): R-01 profile = Override 11 in fixed order `overview · about_me · how_i_communicate · what_matters_to_me · my_goals · daily_living · mobility_access · health_wellbeing · social_community · decision_making · safety_support_preferences` (Self-care → daily_living, My support network → decision_making, Learning & employment dropped — 12th-section candidate, Sue's call); R-02 dashboard = exactly 4 actions + check-in banner, no Export; R-04 availability only in worker detail; R-05 remove Admin Participant Overview; R-06 no ratings anywhere; R-07 workspace access immediate, onboarding gates only directory publication (matches our sign-up behaviour); R-08 approved "TMG180 stores no medical or treatment records." sentences; R-09 two-layer daily log + M-04 check-in; D-01 one dynamic workspace chooser; D-02 Reset Password frame superseded by Create New Password; W-01 Sign In has "Sign up"; M-01 Create Account 5 states; back-links say "Return to Sign In".
+- **Open with Saf:** does the v2 visual style (flat, violet-600, Inter, 1280×960) replace the main page's "Vibrant" style (`#7800ce`, blobs, 48px radii) for existing screens? And the "delivered code" (`WorkerProfile.jsx`, `tokens.css`, `worker-profile-preview.html`) went to Deb — not in this repo; request it.
+- **Known Figma slips to tell Saf** (don't copy them): "No medical records is shown" (1169:4370), "PERSONAL PROFILE (profile BASELINE)" (1169:4370), "Usual pattern Comparison" (1170:6606), "usual pattern energy" (1205:1795); 1205:612 still says "TMG180 Governance Admin"; 1169:5500 still says "Back to Login"; R-07/R-08 corrected copy lives only in v2 Row 6, not yet on the main-page frames.
 
 ## People
 

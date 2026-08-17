@@ -73,7 +73,7 @@ export default function ProfileSelfCare() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+        <h1 className="text-3xl font-bold text-[#0b1c30]">
           Self-care
         </h1>
         <p className="text-base text-[#434655] max-w-2xl">
@@ -87,7 +87,7 @@ export default function ProfileSelfCare() {
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-3">
               <Heart size={22} className="text-brand-600" />
-              <h2 className="text-2xl font-semibold text-[#0b1c30]">Personal Care</h2>
+              <h2 className="text-xl font-semibold text-[#0b1c30]">Personal Care</h2>
             </div>
             <p className="text-sm font-semibold text-[#0b1c30] mb-4">
               Tell us about your daily self-care routine and any support you use.
@@ -111,7 +111,7 @@ export default function ProfileSelfCare() {
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-3">
               <Pill size={22} className="text-brand-600" />
-              <h2 className="text-2xl font-semibold text-[#0b1c30]">
+              <h2 className="text-xl font-semibold text-[#0b1c30]">
                 Medication &amp; Health Routine
               </h2>
             </div>
@@ -143,7 +143,7 @@ export default function ProfileSelfCare() {
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-3">
               <MessageSquareText size={22} className="text-brand-600" />
-              <h2 className="text-2xl font-semibold text-[#0b1c30]">Daily Supports</h2>
+              <h2 className="text-xl font-semibold text-[#0b1c30]">Daily Supports</h2>
             </div>
             <p className="text-sm font-semibold text-[#0b1c30] mb-4">
               Are there any routines or equipment that help you with self-care?
@@ -159,7 +159,7 @@ export default function ProfileSelfCare() {
 
         <div className="flex flex-col gap-6">
           <section className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-sm font-bold text-brand-600 mb-4">
+            <h3 className="text-base font-semibold text-brand-600 mb-4">
               Personal Profile Status
             </h3>
             <div className="flex items-center justify-between">
@@ -181,7 +181,7 @@ export default function ProfileSelfCare() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
-            <h3 className="text-base font-bold text-[#006c49] mb-3">
+            <h3 className="text-base font-semibold text-[#006c49] mb-3">
               Your Information
             </h3>
             <div className="flex flex-col gap-3">
@@ -196,7 +196,7 @@ export default function ProfileSelfCare() {
           <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb size={18} className="text-[#2a1700]" />
-              <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+              <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
             </div>
             <div className="flex flex-col gap-4">
               {HELP_PARAGRAPHS.map((p) => (

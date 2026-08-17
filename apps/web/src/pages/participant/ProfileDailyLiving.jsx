@@ -42,7 +42,7 @@ const HELP_PARAGRAPHS = [
 function RoutineField({ label, placeholder, ...field }) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={field.name} className="text-base text-[#434655]">
+      <label htmlFor={field.name} className="text-sm text-[#434655]">
         {label}
       </label>
       <textarea
@@ -89,7 +89,7 @@ export default function ProfileDailyLiving() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-              <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+              <h1 className="text-3xl font-bold text-[#0b1c30]">
                 Daily Living
               </h1>
               <p className="text-base text-[#434655] max-w-2xl">
@@ -103,7 +103,7 @@ export default function ProfileDailyLiving() {
                 <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <Sun size={22} className="text-brand-600" />
-                    <h2 className="text-2xl font-semibold text-[#0b1c30]">Daily Routine</h2>
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">Daily Routine</h2>
                   </div>
                   <div className="flex flex-col gap-4">
                     <RoutineField
@@ -122,7 +122,7 @@ export default function ProfileDailyLiving() {
                 <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
                   <div className="flex items-start gap-3 mb-4">
                     <PersonStanding size={22} className="text-brand-600 shrink-0 mt-1.5" />
-                    <h2 className="text-2xl font-semibold text-[#0b1c30]">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Tell us which daily activities you do independently and where you use
                       support.
                     </h2>
@@ -151,7 +151,7 @@ export default function ProfileDailyLiving() {
 
               <div className="flex flex-col gap-6">
                 <section className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-sm font-bold text-brand-600 mb-4">
+                  <h3 className="text-base font-semibold text-brand-600 mb-4">
                     Personal Profile Status
                   </h3>
                   <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export default function ProfileDailyLiving() {
                 </section>
 
                 <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
-                  <h3 className="text-base font-bold text-[#006c49] mb-3">
+                  <h3 className="text-base font-semibold text-[#006c49] mb-3">
                     Your Information
                   </h3>
                   <div className="flex flex-col gap-3">
@@ -188,7 +188,7 @@ export default function ProfileDailyLiving() {
                 <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Lightbulb size={18} className="text-[#2a1700]" />
-                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                    <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
                   </div>
                   <div className="flex flex-col gap-4">
                     {HELP_PARAGRAPHS.map((p) => (

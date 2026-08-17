@@ -32,7 +32,7 @@ export default function ProfileAboutMe() {
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-              <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">About Me</h1>
+              <h1 className="text-3xl font-bold text-[#0b1c30]">About Me</h1>
               <p className="text-base text-[#434655]">
                 Tell us a little about yourself, your strengths, interests and what is important to
                 you.
@@ -44,11 +44,11 @@ export default function ProfileAboutMe() {
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 flex flex-col gap-6">
                   <div className="flex items-center gap-2">
                     <UserPen size={19} className="text-[#7800ce]" />
-                    <h2 className="text-2xl font-semibold text-[#0b1c30]">About You</h2>
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">About You</h2>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label htmlFor="preferred_name" className="text-base text-[#434655]">
+                      <label htmlFor="preferred_name" className="text-sm text-[#434655]">
                         Preferred Name
                       </label>
                       <input
@@ -60,7 +60,7 @@ export default function ProfileAboutMe() {
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label htmlFor="pronouns" className="text-base text-[#434655]">
+                      <label htmlFor="pronouns" className="text-sm text-[#434655]">
                         Pronouns
                       </label>
                       <div className="relative">
@@ -84,7 +84,7 @@ export default function ProfileAboutMe() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label htmlFor="about_you" className="text-base text-[#434655]">
+                    <label htmlFor="about_you" className="text-sm text-[#434655]">
                       Tell us about yourself
                     </label>
                     <textarea
@@ -97,7 +97,7 @@ export default function ProfileAboutMe() {
                 </div>
 
                 <div className="bg-white/80 border border-slate-200 rounded-xl shadow-sm px-5 py-4 flex flex-col gap-2">
-                  <h3 className="text-base font-bold text-[#006c49]">Why we ask this</h3>
+                  <h3 className="text-base font-semibold text-[#006c49]">Why we ask this</h3>
                   <p className="text-base text-[#434655]">
                     The information you share helps build your Personal Profile and provides
                     context for your Daily Logs and Monthly Snapshots.
@@ -127,7 +127,7 @@ export default function ProfileAboutMe() {
                 </div>
 
                 <div className="bg-white/80 border border-slate-200 rounded-xl shadow-sm p-6 flex flex-col gap-2">
-                  <h3 className="text-base font-bold text-[#006c49]">Your Information</h3>
+                  <h3 className="text-base font-semibold text-[#006c49]">Your Information</h3>
                   <div className="flex flex-col gap-5">
                     {YOUR_INFORMATION_LINES.map((line) => (
                       <p key={line} className="text-base text-[#434655]">
@@ -140,7 +140,7 @@ export default function ProfileAboutMe() {
                 <div className="bg-[#ffddb8] rounded-2xl p-6 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <Lightbulb size={18} className="text-[#2a1700] shrink-0" />
-                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                    <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
                   </div>
                   <div className="flex flex-col">
                     {NEED_HELP_LINES.map((line) => (

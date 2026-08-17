@@ -3,22 +3,21 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {
     ACCOUNT_STATUS,
-    AUTH_ERROR,
     SELF_SIGNUP_ROLES,
     checkPassword,
     consentRecord,
     isRole,
     isValidEmail,
     missingConsents,
-    normaliseEmail,
     sortRoles,
 } from '@tmg180/shared';
 import { prisma } from '../config/prisma.js';
-import { ApiError, catchResponse } from '../utils/apiResponse.js';
+import { ApiError, ApiResponse, catchResponse } from '../utils/apiResponse.js';
 import { badRequest, unauthorized } from '../middleware/errors.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendPasswordResetEmail } from '../services/mailer.js';
 import { decodeResetToken, signAccessToken, signResetToken } from '../services/tokens.js';
+import { hashPassword } from '../helper/hashPassword.js';
 
 /** Everything the token and the client need; never the password hash. */
 const ACCOUNT_SELECT = {
@@ -37,17 +36,6 @@ type Account = {
     status: string;
 };
 
-/**
- * Compared against when the account is missing, so response timing does not
- * reveal which addresses have accounts.
- */
-const DUMMY_HASH = '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidiu';
-
-/**
- * Cost 12: ~250ms on commodity hardware, which is the point — it prices
- * offline guessing without making sign-in feel slow.
- */
-const BCRYPT_ROUNDS = 12;
 
 /** tmg_audit_log.ip_address is INET, so only store something that parses. */
 const asInet = (value?: string) =>
@@ -65,19 +53,13 @@ function assertUsable(user: Account) {
     if (user.status === ACCOUNT_STATUS.SUSPENDED) {
         throw new ApiError(
             403,
-            'This account is suspended. Contact TMG180 support.',
-            null,
-            [],
-            AUTH_ERROR.ACCOUNT_SUSPENDED
+            'This account is suspended. Contact TMG180 support.'
         );
     }
     if (sortRoles(user.roles).length === 0) {
         throw new ApiError(
             403,
-            "This account doesn't have a workspace yet. Contact TMG180 support.",
-            null,
-            [],
-            AUTH_ERROR.NO_WORKSPACE
+            "This account doesn't have a workspace yet. Contact TMG180 support."
         );
     }
 }
@@ -100,39 +82,20 @@ function writeAudit(
     });
 }
 
-/**
- * Self-service account creation.
- *
- * Deliberately thin: name, email, password, workspace, consent. Everything
- * else about a person is gathered inside their workspace, where they own it
- * and control its visibility (Handoff P1-01/P1-03) — an account is not the
- * place to accumulate participant record content (Technical Brief §7).
- *
- * Admin accounts are never self-served; SELF_SIGNUP_ROLES is the gate.
- */
+
+
+
 export const signUp = asyncHandler(async (req, res) => {
-    const { name, email, password, role, consents } = (req.body ?? {}) as {
-        name?: string;
-        email?: string;
-        password?: string;
+    const { full_name, email, password, role, consents } = (req.body ?? {}) as {
+        full_name: string;
+        email: string;
+        password: string;
         role?: string;
         consents?: Record<string, boolean>;
     };
 
-    const fullName = name?.trim();
-    if (!fullName) throw badRequest('Your name is required.');
-    if (!isValidEmail(email ?? '')) {
-        throw new ApiError(400, 'Enter a valid email address.', null, [], AUTH_ERROR.INVALID_EMAIL);
-    }
-    if (!checkPassword(password ?? '').isValid) {
-        throw new ApiError(
-            400,
-            'Password does not meet the requirements.',
-            null,
-            [],
-            AUTH_ERROR.WEAK_PASSWORD
-        );
-    }
+    if ([full_name, email, password].some(e => e?.trim() === "")) throw new ApiError(400, 'Required fields are missing!!!');
+
     if (!isRole(role) || !SELF_SIGNUP_ROLES.includes(role)) {
         throw badRequest('Choose whether you are joining as a participant or a support worker.');
     }
@@ -144,15 +107,15 @@ export const signUp = asyncHandler(async (req, res) => {
         });
     }
 
-    const password_hash = await bcrypt.hash(password as string, BCRYPT_ROUNDS);
+    const password_hash = await hashPassword(password)
 
     let user: Account;
     try {
         user = await prisma.user.create({
             data: {
-                email: normaliseEmail(email as string),
+                email,
                 password_hash,
-                full_name: fullName,
+                full_name: full_name,
                 roles: [role],
                 status: ACCOUNT_STATUS.ACTIVE,
             },
@@ -162,13 +125,7 @@ export const signUp = asyncHandler(async (req, res) => {
         // P2002 = unique violation. Checking first would still race, so let the
         // index decide and translate the failure.
         if ((error as { code?: string }).code === 'P2002') {
-            throw new ApiError(
-                409,
-                'An account with this email already exists.',
-                null,
-                [],
-                AUTH_ERROR.EMAIL_TAKEN
-            );
+            throw new ApiError(409, 'An account with this email already exists.');
         }
         throw error;
     }
@@ -181,24 +138,28 @@ export const signUp = asyncHandler(async (req, res) => {
         details: { self_signup: true, consents: consentRecord(consents ?? {}) },
     });
 
-    res.status(201).json({ user: toPublicUser(user), accessToken: signAccessToken(user) });
+    res.status(201).json(new ApiResponse(
+        201,
+        "account created successfully",
+        { user: toPublicUser(user), accessToken: signAccessToken(user) }
+    ));
 });
 
 export const signIn = asyncHandler(async (req, res) => {
     try {
         const { email, password } = (req.body ?? {}) as { email?: string; password?: string };
         if (!email || !password) {
-            throw badRequest('Email and password are required.');
+            throw new ApiError(400, 'Email and password are required.');
         }
 
         // Stored lowercased on write, so the unique index does the lookup.
         const user = await prisma.user.findUnique({
-            where: { email: normaliseEmail(email) },
+            where: { email },
             select: { ...ACCOUNT_SELECT, password_hash: true },
         });
         if (!user) throw new ApiError(400, 'Email not registered!!!');
 
-        const valid = await bcrypt.compare(password, user?.password_hash ?? DUMMY_HASH);
+        const valid = await bcrypt.compare(password, user.password_hash as string);
 
         // An invited account has no hash yet — bcrypt.compare against null would
         // throw, so the nullish fallback above keeps it on the same failure path.
@@ -210,7 +171,11 @@ export const signIn = asyncHandler(async (req, res) => {
             data: { last_login_at: new Date() },
         });
 
-        res.json({ user: toPublicUser(user), accessToken: signAccessToken(user) });
+        res.json(new ApiResponse(
+            200,
+            "log in successful",
+            { user: toPublicUser(user), accessToken: signAccessToken(user) }
+        ));
 
     } catch (error: unknown) {
         catchResponse(error, res);
@@ -224,10 +189,10 @@ export const me = asyncHandler(async (req, res) => {
         where: { id: req.user.id },
         select: ACCOUNT_SELECT,
     });
-    if (!user) throw unauthorized('Account no longer exists.');
+    if (!user) throw new ApiError(404, 'Account no longer exists.');
     assertUsable(user);
 
-    res.json(toPublicUser(user));
+    res.json(new ApiResponse(200, "account fetch successfully", toPublicUser(user)));
 });
 
 /**
@@ -237,11 +202,11 @@ export const me = asyncHandler(async (req, res) => {
 export const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = (req.body ?? {}) as { email?: string };
     if (!isValidEmail(email ?? '')) {
-        throw new ApiError(400, 'Enter a valid email address.', null, [], AUTH_ERROR.INVALID_EMAIL);
+        throw new ApiError(400, 'Enter a valid email address.');
     }
 
     const user = await prisma.user.findUnique({
-        where: { email: normaliseEmail(email as string) },
+        where: { email },
         select: { id: true, email: true, status: true },
     });
 
@@ -260,14 +225,11 @@ const decodeUsableReset = (token: string) => {
         return decodeResetToken(token);
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
-            throw new ApiError(400, 'This reset link has expired.', null, [], AUTH_ERROR.TOKEN_EXPIRED);
+            throw new ApiError(400, 'This reset link has expired.');
         }
         throw new ApiError(
             400,
-            'This reset link is no longer valid.',
-            null,
-            [],
-            AUTH_ERROR.INVALID_TOKEN
+            'This reset link is no longer valid.'
         );
     }
 };
@@ -282,20 +244,13 @@ export const verifyResetToken = asyncHandler(async (req, res) => {
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-    const { token, password } = (req.body ?? {}) as { token?: string; password?: string };
+    const { token, password } = (req.body ?? {}) as { token?: string; password: string };
     if (!token) throw badRequest('A reset token is required.');
-    if (!checkPassword(password ?? '').isValid) {
-        throw new ApiError(
-            400,
-            'Password does not meet the requirements.',
-            null,
-            [],
-            AUTH_ERROR.WEAK_PASSWORD
-        );
-    }
+    
+    if (!checkPassword(password ?? '').isValid) throw new ApiError(400, 'Password does not meet the requirements.');
 
     const userId = decodeUsableReset(token);
-    const password_hash = await bcrypt.hash(password as string, BCRYPT_ROUNDS);
+    const password_hash = await hashPassword(password);
 
     await prisma.user.update({ where: { id: userId }, data: { password_hash } });
     await writeAudit(req, { actorId: userId, action: 'password_reset_completed' });

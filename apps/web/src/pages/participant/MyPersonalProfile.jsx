@@ -140,7 +140,7 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
         <div className="w-16 h-16 rounded-2xl bg-[#7800ce] flex items-center justify-center mb-4">
           <Icon size={24} className="text-white" />
         </div>
-        <h3 className="text-lg font-medium text-[#0b1c30] mb-3">{title}</h3>
+        <h3 className="text-base font-semibold text-[#0b1c30] mb-3">{title}</h3>
         <p className="text-base text-[#434655]">{description}</p>
         <StatusBadge status={status} />
       </div>
@@ -157,7 +157,7 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
           <Icon size={22} className="text-[#7800ce]" />
         </div>
         <div className="flex flex-col gap-1 flex-1">
-          <h3 className="text-lg font-medium text-[#0b1c30]">{title}</h3>
+          <h3 className="text-base font-semibold text-[#0b1c30]">{title}</h3>
           <p className="text-sm text-[#434655]">{description}</p>
           <StatusBadge status={status} />
         </div>
@@ -171,7 +171,7 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
       className="flex flex-col bg-white border border-slate-200 rounded-xl p-5 shadow-sm cursor-pointer"
     >
       <Icon size={20} className="text-[#7800ce] mb-3" />
-      <h3 className="text-lg font-medium text-[#0b1c30] mb-3">{title}</h3>
+      <h3 className="text-base font-semibold text-[#0b1c30] mb-3">{title}</h3>
       <p className="text-sm text-[#434655]">{description}</p>
       <StatusBadge status={status} />
     </div>
@@ -188,8 +188,8 @@ export default function MyPersonalProfile() {
   const lastSection = SECTIONS.find((section) => section.key === lastKey) ?? null;
   const started = Boolean(lastSection);
 
-  const overall =
-    completed >= total ? 'Complete' : started || completed > 0 ? 'In progress' : 'Not started';
+  const isComplete = completed >= total;
+  const overall = isComplete ? 'Complete' : started || completed > 0 ? 'In progress' : 'Not started';
 
   // Continue where you left off (P1-01); a fresh profile starts at the top.
   const continueTo = SECTION_PATHS[lastKey] ?? SECTION_PATHS['about-me'];
@@ -199,7 +199,7 @@ export default function MyPersonalProfile() {
       <div className="flex items-start gap-6">
         <div className="flex-1 flex flex-col gap-2">
           <span className="text-base text-[#004ac6]">Your Personal Profile</span>
-          <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+          <h1 className="text-3xl font-bold text-[#0b1c30]">
             Your Personal Profile
           </h1>
           <p className="text-base text-[#434655] max-w-2xl">
@@ -219,9 +219,11 @@ export default function MyPersonalProfile() {
         </div>
       </div>
 
+      {/* Once every section is complete there is nothing to continue — hide the card. */}
+      {!isComplete && (
       <div className="flex items-center gap-10 rounded-3xl bg-linear-to-br from-[#ece5fb] via-[#e9e4fa] to-[#e2e2f9] shadow-[0_18px_40px_rgb(120,0,206,0.12)] p-8">
         <div className="flex-1 flex flex-col gap-3">
-          <h2 className="text-[22px] font-bold text-black">Continue Your Personal Profile</h2>
+          <h2 className="text-xl font-semibold text-black">Continue Your Personal Profile</h2>
           {started ? (
             <>
               <p className="text-base text-black">
@@ -249,9 +251,10 @@ export default function MyPersonalProfile() {
           <img src="/images/img.jpg" alt="" className='w-full h-full object-cover' />
         </div>
       </div>
+      )}
 
       <div className="flex flex-col gap-4">
-        <h2 className="text-base text-[#0b1c30]">Your Profile Sections</h2>
+        <h2 className="text-xl text-[#0b1c30] font-semibold">Your Profile Sections</h2>
         <div className="grid grid-cols-4 gap-6">
           {SECTIONS.map((section) => (
             <SectionCard

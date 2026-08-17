@@ -72,7 +72,7 @@ function TopicCard({ title, desc, icon: Icon, tone }) {
       >
         <Icon size={20} />
       </div>
-      <h3 className="text-sm font-bold text-slate-900 mb-1">{title}</h3>
+      <h3 className="text-base font-semibold text-slate-900 mb-1">{title}</h3>
       <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
       <div
         className={`absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-10 ${tone}`}
@@ -86,7 +86,7 @@ export default function ParticipantHelpCentre() {
     <div className="max-w-4xl mx-auto flex flex-col gap-10">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-brand-600 mb-2">Help Centre</h1>
-        <p className="text-sm text-slate-500 max-w-md mx-auto">
+        <p className="text-base text-slate-500 max-w-md mx-auto">
           Find guidance for your participant portal, daily logs, monthly
           snapshots and sharing controls.
         </p>
@@ -108,7 +108,7 @@ export default function ParticipantHelpCentre() {
       </div>
 
       <div>
-        <h2 className="text-xl font-bold text-slate-900 text-center mb-4">
+        <h2 className="text-xl font-semibold text-slate-900 text-center mb-4">
           Frequently Asked Questions
         </h2>
         <div className="flex flex-col gap-2">

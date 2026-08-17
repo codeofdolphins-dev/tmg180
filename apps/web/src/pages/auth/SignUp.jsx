@@ -55,7 +55,7 @@ export default function SignUp() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: { name: '', email: '', password: '', role: ROLES.PARTICIPANT, consents: {} },
+    defaultValues: { full_name: '', email: '', password: '', role: ROLES.PARTICIPANT, consents: {} },
   });
 
   const password = watch('password') ?? '';
@@ -105,14 +105,14 @@ export default function SignUp() {
                 autoComplete="name"
                 placeholder="Enter your full name"
                 className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 flex-1 min-w-0"
-                {...register('name', {
+                {...register('full_name', {
                   required: 'Enter your name.',
                   validate: (value) => value.trim().length > 0 || 'Enter your name.',
                 })}
               />
             </div>
-            {errors.name && (
-              <p className="text-xs text-rose-600 mt-1.5 px-1">{errors.name.message}</p>
+            {errors.full_name && (
+              <p className="text-xs text-rose-600 mt-1.5 px-1">{errors.full_name.message}</p>
             )}
           </div>
 

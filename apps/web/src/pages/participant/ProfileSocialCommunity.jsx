@@ -44,7 +44,7 @@ export default function ProfileSocialCommunity() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+        <h1 className="text-3xl font-bold text-[#0b1c30]">
           Social Participation
         </h1>
         <p className="text-base text-[#434655] max-w-2xl">
@@ -60,14 +60,14 @@ export default function ProfileSocialCommunity() {
               <div className="w-10 h-10 rounded-lg bg-purple-600/10 flex items-center justify-center shrink-0">
                 <Users size={20} className="text-brand-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-[#0b1c30]">
+              <h2 className="text-xl font-semibold text-[#0b1c30]">
                 Community Participation
               </h2>
             </div>
 
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-3">
-                <label htmlFor="spend_time_with" className="text-base text-[#434655]">
+                <label htmlFor="spend_time_with" className="text-sm text-[#434655]">
                   Tell us about the people, places and activities that are important to
                   you.
                 </label>
@@ -81,7 +81,7 @@ export default function ProfileSocialCommunity() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="enjoyed_activities" className="text-base text-[#434655]">
+                <label htmlFor="enjoyed_activities" className="text-sm text-[#434655]">
                   What activities do you enjoy?
                 </label>
                 <textarea
@@ -97,7 +97,7 @@ export default function ProfileSocialCommunity() {
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-4">
               <Shapes size={24} className="text-brand-600 shrink-0" />
-              <h2 className="text-2xl font-semibold text-[#0b1c30]">
+              <h2 className="text-xl font-semibold text-[#0b1c30]">
                 Community Activities
               </h2>
             </div>
@@ -134,7 +134,7 @@ export default function ProfileSocialCommunity() {
 
         <div className="flex flex-col gap-6">
           <section className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-sm font-bold text-brand-600 mb-4">
+            <h3 className="text-base font-semibold text-brand-600 mb-4">
               Personal Profile Status
             </h3>
             <div className="flex items-center justify-between">
@@ -156,7 +156,7 @@ export default function ProfileSocialCommunity() {
           </section>
 
           <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
-            <h3 className="text-base font-bold text-[#006c49] mb-3">
+            <h3 className="text-base font-semibold text-[#006c49] mb-3">
               Your Information
             </h3>
             <div className="flex flex-col gap-3">
@@ -171,7 +171,7 @@ export default function ProfileSocialCommunity() {
           <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb size={18} className="text-[#2a1700]" />
-              <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+              <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
             </div>
             <div className="flex flex-col gap-4">
               {HELP_PARAGRAPHS.map((p) => (

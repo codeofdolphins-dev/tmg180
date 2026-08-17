@@ -9,18 +9,18 @@ import { PARTICIPANT_PATHS } from '../../routes/paths';
 export default function PermissionDeniedParticipant() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-linear-to-br from-brand-100 via-brand-200 to-brand-300 flex flex-col font-sans text-slate-800">
+    <div className="participant-portal min-h-screen bg-linear-to-br from-brand-100 via-brand-200 to-brand-300 flex flex-col font-sans text-slate-800">
       <TopBar />
 
       <main className="flex-1 flex items-center justify-center p-6">
         <Card className="max-w-xl">
           <LockIllustration />
 
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">
             You don&rsquo;t have access to this information
           </h1>
 
-          <p className="text-slate-600 text-sm md:text-base max-w-md mb-8 leading-relaxed">
+          <p className="text-base text-slate-600 max-w-md mb-8 leading-relaxed">
             This information is participant-owned and can only be viewed with
             the correct permission.
           </p>

@@ -58,7 +58,7 @@ function ExportRow({ item }) {
         <div className="absolute left-0.5 top-0.5 bottom-0.5 w-1.5 rounded-full bg-[#7800ce]" />
         <div className="pl-3">
           <div className="flex items-start gap-6">
-            <h3 className="text-2xl font-bold text-[#0b1c30] leading-tight max-w-[9rem]">
+            <h3 className="text-base font-semibold text-[#0b1c30] leading-tight max-w-[9rem]">
               {item.title}
             </h3>
             <span className="bg-[#2170e4] text-[#fefcff] text-xs font-bold leading-tight text-center px-3 py-2 rounded-full shrink-0 mt-2">
@@ -84,7 +84,7 @@ function ExportRow({ item }) {
     <div className="bg-white/70 shadow-sm rounded-[32px] p-6 flex items-center justify-between gap-4">
       <div>
         <div className="flex items-center gap-3 flex-wrap">
-          <h3 className="text-2xl font-bold text-[#0b1c30]">{item.title}</h3>
+          <h3 className="text-base font-semibold text-[#0b1c30]">{item.title}</h3>
           <span className="bg-[#007a53] text-[#a3ffd0] text-xs font-bold px-2.5 py-0.5 rounded-full">
             {item.badge}
           </span>
@@ -105,8 +105,8 @@ function ExportRow({ item }) {
 export default function SnapshotExports() {
   return (
     <>
-          <h1 className="text-[32px] font-bold text-[#0b1c30]">Snapshot Exports</h1>
-          <p className="text-lg text-[#4d4354] mt-2">
+          <h1 className="text-3xl font-bold text-[#0b1c30]">Snapshot Exports</h1>
+          <p className="text-base text-[#4d4354] mt-2">
             You own this information. You decide who sees it.
           </p>
 
@@ -120,7 +120,7 @@ export default function SnapshotExports() {
                     <KeyRound size={20} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-[#0b1c30]">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Participant-Owned Data
                     </h2>
                     <p className="text-base text-[#4d4354] leading-relaxed mt-2">
@@ -155,7 +155,7 @@ export default function SnapshotExports() {
             <div className="flex flex-col gap-6">
               <div className="bg-white/70 shadow-sm rounded-[32px] p-6 flex flex-col gap-6">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-2xl font-bold text-[#0b1c30]">Share May 2026</h2>
+                  <h2 className="text-xl font-semibold text-[#0b1c30]">Share May 2026</h2>
                   <div className="w-10 h-10 rounded-full bg-[#f0dbff] flex items-center justify-center shrink-0">
                     <Share2 size={18} className="text-[#7800ce]" />
                   </div>
@@ -222,7 +222,7 @@ export default function SnapshotExports() {
               <div className="bg-white shadow-sm rounded-[32px] p-6">
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={16} className="text-[#2170e4]" />
-                  <h2 className="text-sm font-bold text-[#0b1c30]">Audit Log</h2>
+                  <h2 className="text-xl font-semibold text-[#0b1c30]">Audit Log</h2>
                 </div>
                 <div className="mt-5 flex flex-col gap-4">
                   {AUDIT_LOG.map((entry) => (

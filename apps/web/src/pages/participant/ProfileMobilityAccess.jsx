@@ -122,10 +122,10 @@ export default function ProfileMobilityAccess() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-              <h1 className="text-[32px] leading-10 font-semibold text-[#0b1c30]">
+              <h1 className="text-3xl font-bold text-[#0b1c30]">
                 Mobility &amp; transport
               </h1>
-              <p className="text-lg text-[#434655] max-w-xl">
+              <p className="text-base text-[#434655] max-w-xl">
                 Tell us how you get around, any mobility equipment you use, and anything
                 that helps you access places safely and comfortably.
               </p>
@@ -136,7 +136,7 @@ export default function ProfileMobilityAccess() {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <Accessibility size={18} className="text-brand-600" />
-                    <h2 className="text-base font-semibold text-[#0b1c30]">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Mobility Equipment
                     </h2>
                   </div>
@@ -200,7 +200,7 @@ export default function ProfileMobilityAccess() {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <Map size={18} className="text-brand-600" />
-                    <h2 className="text-base font-bold text-[#0b1c30]">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Environmental Preferences
                     </h2>
                   </div>
@@ -223,7 +223,7 @@ export default function ProfileMobilityAccess() {
 
               <div className="flex flex-col gap-6">
                 <section className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-sm font-bold text-brand-600 mb-4">
+                  <h3 className="text-base font-semibold text-brand-600 mb-4">
                     Personal Profile Status
                   </h3>
                   <div className="flex items-center justify-between">
@@ -245,7 +245,7 @@ export default function ProfileMobilityAccess() {
                 </section>
 
                 <section className="bg-white/80 rounded-xl border border-slate-100 shadow-sm p-6">
-                  <h3 className="text-base font-bold text-[#006c49] mb-3">
+                  <h3 className="text-base font-semibold text-[#006c49] mb-3">
                     Your Information
                   </h3>
                   <p className="text-base text-[#434655]">
@@ -257,7 +257,7 @@ export default function ProfileMobilityAccess() {
                 <section className="bg-[#ffddb8] border border-orange-300 rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Lightbulb size={18} className="text-[#2a1700]" />
-                    <h3 className="text-base font-bold text-[#2a1700]">Need Help?</h3>
+                    <h3 className="text-base font-semibold text-[#2a1700]">Need Help?</h3>
                   </div>
                   <div className="flex flex-col gap-4">
                     {HELP_PARAGRAPHS.map((p) => (

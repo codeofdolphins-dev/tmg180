@@ -9,8 +9,8 @@ export default function ParticipantDashboard() {
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-16">
       <div>
-        <h1 className="text-5xl font-bold text-slate-900">Welcome back, Alex.</h1>
-        <p className="text-lg text-slate-500 mt-4 max-w-2xl leading-relaxed">
+        <h1 className="text-3xl font-bold text-slate-900">Welcome back, Alex.</h1>
+        <p className="text-base text-slate-500 mt-4 max-w-2xl leading-relaxed">
           This is your personal space to record your experiences, reflect on your
           progress, and build evidence over time.
         </p>
@@ -21,7 +21,7 @@ export default function ParticipantDashboard() {
           <div className="w-12 h-12 rounded-xl bg-[#ece8ff] flex items-center justify-center mb-5">
             <User size={22} className="text-brand-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
             Personal Profile
           </h2>
           <p className="text-base text-slate-600 mb-4">Continue where you left off.</p>
@@ -43,7 +43,7 @@ export default function ParticipantDashboard() {
           <div className="relative w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-5">
             <NotebookPen size={22} className="text-brand-600" />
           </div>
-          <h2 className="relative text-[32px] leading-tight font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl relative font-semibold text-slate-900 mb-2">
             Today's Daily Log
           </h2>
           <p className="relative text-base text-slate-600 mb-6">
@@ -63,7 +63,7 @@ export default function ParticipantDashboard() {
           <div className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center mb-4">
             <TrendingUp size={18} className="text-emerald-700" />
           </div>
-          <h2 className="text-2xl font-semibold text-slate-900 mb-2">Monthly Snapshot</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Monthly Snapshot</h2>
           <p className="text-base text-slate-600 mb-6">
             Review your monthly support summary before approving it.
           </p>
@@ -82,7 +82,7 @@ export default function ParticipantDashboard() {
           <div className="w-16 h-16 rounded-full bg-white/60 shadow-sm flex items-center justify-center mb-5">
             <Files size={26} className="text-red-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-slate-900 mb-3">
+          <h2 className="text-xl font-semibold text-slate-900 mb-3">
             Browse verified worker profiles
           </h2>
           <p className="text-base text-slate-600 mb-6 max-w-xs">
@@ -102,7 +102,7 @@ export default function ParticipantDashboard() {
               <NotebookPen size={22} className="text-rose-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-2">
+              <h2 className="text-xl font-semibold text-slate-900 mb-2">
                 Export Snapshot
               </h2>
               <p className="text-base text-slate-600 max-w-md">

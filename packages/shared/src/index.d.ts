@@ -68,7 +68,6 @@ export declare function checkPassword(value?: string): {
   isValid: boolean;
 };
 
-export declare function normaliseEmail(value?: string): string;
 
 export declare function isValidEmail(value?: string): boolean;
 

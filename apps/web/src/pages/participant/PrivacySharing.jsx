@@ -111,8 +111,8 @@ export default function PrivacySharing() {
           <div className="w-11 h-12 rounded-2xl bg-[#d3e4fe] shadow-sm flex items-center justify-center">
             <ShieldCheck size={24} className="text-[#7800ce]" />
           </div>
-          <h1 className="text-5xl font-bold text-[#0b1c30] mt-4">Privacy & Sharing</h1>
-          <p className="text-lg text-[#4d4354] mt-3">
+          <h1 className="text-3xl font-bold text-[#0b1c30] mt-4">Privacy & Sharing</h1>
+          <p className="text-base text-[#4d4354] mt-3">
             You control who can access your information.
           </p>
 
@@ -120,7 +120,7 @@ export default function PrivacySharing() {
             <div className="relative overflow-hidden bg-white/70 rounded-3xl border-l-4 border-[#7800ce] shadow-sm px-9 py-8 flex items-center justify-between gap-6">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-100/70 via-white/40 to-transparent" />
               <div className="relative">
-                <h2 className="text-[32px] font-bold text-[#0b1c30]">
+                <h2 className="text-xl font-semibold text-[#0b1c30]">
                   You own this information.
                 </h2>
                 <p className="text-lg text-[#4d4354] leading-relaxed mt-2 max-w-2xl">
@@ -139,7 +139,7 @@ export default function PrivacySharing() {
                   <div className="pb-6 border-b border-slate-100">
                     <div className="flex items-center gap-2">
                       <SlidersHorizontal size={18} className="text-[#7800ce]" />
-                      <h2 className="text-2xl font-bold text-[#0b1c30]">
+                      <h2 className="text-xl font-semibold text-[#0b1c30]">
                         Sharing Preferences
                       </h2>
                     </div>
@@ -154,7 +154,7 @@ export default function PrivacySharing() {
                         className="bg-white/50 rounded-2xl p-4 flex items-center justify-between gap-6 shadow-xs"
                       >
                         <div>
-                          <h3 className="text-sm font-bold text-[#0b1c30]">
+                          <h3 className="text-base font-semibold text-[#0b1c30]">
                             {pref.title}
                           </h3>
                           <p className="text-sm text-[#4d4354] mt-1 max-w-md">
@@ -172,7 +172,7 @@ export default function PrivacySharing() {
                     <div>
                       <div className="flex items-center gap-2">
                         <Users size={20} className="text-[#7800ce]" />
-                        <h2 className="text-2xl font-bold text-[#0b1c30]">
+                        <h2 className="text-xl font-semibold text-[#0b1c30]">
                           Support Team Access
                         </h2>
                       </div>
@@ -253,7 +253,7 @@ export default function PrivacySharing() {
                   <div className="pb-6 border-b border-slate-100">
                     <div className="flex items-center gap-2">
                       <History size={18} className="text-[#7800ce]" />
-                      <h2 className="text-2xl font-bold text-[#0b1c30]">
+                      <h2 className="text-xl font-semibold text-[#0b1c30]">
                         Consent Audit Log
                       </h2>
                     </div>
@@ -299,7 +299,7 @@ export default function PrivacySharing() {
                 <section className="bg-white/70 rounded-3xl shadow-sm p-6">
                   <div className="flex items-start gap-2">
                     <Share2 size={18} className="text-[#7800ce] mt-1.5 shrink-0" />
-                    <h2 className="text-2xl font-bold text-[#0b1c30] leading-tight">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Active Share Links
                     </h2>
                   </div>
@@ -361,7 +361,7 @@ export default function PrivacySharing() {
                 <section className="bg-white/70 rounded-3xl shadow-sm p-6">
                   <div className="flex items-start gap-2">
                     <Users size={18} className="text-[#7800ce] mt-1.5 shrink-0" />
-                    <h2 className="text-2xl font-bold text-[#0b1c30] leading-tight">
+                    <h2 className="text-xl font-semibold text-[#0b1c30]">
                       Support Team Access
                     </h2>
                   </div>

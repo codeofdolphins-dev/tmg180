@@ -39,7 +39,7 @@ function WorkerCard({ worker }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-slate-900 truncate">{worker.name}</h3>
+            <h3 className="text-base font-semibold text-slate-900 truncate">{worker.name}</h3>
             <Heart size={16} className="text-rose-500 fill-rose-500 shrink-0" />
           </div>
           <p className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
@@ -97,7 +97,7 @@ export default function WorkerDirectory() {
               <h1 className="text-3xl font-bold text-slate-900">
                 Browse verified worker profiles
               </h1>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-base text-slate-500 mt-1">
                 Use filters to find the right fit. You choose who to contact directly.
               </p>
             </div>

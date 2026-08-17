@@ -82,7 +82,7 @@ export default function ParticipantDailyLog() {
             <span className="text-xs text-[#4d4354]">TMG180-P-2048</span>
           </div>
           <div>
-            <h1 className="text-[32px] font-bold text-[#0b1c30] leading-tight">
+            <h1 className="text-3xl font-bold text-[#0b1c30] leading-tight">
               Daily Support Evidence Log
             </h1>
             <p className="text-base text-[#434655] mt-2 max-w-[672px]">
@@ -96,7 +96,7 @@ export default function ParticipantDailyLog() {
             <section className="bg-[#f8f9ff] rounded-[32px] p-8">
               <div className="flex items-center gap-3">
                 <Clock size={20} className="text-[#7800ce]" />
-                <h2 className="text-2xl font-bold text-[#0b1c30]">
+                <h2 className="text-xl font-semibold text-[#0b1c30]">
                   Session Details
                 </h2>
               </div>
@@ -110,7 +110,7 @@ export default function ParticipantDailyLog() {
             <section className="bg-[#f8f9ff] rounded-[32px] p-8">
               <div className="flex items-center gap-3">
                 <Target size={20} className="text-[#007a53]" />
-                <h2 className="text-2xl font-bold text-[#0b1c30]">
+                <h2 className="text-xl font-semibold text-[#0b1c30]">
                   Intent &amp; Focus
                 </h2>
               </div>
@@ -150,7 +150,7 @@ export default function ParticipantDailyLog() {
             <section className="bg-[#f8f9ff] rounded-[32px] p-8">
               <div className="flex items-center gap-3">
                 <PenLine size={19} className="text-[#7800ce]" />
-                <h2 className="text-2xl font-bold text-[#0b1c30]">The Details</h2>
+                <h2 className="text-xl font-semibold text-[#0b1c30]">The Details</h2>
               </div>
               <p className="mt-2 text-base text-[#4d4354]">
                 Describe the support in your own words. Focus on the impact and
@@ -222,7 +222,7 @@ export default function ParticipantDailyLog() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <Sparkles size={22} className="text-[#7800ce] shrink-0" />
-                    <h3 className="text-2xl font-bold text-[#7800ce]">
+                    <h3 className="text-base font-semibold text-[#7800ce]">
                       Help me write this
                     </h3>
                   </div>

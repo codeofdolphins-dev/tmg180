@@ -31,7 +31,7 @@ export function createApp() {
   app.use('/api/v1', v1Routes);
 
   app.use(notFound);
-  // app.use(errorHandler);
+  app.use(errorHandler);
 
   return app;
 }

@@ -61,8 +61,8 @@ export const useAuthStore = create(
         signUp: async (details) => applySession(await call(() => api.auth.signUp(details))),
 
         signOut: () => {
-          // There is no server-side session to revoke — this just drops the
-          // locally stored access token.
+          // Drops both tokens locally and asks the API to revoke the refresh
+          // chain, so the session cannot be resumed from another copy of it.
           api.auth.signOut();
           queryClient.clear();
           set({ ...SIGNED_OUT });
@@ -73,12 +73,21 @@ export const useAuthStore = create(
          * localStorage says who was signed in; only the server knows if that is
          * still true. A suspended account, a revoked session or a role change
          * all take effect here rather than at the next write.
+         *
+         * Only the API saying no ends the session. A dead network, a 500, or
+         * the dev API mid-restart must leave the stored session alone —
+         * treating those as a rejection is how a reload at the wrong moment
+         * used to sign a perfectly good session out. An expired access token is
+         * not a rejection either: the client rotates it and replays the call
+         * before this ever sees a 401.
          */
         refreshSession: async () => {
           try {
             applySession(await api.auth.me());
-          } catch {
-            get().signOut();
+          } catch (error) {
+            const rejected =
+              error?.name === 'ApiError' && (error.status === 401 || error.status === 403);
+            if (rejected) get().signOut();
           }
         },
 
@@ -92,7 +101,9 @@ export const useAuthStore = create(
     },
     {
       name: 'tmg180-auth',
-      version: 2, // v1 stored a freely-chosen role; those sessions must sign in again
+      // v1 stored a freely-chosen role; v2 predates refresh tokens, so those
+      // sessions hold an access token with nothing behind it. Both sign in again.
+      version: 3,
       migrate: () => ({ ...SIGNED_OUT }),
       partialize: ({ user, roles, role, isAuthenticated }) => ({
         user,

@@ -89,31 +89,158 @@ export declare function landingRole(roles?: readonly string[]): Role | null;
 
 export declare function canUseRole(roles: readonly string[] | undefined, role: unknown): boolean;
 
-// --- evidence.js ---
+// --- dailyLog.js ---
+
+export type DailyLogStatus = 'draft' | 'submitted';
 
 export declare const DAILY_LOG_STATUS: {
   readonly DRAFT: 'draft';
-  readonly FINALISED: 'finalised';
+  readonly SUBMITTED: 'submitted';
 };
+
+export declare const DAILY_LOG_AUTHOR_ROLE: {
+  readonly PARTICIPANT: 'participant';
+  readonly WORKER: 'worker';
+};
+
+export declare const DAILY_LOG_LIMITS: {
+  readonly minGoals: number;
+  readonly maxGoals: number;
+  readonly maxDomains: number;
+  readonly maxText: number;
+  readonly maxReason: number;
+};
+
+/** Taken from the built screens, not from canon — see the note in dailyLog.js. */
+export declare const FUNCTIONAL_DOMAINS: readonly { key: string; label: string }[];
+export declare const FUNCTIONAL_DOMAIN_KEYS: readonly string[];
+
+export declare const USUAL_PATTERN_COMPARISONS: readonly { key: string; label: string }[];
+export declare const COMPARISON_KEYS: readonly string[];
+
+export interface DailyLogFields {
+  sessionDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  goalIds?: number[];
+  domainTags?: string[];
+  impactText?: string | null;
+  supportText?: string | null;
+  outcomeText?: string | null;
+  comparison?: string | null;
+  additionalNotes?: string | null;
+}
+
+export declare function validateDailyLogFields(fields?: DailyLogFields): Record<string, string>;
+
+export declare function canSubmitDailyLog(log?: DailyLogFields): {
+  ok: boolean;
+  errors: Record<string, string>;
+};
+
+export declare function isDailyLogLocked(log?: { status?: string }): boolean;
+
+export declare function validateAddendum(addendum?: {
+  text?: string | null;
+  reason?: string | null;
+}): Record<string, string>;
+
+export declare function domainLabel(key: string): string;
+export declare function comparisonLabel(key: string): string | null;
+
+// --- snapshot.js ---
+
+export type SnapshotStatus = 'generating' | 'draft' | 'locked';
 
 export declare const SNAPSHOT_STATUS: {
   readonly GENERATING: 'generating';
-  readonly AWAITING_APPROVAL: 'awaiting_approval';
+  readonly DRAFT: 'draft';
   readonly LOCKED: 'locked';
 };
 
-/**
- * Null until the API serves the allowed set — the NDIS domain codes are not
- * enumerated anywhere in the document set.
- */
-export declare const FUNCTIONAL_DOMAINS: string[] | null;
+/** Mandatory in every snapshot; identical to the column default. */
+export declare const NONLINEAR_STATEMENT: string;
 
-export declare function canFinaliseDailyLog(log: {
-  goalIds?: readonly string[];
-  domainTags?: readonly string[];
+export interface SnapshotField {
+  key: string;
+  label: string;
+  prompt: string;
+}
+
+export interface SnapshotLayer {
+  key: string;
+  label: string;
+  description: string;
+  fields: readonly SnapshotField[];
+}
+
+export declare const SNAPSHOT_LAYERS: readonly SnapshotLayer[];
+export declare const SNAPSHOT_FIELD_KEYS: readonly string[];
+export declare const SNAPSHOT_ADDENDUM_REASONS: readonly string[];
+
+export declare const SNAPSHOT_LIMITS: {
+  readonly maxText: number;
+  readonly maxReason: number;
+};
+
+export declare function isMonthKey(value: unknown): boolean;
+export declare function monthLabel(monthKey: string): string;
+export declare function monthKeyOf(date?: Date): string;
+export declare function previousMonthKey(monthKey: string): string;
+
+export declare function validateSnapshotFields(
+  fields?: Record<string, unknown>
+): Record<string, string>;
+
+export declare function canApproveSnapshot(snapshot?: {
+  status?: string;
+  nonlinearStatement?: string | null;
+  sourceLogIds?: readonly number[];
 }): { ok: boolean; errors: string[] };
 
-export declare function isAddendumOnly(record: { status?: string }): boolean;
+export declare function isAddendumOnly(record?: { status?: string }): boolean;
+
+export declare function validateSnapshotAddendum(addendum?: {
+  text?: string | null;
+  reason?: string | null;
+}): Record<string, string>;
+
+// --- privacy.js ---
+
+export interface SharingPreference {
+  key: string;
+  label: string;
+  description: string;
+  default: boolean;
+  pending?: boolean;
+}
+
+export declare const SHARING_PREFERENCES: readonly SharingPreference[];
+export declare const PREFERENCE_KEYS: readonly string[];
+export declare const DEFAULT_PREFERENCES: Record<string, boolean>;
+
+export declare const CONSENT_STATUS: {
+  readonly ACTIVE: 'active';
+  readonly SUPERSEDED: 'superseded';
+  readonly REVOKED: 'revoked';
+};
+
+export interface ConsentPermission {
+  key: string;
+  column: string;
+  label: string;
+  description: string;
+}
+
+export declare const CONSENT_PERMISSIONS: readonly ConsentPermission[];
+export declare const CONSENT_PERMISSION_KEYS: readonly string[];
+
+export declare const PRIVACY_AUDIT_ACTIONS: Record<string, { label: string; tone: string }>;
+export declare const PRIVACY_AUDIT_ACTION_KEYS: readonly string[];
+
+export declare function consentSummary(permissions?: Record<string, boolean>): string;
+export declare function validatePreferences(preferences?: Record<string, unknown>): Record<string, string>;
+export declare function validateConsentPermissions(permissions?: Record<string, unknown>): Record<string, string>;
 
 // --- profile.js ---
 

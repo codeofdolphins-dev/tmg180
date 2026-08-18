@@ -1,8 +1,8 @@
 import { useAuthStore } from '../store';
 
 /**
- * The app's API client: one fetch wrapper, one place the token lives, one place
- * a 401 is handled.
+ * The app's API client: one fetch wrapper, one place the tokens live, one
+ * place an expired session is handled.
  *
  * Base URL is relative in dev so Vite's /api proxy handles it (see
  * vite.config.js); set VITE_API_URL for deployed builds where web and API are
@@ -10,7 +10,14 @@ import { useAuthStore } from '../store';
  */
 
 const BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api/v1`;
+
+/**
+ * Two tokens, two jobs. The access token is short-lived and rides on every
+ * request; the refresh token is long-lived, goes nowhere except /auth/refresh,
+ * and is the only half the server can revoke.
+ */
 const TOKEN_KEY = 'tmg180-token';
+const REFRESH_KEY = 'tmg180-refresh';
 
 /**
  * The API's response envelope, on success and failure alike:
@@ -39,29 +46,94 @@ const isEnvelope = (payload) =>
 const unwrap = (payload) => (isEnvelope(payload) ? payload.data : payload);
 
 // localStorage throws in private mode; a missing token just means unauthenticated.
-const readToken = () => {
+const read = (key) => {
   try {
-    return globalThis.localStorage?.getItem(TOKEN_KEY) ?? null;
+    return globalThis.localStorage?.getItem(key) ?? null;
   } catch {
     return null;
   }
 };
 
-const writeToken = (token) => {
+const write = (key, value) => {
   try {
-    if (token) globalThis.localStorage?.setItem(TOKEN_KEY, token);
-    else globalThis.localStorage?.removeItem(TOKEN_KEY);
+    if (value) globalThis.localStorage?.setItem(key, value);
+    else globalThis.localStorage?.removeItem(key);
   } catch {
     // Storage disabled — the session stays in memory for this tab only.
   }
 };
 
+const storeSession = ({ accessToken, refreshToken }) => {
+  write(TOKEN_KEY, accessToken);
+  write(REFRESH_KEY, refreshToken);
+};
+
+const clearSession = () => {
+  write(TOKEN_KEY, null);
+  write(REFRESH_KEY, null);
+};
+
 /**
- * @param {boolean} [options.signOutOn401] false for the /auth endpoints you can
- *   call while signed out — a rejected sign-in must not clear a live session.
+ * Refreshing is deduplicated: an expired access token usually surfaces as
+ * several 401s at once (a screen firing three queries on mount), and each one
+ * racing its own rotation would spend the others' refresh token and sign
+ * everybody out. They all await the same attempt instead.
  */
-async function request(method, path, { body, signOutOn401 = true } = {}) {
-  const token = readToken();
+let refreshInFlight = null;
+
+/**
+ * Raw fetch rather than `request` — this is what `request` calls when it hits
+ * a 401, so going back through it would recurse.
+ *
+ * @returns true if a new access token is now stored.
+ */
+async function rotateSession() {
+  const refreshToken = read(REFRESH_KEY);
+  if (!refreshToken) return false;
+
+  try {
+    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    // A rejected refresh token is final — the session is genuinely over.
+    // Anything else (network down, API restarting, a 500) is not the session's
+    // fault, so leave the tokens alone and let the caller surface the error.
+    if (response.status === 401 || response.status === 403) {
+      clearSession();
+      return false;
+    }
+    if (!response.ok) return false;
+
+    const session = unwrap(await response.json().catch(() => null));
+    if (!session?.accessToken) return false;
+
+    storeSession(session);
+    return true;
+  } catch {
+    // Network failure. Same reasoning: not a reason to end the session.
+    return false;
+  }
+}
+
+function refreshSessionOnce() {
+  refreshInFlight ??= rotateSession().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+/**
+ * @param {boolean} [options.recoverFrom401] false for the /auth endpoints you
+ *   can call while signed out — a rejected sign-in must not try to refresh a
+ *   session or clear a live one.
+ * @param {boolean} [options.retry] internal: guards the single replay after a
+ *   successful refresh so a persistent 401 cannot loop.
+ */
+async function request(method, path, { body, recoverFrom401 = true, retry = true } = {}) {
+  const token = read(TOKEN_KEY);
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -72,10 +144,13 @@ async function request(method, path, { body, signOutOn401 = true } = {}) {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
-  // The token is a stateless JWT with no server-side session, so there is
-  // nothing to refresh: a 401 means it is gone or expired.
-  if (response.status === 401 && signOutOn401) {
-    writeToken(null);
+  // A 401 means the access token is gone or past its 15 minutes. That is the
+  // expected state most of the time, not an error: rotate and replay the call
+  // once, and only end the session if the refresh token is dead too.
+  if (response.status === 401 && recoverFrom401) {
+    if (retry && (await refreshSessionOnce())) {
+      return request(method, path, { body, recoverFrom401, retry: false });
+    }
     useAuthStore.getState().signOut();
   }
 
@@ -93,11 +168,11 @@ async function request(method, path, { body, signOutOn401 = true } = {}) {
   return unwrap(payload);
 }
 
-/** Sign-in and sign-up both answer with data: { user, accessToken }. */
+/** Sign-in and sign-up both answer with data: { user, accessToken, refreshToken }. */
 async function authenticate(path, body) {
-  const { user, accessToken } = await request('POST', path, { body, signOutOn401: false });
-  writeToken(accessToken);
-  return user;
+  const session = await request('POST', path, { body, recoverFrom401: false });
+  storeSession(session);
+  return session.user;
 }
 
 export const api = {
@@ -109,19 +184,39 @@ export const api = {
   auth: {
     signIn: (email, password) => authenticate('/auth/sign-in', { email, password }),
     signUp: (details) => authenticate('/auth/sign-up', details),
-    /** Nothing to revoke server-side — this just drops the local token. */
-    signOut: () => writeToken(null),
+
+    /**
+     * Drops the local tokens first so the UI is signed out immediately, then
+     * tells the API to revoke the chain. That call is best-effort: it is not
+     * worth blocking sign-out on, and an unrevoked refresh token still expires
+     * on its own.
+     */
+    signOut: () => {
+      const refreshToken = read(REFRESH_KEY);
+      clearSession();
+      if (!refreshToken) return;
+      request('POST', '/auth/sign-out', {
+        body: { refreshToken },
+        recoverFrom401: false,
+      }).catch(() => undefined);
+    },
+
     me: () => request('GET', '/auth/me'),
 
     /** Always resolves — the API never reveals whether the address exists. */
     forgotPassword: (email) =>
-      request('POST', '/auth/forgot-password', { body: { email }, signOutOn401: false }),
+      request('POST', '/auth/forgot-password', { body: { email }, recoverFrom401: false }),
 
     /** Lets the reset screen show "link expired" before asking for a password. */
     verifyResetToken: (token) =>
-      request('GET', `/auth/reset-password/${encodeURIComponent(token)}`, { signOutOn401: false }),
+      request('GET', `/auth/reset-password/${encodeURIComponent(token)}`, {
+        recoverFrom401: false,
+      }),
 
     resetPassword: (token, password) =>
-      request('POST', '/auth/reset-password', { body: { token, password }, signOutOn401: false }),
+      request('POST', '/auth/reset-password', {
+        body: { token, password },
+        recoverFrom401: false,
+      }),
   },
 };

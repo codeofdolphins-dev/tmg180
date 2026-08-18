@@ -2,8 +2,10 @@ import { Router } from 'express';
 import {
   forgotPassword,
   me,
+  refresh,
   resetPassword,
   signIn,
+  signOut,
   signUp,
   verifyResetToken,
 } from '../controllers/auth.controller.js';
@@ -15,11 +17,14 @@ export const authRoutes = Router();
 // rest of the security pass (MFA, lockout, breach notification) that the Gaps
 // Analysis calls for. Add it before anything is exposed publicly.
 
-// Access tokens are stateless JWTs with no server-side session, so there is
-// nothing for a refresh or sign-out endpoint to do — sign-out is the client
-// discarding its token.
+// Sign-in and sign-up answer with a pair: a 15-minute access token and a
+// rotating refresh token. /refresh and /sign-out take the refresh token in the
+// body and are unauthenticated by design — that token is itself the credential,
+// and both have to work once the access token has already expired.
 authRoutes.post('/sign-up', signUp);
 authRoutes.post('/sign-in', signIn);
+authRoutes.post('/refresh', refresh);
+authRoutes.post('/sign-out', signOut);
 authRoutes.get('/me', requireAuth, me);
 
 authRoutes.post('/forgot-password', forgotPassword);

@@ -70,7 +70,7 @@ export default function ParticipantSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 w-64 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6 overflow-y-auto">
+    <aside className="print:hidden fixed inset-y-0 left-0 z-20 w-64 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6 overflow-y-auto">
       <div className="mb-10 px-2">
         <div className="text-2xl font-bold text-brand-600 leading-tight">TMG180</div>
         <div className="text-sm font-medium text-slate-500 mt-1">Participant Portal</div>

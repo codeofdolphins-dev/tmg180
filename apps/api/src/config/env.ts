@@ -25,8 +25,17 @@ export const env = {
 
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET', { allowDevDefault: 'dev-access-secret' }),
+    // Short on purpose: nothing can revoke an access token, so its blast radius
+    // is its lifetime. The refresh token below is what makes that survivable.
     accessTtl: process.env.ACCESS_TOKEN_TTL ?? '15m',
   },
+
+  /**
+   * How long a signed-in device stays signed in without re-entering a password.
+   * Refresh tokens are opaque and stored hashed, so unlike the access token
+   * they need no signing secret — the row is the authority.
+   */
+  refreshTtl: process.env.REFRESH_TOKEN_TTL ?? '30d',
 
   /** Where password-reset links point — the web app, not the API. */
   appUrl: process.env.APP_URL ?? 'http://localhost:5173',

@@ -8,9 +8,9 @@ import {
   nextProfileSection,
   profileSection,
 } from '@tmg180/shared';
+import { api } from '../../lib/apiClient';
 import { queryClient } from '../../lib/queryClient';
 import { PARTICIPANT_PATHS } from '../../routes/paths';
-import { profileService } from '../../services/participant/profile';
 
 /**
  * Server state for the Personal Profile. One query holds the whole profile
@@ -40,14 +40,17 @@ export const SECTION_PATHS = {
 export function useProfile() {
   return useQuery({
     queryKey: profileKeys.profile,
-    queryFn: profileService.get,
+    queryFn: () => api.get('/participant/profile'),
     staleTime: 60_000,
   });
 }
 
 export function useSaveSection() {
   return useMutation({
-    mutationFn: ({ sectionKey, answers }) => profileService.saveSection(sectionKey, answers),
+    // Partial saves welcome — this is also Save Draft. Resolves with the
+    // fresh full profile, progress recomputed.
+    mutationFn: ({ sectionKey, answers }) =>
+      api.patch(`/participant/profile/sections/${encodeURIComponent(sectionKey)}`, { answers }),
     onSuccess: (profile) => queryClient.setQueryData(profileKeys.profile, profile),
   });
 }

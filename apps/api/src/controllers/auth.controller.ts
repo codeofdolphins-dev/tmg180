@@ -17,6 +17,13 @@ import { badRequest, unauthorized } from '../middleware/errors.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendPasswordResetEmail } from '../services/mailer.js';
 import { decodeResetToken, signAccessToken, signResetToken } from '../services/tokens.js';
+import {
+    issueRefreshToken,
+    revokeAllRefreshTokens,
+    revokeRefreshToken,
+    rotateRefreshToken,
+} from '../services/refreshTokens.js';
+import { asInet } from '../utils/clientInfo.js';
 import { hashPassword } from '../helper/hashPassword.js';
 
 /** Everything the token and the client need; never the password hash. */
@@ -37,9 +44,18 @@ type Account = {
 };
 
 
-/** tmg_audit_log.ip_address is INET, so only store something that parses. */
-const asInet = (value?: string) =>
-    value && /^[0-9a-fA-F.:]+$/.test(value) ? value.replace(/^::ffff:/, '') : null;
+/**
+ * What sign-in, sign-up and refresh all hand back. The access token is the
+ * 15-minute credential every request carries; the refresh token is the
+ * long-lived one that buys the next access token and is the only half the
+ * server can revoke.
+ */
+async function issueSession(req: Request, user: Account) {
+    return {
+        accessToken: signAccessToken(user),
+        refreshToken: await issueRefreshToken(req, user.id),
+    };
+}
 
 const toPublicUser = (user: Account) => ({
     id: user.id,
@@ -141,7 +157,7 @@ export const signUp = asyncHandler(async (req, res) => {
     res.status(201).json(new ApiResponse(
         201,
         "account created successfully",
-        { user: toPublicUser(user), accessToken: signAccessToken(user) }
+        { user: toPublicUser(user), ...(await issueSession(req, user)) }
     ));
 });
 
@@ -174,7 +190,7 @@ export const signIn = asyncHandler(async (req, res) => {
         res.json(new ApiResponse(
             200,
             "log in successful",
-            { user: toPublicUser(user), accessToken: signAccessToken(user) }
+            { user: toPublicUser(user), ...(await issueSession(req, user)) }
         ));
 
     } catch (error: unknown) {
@@ -193,6 +209,57 @@ export const me = asyncHandler(async (req, res) => {
     assertUsable(user);
 
     res.json(new ApiResponse(200, "account fetch successfully", toPublicUser(user)));
+});
+
+/**
+ * Trades a refresh token for a fresh pair. Deliberately unauthenticated — the
+ * refresh token IS the credential, and the whole point is that it works when
+ * the access token has already expired.
+ *
+ * This is also the checkpoint the stateless access token cannot be: an account
+ * suspended or stripped of its roles mid-session gets no further tokens here,
+ * so the change takes effect within one access-token lifetime.
+ */
+export const refresh = asyncHandler(async (req, res) => {
+    const { refreshToken } = (req.body ?? {}) as { refreshToken?: string };
+    if (!refreshToken) throw unauthorized('A refresh token is required.');
+
+    const rotated = await rotateRefreshToken(req, refreshToken);
+
+    const user = await prisma.user.findUnique({
+        where: { id: rotated.userId },
+        select: ACCOUNT_SELECT,
+    });
+
+    // The account went away or is no longer usable — do not leave a live
+    // refresh chain behind for it.
+    if (!user) {
+        await revokeAllRefreshTokens(rotated.userId);
+        throw unauthorized('Your session has ended. Please sign in again.');
+    }
+    try {
+        assertUsable(user);
+    } catch (error) {
+        await revokeAllRefreshTokens(user.id);
+        throw error;
+    }
+
+    res.json(new ApiResponse(200, "session refreshed", {
+        user: toPublicUser(user),
+        accessToken: signAccessToken(user),
+        refreshToken: rotated.token,
+    }));
+});
+
+/**
+ * Ends the session the given refresh token belongs to. Always 204: the client
+ * has already dropped its tokens by the time this lands, and whether the token
+ * was real is not something an unauthenticated caller gets told.
+ */
+export const signOut = asyncHandler(async (req, res) => {
+    const { refreshToken } = (req.body ?? {}) as { refreshToken?: string };
+    if (refreshToken) await revokeRefreshToken(refreshToken);
+    res.status(204).end();
 });
 
 /**
@@ -253,6 +320,9 @@ export const resetPassword = asyncHandler(async (req, res) => {
     const password_hash = await hashPassword(password);
 
     await prisma.user.update({ where: { id: userId }, data: { password_hash } });
+    // Changing the password is how someone locks an intruder out, so every
+    // session opened with the old one has to end with it.
+    await revokeAllRefreshTokens(userId);
     await writeAudit(req, { actorId: userId, action: 'password_reset_completed' });
 
     res.status(204).end();

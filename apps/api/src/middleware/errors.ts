@@ -2,31 +2,24 @@ import type { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../utils/apiResponse.js';
 
 /**
- * One error envelope for every failure: { error: { code, message, details } }.
- * The web client parses exactly this shape (apps/web/src/lib/apiClient.js).
- *
- * Throw these from a controller wrapped in `asyncHandler` — it forwards the
- * rejection to `errorHandler` below.
+ * One error envelope for every failure, the same one the controllers send:
+ * { statusCode, message, data, success: false }. Throw these from a handler
+ * wrapped in `asyncHandler` and `errorHandler` below turns them into that
+ * shape — including the failures thrown in middleware, before any controller
+ * runs, which is where the auth and role guards live.
  */
 
-const CODE_BY_STATUS: Record<number, string> = {
-  400: 'bad_request',
-  401: 'unauthorized',
-  403: 'forbidden',
-  404: 'not_found',
-};
-
 export const badRequest = (message: string, details: unknown = null) =>
-  new ApiError(400, message, details, [], 'bad_request');
+  new ApiError(400, message, details);
 
 export const unauthorized = (message = 'Authentication required.') =>
-  new ApiError(401, message, null, [], 'unauthorized');
+  new ApiError(401, message);
 
 export const forbidden = (message = 'You do not have access to this record.') =>
-  new ApiError(403, message, null, [], 'forbidden');
+  new ApiError(403, message);
 
 export const notFoundError = (message = 'Not found.') =>
-  new ApiError(404, message, null, [], 'not_found');
+  new ApiError(404, message);
 
 export function notFound(req: Request, _res: Response, next: NextFunction) {
   next(notFoundError(`No route for ${req.method} ${req.originalUrl}`));
@@ -45,16 +38,12 @@ export function errorHandler(
     console.error('[api] unhandled error', error);
   }
 
-  res.status(status).json({
-    error: {
-      code:
-        (error instanceof ApiError ? error.code : undefined) ??
-        CODE_BY_STATUS[status] ??
-        'internal_error',
+  res.status(status).json(
+    new ApiError(
+      status,
       // Never leak internals to a client; 5xx detail stays in the logs.
-      message:
-        status >= 500 || !(error instanceof Error) ? 'Something went wrong.' : error.message,
-      details: error instanceof ApiError ? (error.data ?? undefined) : undefined,
-    },
-  });
+      status >= 500 || !(error instanceof Error) ? 'Something went wrong.' : error.message,
+      error instanceof ApiError ? error.data : null
+    )
+  );
 }

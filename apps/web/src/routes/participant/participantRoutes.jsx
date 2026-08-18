@@ -11,8 +11,11 @@ import ProfileDecisionMaking from '../../pages/participant/ProfileDecisionMaking
 import ProfileSafetySupport from '../../pages/participant/ProfileSafetySupport';
 import ProfileLearningEmployment from '../../pages/participant/ProfileLearningEmployment';
 import ProfileSelfCare from '../../pages/participant/ProfileSelfCare';
+import DailyLogList from '../../pages/participant/DailyLogList';
 import ParticipantDailyLog from '../../pages/participant/ParticipantDailyLog';
 import DailySupportEvidenceLog from '../../pages/participant/DailySupportEvidenceLog';
+import MonthlySnapshotList from '../../pages/participant/MonthlySnapshotList';
+import MonthlySnapshotReview from '../../pages/participant/MonthlySnapshotReview';
 import MonthlySnapshotSummary from '../../pages/participant/MonthlySnapshotSummary';
 import SnapshotExports from '../../pages/participant/SnapshotExports';
 import BrowseVerifiedWorkers from '../../pages/participant/BrowseVerifiedWorkers';
@@ -44,10 +47,14 @@ export const participantRoutes = [
   { path: rel(P.profileSafetySupport), element: <ProfileSafetySupport /> },
   { path: rel(P.profileLearningEmployment), element: <ProfileLearningEmployment /> },
   { path: rel(P.profileSelfCare), element: <ProfileSelfCare /> },
-  { path: rel(P.dailyLog), element: <ParticipantDailyLog /> },
-  { path: rel(P.dailyLogEvidence), element: <DailySupportEvidenceLog /> },
-  { path: rel(P.snapshot), element: <MonthlySnapshotSummary /> },
+  { path: rel(P.dailyLog), element: <DailyLogList /> },
+  { path: rel(P.dailyLogNew), element: <ParticipantDailyLog /> },
+  { path: rel(P.dailyLogEdit), element: <ParticipantDailyLog /> },
+  { path: rel(P.dailyLogDetail), element: <DailySupportEvidenceLog /> },
+  { path: rel(P.snapshot), element: <MonthlySnapshotList /> },
   { path: rel(P.snapshotExports), element: <SnapshotExports /> },
+  { path: rel(P.snapshotReview), element: <MonthlySnapshotReview /> },
+  { path: rel(P.snapshotDetail), element: <MonthlySnapshotSummary /> },
   { path: rel(P.browseWorkers), element: <BrowseVerifiedWorkers /> },
   { path: rel(P.browseWorkersProfile), element: <RelationalWorkerProfile /> },
   { path: rel(P.directory), element: <WorkerDirectory /> },

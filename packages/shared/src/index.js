@@ -15,13 +15,51 @@ export {
   landingRole,
   canUseRole,
 } from './auth.js';
+
 export {
   DAILY_LOG_STATUS,
-  SNAPSHOT_STATUS,
+  DAILY_LOG_AUTHOR_ROLE,
+  DAILY_LOG_LIMITS,
   FUNCTIONAL_DOMAINS,
-  canFinaliseDailyLog,
+  FUNCTIONAL_DOMAIN_KEYS,
+  USUAL_PATTERN_COMPARISONS,
+  COMPARISON_KEYS,
+  validateDailyLogFields,
+  canSubmitDailyLog,
+  isDailyLogLocked,
+  validateAddendum,
+  domainLabel,
+  comparisonLabel,
+} from './dailyLog.js';
+export {
+  SNAPSHOT_STATUS,
+  SNAPSHOT_LAYERS,
+  SNAPSHOT_FIELD_KEYS,
+  SNAPSHOT_ADDENDUM_REASONS,
+  SNAPSHOT_LIMITS,
+  NONLINEAR_STATEMENT,
+  isMonthKey,
+  monthLabel,
+  monthKeyOf,
+  previousMonthKey,
+  validateSnapshotFields,
+  canApproveSnapshot,
   isAddendumOnly,
-} from './evidence.js';
+  validateSnapshotAddendum,
+} from './snapshot.js';
+export {
+  SHARING_PREFERENCES,
+  PREFERENCE_KEYS,
+  DEFAULT_PREFERENCES,
+  CONSENT_STATUS,
+  CONSENT_PERMISSIONS,
+  CONSENT_PERMISSION_KEYS,
+  PRIVACY_AUDIT_ACTIONS,
+  PRIVACY_AUDIT_ACTION_KEYS,
+  consentSummary,
+  validatePreferences,
+  validateConsentPermissions,
+} from './privacy.js';
 export {
   ANSWER_VISIBILITY,
   PROFILE_SECTION_STATUS,

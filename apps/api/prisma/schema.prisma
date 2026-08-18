@@ -39,9 +39,11 @@ model User {
   private_notes_authored   DailyNotePrivate[]         @relation("WorkerPrivateNotes")
   private_notes_about      DailyNotePrivate[]         @relation("ParticipantPrivateNotes")
   notes_authored           DailyNoteStructured[]      @relation("WorkerNotes")
+  notes_written            DailyNoteStructured[]      @relation("AuthoredNotes")
   notes_about              DailyNoteStructured[]      @relation("ParticipantNotes")
   note_addenda             DailyNoteAddendum[]        @relation("NoteAddenda")
   snapshot_addenda         SnapshotAddendum[]         @relation("SnapshotAddenda")
+  privacy_settings         ParticipantPrivacySettings? @relation("ParticipantPrivacySettings")
   consents_given           Consent[]                  @relation("ParticipantConsents")
   consents_held            Consent[]                  @relation("WorkerConsents")
   invitations_sent         ExternalWorkerInvitation[] @relation("ParticipantInvitations")
@@ -52,12 +54,42 @@ model User {
   invoice_audit_entries    InvoiceAudit[]             @relation("InvoiceAuditChanges")
   notifications            Notification[]             @relation("UserNotifications")
   audit_entries            AuditLog[]                 @relation("AuditActor")
+  refresh_tokens           RefreshToken[]             @relation("UserRefreshTokens")
   deletion_requests        DeletionRequest[]          @relation("ParticipantDeletionRequests")
   deletion_requests_closed DeletionRequest[]          @relation("DeletionRequestsProcessed")
 
   @@index([status])
   @@index([roles(ops: ArrayOps)], type: Gin)
   @@map("tmg_users")
+}
+
+// The only server-side session state in the app. An access token is a short
+// JWT that nothing can revoke; the refresh token behind it is a row, so
+// signing out, a replayed rotation, or an account being suspended all take
+// effect at the next refresh rather than never.
+//
+// The token itself is opaque randomness, not a JWT — there is nothing to read
+// out of it and the database is the sole authority on whether it is still
+// live. Only its SHA-256 is stored, so the table is not replayable if it leaks.
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  // Rotation chain. Presenting a token that was already rotated means the
+  // chain leaked, so the whole family is revoked rather than just that row.
+  family     String    @db.Uuid
+  token_hash String    @unique @db.VarChar(64)
+  expires_at DateTime  @db.Timestamptz
+  revoked_at DateTime? @db.Timestamptz
+  user_agent String?   @db.VarChar(255)
+  ip_address String?   @db.Inet
+  created_at DateTime  @default(now()) @db.Timestamptz
+
+  user User @relation("UserRefreshTokens", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, revoked_at])
+  @@index([family])
+  @@index([expires_at])
+  @@map("tmg_refresh_tokens")
 }
 
 // ============================================================
@@ -295,14 +327,23 @@ model DailyNotePrivate {
 }
 
 model DailyNoteStructured {
-  id               Int      @id @default(autoincrement())
-  private_note_id  Int?
-  worker_id        Int
-  participant_id   Int
-  session_date     DateTime @db.Date
+  id              Int  @id @default(autoincrement())
+  private_note_id Int?
+  participant_id  Int
+
+  // Who wrote this log. The DB pack assumed only a worker ever does, but the
+  // participant layer of R-09 authors its own — so worker_id is nullable and
+  // author_id/author_role say which layer a row belongs to.
+  author_id   Int?
+  author_role String? @db.VarChar(50)
+  worker_id   Int?
+
+  session_date     DateTime  @db.Date
+  start_time       DateTime? @db.Time
+  end_time         DateTime? @db.Time
   duration_minutes Int?
-  service_type     String?  @db.VarChar(100)
-  location         String?  @db.VarChar(255)
+  service_type     String?   @db.VarChar(100)
+  location         String?   @db.VarChar(255)
 
   goal_ids       Int[]
   goal_validated Boolean? @default(false)
@@ -312,6 +353,8 @@ model DailyNoteStructured {
 
   impact_tags       String[]
   support_type_tags String[]
+  impact_text       String?
+  support_text      String?
 
   outcome_tags String[]
   outcome_text String?
@@ -322,13 +365,18 @@ model DailyNoteStructured {
 
   participant_voice String?
   safety_note       String?
+  additional_notes  String?
 
-  status       String?  @default("submitted") @db.VarChar(50)
-  submitted_at DateTime @default(now()) @db.Timestamptz
-  is_locked    Boolean? @default(true)
-  created_at   DateTime @default(now()) @db.Timestamptz
+  // A draft is editable and has no submitted_at; submitting stamps both and
+  // locks the row for good (addendum-only from then on).
+  status       String?   @default("draft") @db.VarChar(50)
+  submitted_at DateTime? @db.Timestamptz
+  is_locked    Boolean?  @default(false)
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  updated_at   DateTime  @default(now()) @updatedAt @db.Timestamptz
 
-  worker       User                @relation("WorkerNotes", fields: [worker_id], references: [id])
+  author       User?               @relation("AuthoredNotes", fields: [author_id], references: [id])
+  worker       User?               @relation("WorkerNotes", fields: [worker_id], references: [id])
   participant  User                @relation("ParticipantNotes", fields: [participant_id], references: [id])
   private_note DailyNotePrivate?   @relation(fields: [private_note_id], references: [id])
   addenda      DailyNoteAddendum[]
@@ -336,6 +384,7 @@ model DailyNoteStructured {
 
   @@index([participant_id, session_date])
   @@index([worker_id, session_date])
+  @@index([author_id, session_date])
   @@map("tmg_daily_note_structured")
 }
 
@@ -345,6 +394,7 @@ model DailyNoteAddendum {
   added_by      Int
   added_by_role String   @db.VarChar(50)
   addendum_text String
+  reason        String?  @db.VarChar(255)
   created_at    DateTime @default(now()) @db.Timestamptz
 
   author User                 @relation("NoteAddenda", fields: [added_by], references: [id])
@@ -450,6 +500,7 @@ model SnapshotAddendum {
   added_by      Int
   added_by_role String   @db.VarChar(50)
   addendum_text String
+  reason        String?  @db.VarChar(255)
   created_at    DateTime @default(now()) @db.Timestamptz
 
   author   User             @relation("SnapshotAddenda", fields: [added_by], references: [id])
@@ -461,6 +512,21 @@ model SnapshotAddendum {
 // ============================================================
 // SECTION 3: CONSENT ARCHITECTURE
 // ============================================================
+
+// Global privacy preferences: what a grant is allowed to include, never a
+// grant in itself. JSONB so adding a preference is a seed edit, not a
+// migration — the same call as the profile answers.
+model ParticipantPrivacySettings {
+  id             Int      @id @default(autoincrement())
+  participant_id Int      @unique
+  preferences    Json     @default("{}")
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  participant User @relation("ParticipantPrivacySettings", fields: [participant_id], references: [id])
+
+  @@map("tmg_participant_privacy_settings")
+}
 
 model Consent {
   id             Int       @id @default(autoincrement())

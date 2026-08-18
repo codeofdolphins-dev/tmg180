@@ -11,6 +11,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import { PARTICIPANT_PATHS } from '../../routes/paths';
+import { useWorkerList } from '../../hooks/participant/worker';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -144,9 +145,8 @@ function WorkerCard({ worker }) {
           {worker.availability.map((available, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <span
-                className={`w-full h-2 rounded-full ${
-                  available ? 'bg-emerald-300' : 'bg-slate-300'
-                }`}
+                className={`w-full h-2 rounded-full ${available ? 'bg-emerald-300' : 'bg-slate-300'
+                  }`}
               />
               <span className="text-[10px] text-slate-400">{DAY_LETTERS[i]}</span>
             </div>
@@ -178,11 +178,10 @@ function WorkerCard({ worker }) {
 function PageDot({ label, active }) {
   return (
     <button
-      className={`w-9 h-9 rounded-full text-sm font-medium flex items-center justify-center transition-colors ${
-        active
+      className={`w-9 h-9 rounded-full text-sm font-medium flex items-center justify-center transition-colors ${active
           ? 'bg-brand-600 text-white'
           : 'text-slate-500 hover:bg-white hover:text-slate-700'
-      }`}
+        }`}
     >
       {label}
     </button>
@@ -190,79 +189,89 @@ function PageDot({ label, active }) {
 }
 
 export default function BrowseVerifiedWorkers() {
+
+  const { data: workerList } = useWorkerList()
+
+
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-6">
-            <div>
-              <p className="text-sm text-slate-400 mb-2">
-                Home <span className="mx-1">/</span>
-                <span className="text-slate-600">Browse Verified Workers</span>
-              </p>
-              <h1 className="text-3xl font-bold text-slate-900">Browse Verified Workers</h1>
-              <p className="text-base text-slate-500 mt-2">
-                Connect with experienced support professionals in your community.
-              </p>
-            </div>
 
-            <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-5">
-              <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_auto] gap-4 items-end">
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">Search Keywords</p>
-                  <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
-                    <Search size={15} className="text-slate-400 shrink-0" />
-                    <span className="text-sm text-slate-400">
-                      Specialties, skills, or names...
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">Location</p>
-                  <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
-                    <MapPin size={15} className="text-slate-500 shrink-0" />
-                    <span className="text-sm text-slate-700 flex-1">All Locations</span>
-                    <ChevronDown size={15} className="text-slate-400 shrink-0" />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">Support Area</p>
-                  <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
-                    <Network size={15} className="text-slate-500 shrink-0" />
-                    <span className="text-sm text-slate-700 flex-1">All Categories</span>
-                    <ChevronDown size={15} className="text-slate-400 shrink-0" />
-                  </div>
-                </div>
-                <button className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-bold rounded-xl px-6 py-3 transition-colors">
-                  Apply Filters
-                </button>
-              </div>
-            </div>
+      {/* header */}
+      <div>
+        <p className="text-sm text-slate-400 mb-2">
+          Home <span className="mx-1">/</span>
+          <span className="text-slate-600">Browse Verified Workers</span>
+        </p>
+        <h1 className="text-3xl font-bold text-slate-900">Browse Verified Workers</h1>
+        <p className="text-base text-slate-500 mt-2">
+          Connect with experienced support professionals in your community.
+        </p>
+      </div>
 
-            <div className="flex items-start gap-2.5 bg-purple-50 border border-purple-100 rounded-2xl px-5 py-4">
-              <Info size={15} className="text-brand-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-slate-600 leading-relaxed">
-                TMG180 does not coordinate services. Participants contact independent
-                workers directly using the worker's preferred method.
-              </p>
+      {/* search section */}
+      <div className="bg-white border border-slate-200/70 rounded-2xl shadow-sm p-5">
+        <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_auto] gap-4 items-end">
+          <div>
+            <p className="text-sm font-medium text-slate-600 mb-2">Search Keywords</p>
+            <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
+              <Search size={15} className="text-slate-400 shrink-0" />
+              <span className="text-sm text-slate-400">
+                Specialties, skills, or names...
+              </span>
             </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-600 mb-2">Location</p>
+            <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
+              <MapPin size={15} className="text-slate-500 shrink-0" />
+              <span className="text-sm text-slate-700 flex-1">All Locations</span>
+              <ChevronDown size={15} className="text-slate-400 shrink-0" />
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-600 mb-2">Support Area</p>
+            <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-3">
+              <Network size={15} className="text-slate-500 shrink-0" />
+              <span className="text-sm text-slate-700 flex-1">All Categories</span>
+              <ChevronDown size={15} className="text-slate-400 shrink-0" />
+            </div>
+          </div>
+          <button className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-bold rounded-xl px-6 py-3 transition-colors">
+            Apply Filters
+          </button>
+        </div>
+      </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {WORKERS.map((worker) => (
-                <WorkerCard key={worker.name} worker={worker} />
-              ))}
-            </div>
+      {/* note */}
+      <div className="flex items-start gap-2.5 bg-purple-50 border border-purple-100 rounded-2xl px-5 py-4">
+        <Info size={15} className="text-brand-600 mt-0.5 shrink-0" />
+        <p className="text-sm text-slate-600 leading-relaxed">
+          TMG180 does not coordinate services. Participants contact independent
+          workers directly using the worker's preferred method.
+        </p>
+      </div>
 
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-300">
-                <ChevronLeft size={16} />
-              </button>
-              <PageDot label="1" active />
-              <PageDot label="2" />
-              <PageDot label="3" />
-              <span className="text-sm text-slate-400 px-1">...</span>
-              <PageDot label="12" />
-              <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
-                <ChevronRight size={16} />
-              </button>
-            </div>
+      {/* worker cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        {WORKERS.map((worker) => (
+          <WorkerCard key={worker.name} worker={worker} />
+        ))}
+      </div>
+
+      {/* pagination */}
+      <div className="flex items-center justify-center gap-2 pt-4">
+        <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-300">
+          <ChevronLeft size={16} />
+        </button>
+        <PageDot label="1" active />
+        <PageDot label="2" />
+        <PageDot label="3" />
+        <span className="text-sm text-slate-400 px-1">...</span>
+        <PageDot label="12" />
+        <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
+          <ChevronRight size={16} />
+        </button>
+      </div>
     </div>
   );
 }

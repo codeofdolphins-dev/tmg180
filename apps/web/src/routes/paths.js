@@ -35,9 +35,13 @@ export const PARTICIPANT_PATHS = {
   profileLearningEmployment: '/participant/profile/learning-employment',
   profileSelfCare: '/participant/profile/self-care',
   dailyLog: '/participant/daily-log',
-  dailyLogEvidence: '/participant/daily-log/evidence',
+  dailyLogNew: '/participant/daily-log/new',
+  dailyLogDetail: '/participant/daily-log/:id',
+  dailyLogEdit: '/participant/daily-log/:id/edit',
   snapshot: '/participant/snapshot',
   snapshotExports: '/participant/snapshot/exports',
+  snapshotDetail: '/participant/snapshot/:id',
+  snapshotReview: '/participant/snapshot/:id/review',
   browseWorkers: '/participant/browse-workers',
   browseWorkersProfile: '/participant/browse-workers/profile',
   directory: '/participant/directory',
@@ -89,6 +93,19 @@ export const ADMIN_PATHS = {
   settings: '/admin/settings',
   profile: '/admin/profile',
   permissionDenied: '/admin/permission-denied',
+};
+
+/** One log has three URLs: read it, edit its draft, or start a new one. */
+export const participantDailyLogPath = {
+  detail: (id) => `/participant/daily-log/${id}`,
+  edit: (id) => `/participant/daily-log/${id}/edit`,
+  new: () => PARTICIPANT_PATHS.dailyLogNew,
+};
+
+/** A snapshot is reviewed while it is a draft, then read once it is locked. */
+export const participantSnapshotPath = {
+  detail: (id) => `/participant/snapshot/${id}`,
+  review: (id) => `/participant/snapshot/${id}/review`,
 };
 
 export const DASHBOARD_BY_ROLE = {

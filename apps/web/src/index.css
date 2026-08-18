@@ -104,3 +104,62 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/*
+ * react-datepicker ships its own stylesheet (imported by DateField.jsx). These
+ * overrides are the only place it is themed — the popup has to read as part of
+ * the portal, not as a third-party widget dropped into it.
+ */
+.tmg-calendar,
+.tmg-calendar .react-datepicker__header {
+  font-family: inherit;
+  background: #fff;
+  border: none;
+}
+
+.tmg-calendar {
+  border-radius: 20px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0 8px 30px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.tmg-calendar .react-datepicker__current-month,
+.tmg-calendar .react-datepicker__day-name {
+  color: #0b1c30;
+  font-weight: 600;
+}
+
+.tmg-calendar .react-datepicker__day {
+  color: #0b1c30;
+  border-radius: 999px;
+}
+
+.tmg-calendar .react-datepicker__day:hover {
+  background: #f5f0fa;
+}
+
+.tmg-calendar .react-datepicker__day--selected,
+.tmg-calendar .react-datepicker__day--keyboard-selected {
+  background: #6b21a8;
+  color: #fff;
+}
+
+.tmg-calendar .react-datepicker__day--today {
+  font-weight: 700;
+}
+
+.tmg-calendar .react-datepicker__day--outside-month,
+.tmg-calendar .react-datepicker__day--disabled {
+  color: #9ca3af;
+}
+
+.react-datepicker-popper {
+  z-index: 30;
+}
+
+/* The time picker's columns scroll a lot in a small space — keep the bar quiet. */
+.tmg-time-column {
+  scrollbar-width: thin;
+  scrollbar-color: #dcd2ec transparent;
+}

@@ -24,7 +24,7 @@ export default function ParticipantTopBar() {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <header className="fixed top-0 left-64 right-0 z-10 h-14 flex items-center justify-end gap-3 px-10 bg-white/60 backdrop-blur-md">
+    <header className="print:hidden fixed top-0 left-64 right-0 z-10 h-14 flex items-center justify-end gap-3 px-10 bg-white/60 backdrop-blur-md">
       <button
         onClick={() => navigate(PARTICIPANT_PATHS.preferences)}
         aria-label="Settings"

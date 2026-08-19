@@ -1,10 +1,13 @@
 import type { Request } from 'express';
 import {
+  ACCOUNT_STATUS,
   CONSENT_PERMISSIONS,
   CONSENT_STATUS,
+  CONSENT_TYPE_WORKER_ACCESS,
+  ROLES,
+  WORKER_PROFILE_STATUS,
   DEFAULT_PREFERENCES,
   PRIVACY_AUDIT_ACTION_KEYS,
-  ROLES,
   validateConsentPermissions,
   validatePreferences,
 } from '@tmg180/shared';
@@ -44,13 +47,21 @@ type ConsentRow = {
   superseded_by: number | null;
   created_at: Date;
   updated_at: Date;
-  worker?: { id: number; full_name: string; email: string } | null;
+  worker?: {
+    id: number;
+    full_name: string;
+    email: string;
+    relational_profile?: { display_name: string | null } | null;
+  } | null;
 };
 
 const toConsent = (row: ConsentRow) => ({
   id: row.id,
   workerId: row.worker_id,
-  workerName: row.worker?.full_name ?? 'A worker who has since left TMG180',
+  workerName:
+    row.worker?.relational_profile?.display_name?.trim() ||
+    row.worker?.full_name ||
+    'A worker who has since left TMG180',
   consentType: row.consent_type,
   status: row.status,
   grantedAt: row.granted_at,
@@ -86,8 +97,18 @@ function writeAudit(
   });
 }
 
+// The worker's name as the participant knows it: the display name they chose
+// for the directory when they set one, the account name otherwise — the same
+// rule the directory card uses, so one person never shows under two names.
 const consentInclude = {
-  worker: { select: { id: true, full_name: true, email: true } },
+  worker: {
+    select: {
+      id: true,
+      full_name: true,
+      email: true,
+      relational_profile: { select: { display_name: true } },
+    },
+  },
 } as const;
 
 /** Preferences row, created on first read so the screen always has one. */
@@ -196,6 +217,94 @@ const numericId = (value: string) => {
   if (!Number.isInteger(id) || id < 1) throw new ApiError(404, 'No such consent record.');
   return id;
 };
+
+/**
+ * POST /participant/privacy/consents  { workerId, permissions }
+ *
+ * The grant — the one verb this screen was missing. The participant names a
+ * worker and says which areas they may see; the row is created active with
+ * those exact permissions and nothing else. The worker sees the person in
+ * "Participants I support" on their next request. There is no acceptance
+ * step on the worker's side: canon is that the participant decides.
+ *
+ * Who can be granted to: any worker with a *published* directory profile —
+ * the same list the participant browses, so "who is this" is always
+ * answerable. One active grant per worker at a time: a second attempt is a
+ * 409 pointing at the existing one (edit or revoke that instead). A revoked
+ * grant can be followed by a fresh one; the old row stays in history.
+ */
+export const grantConsent = asyncHandler(async (req, res) => {
+  try {
+    const participantId = req.user!.id;
+    const body = (req.body ?? {}) as { workerId?: unknown; permissions?: Record<string, boolean> };
+
+    const workerId = Number(body.workerId);
+    if (!Number.isInteger(workerId) || workerId <= 0) {
+      throw new ApiError(400, 'Choose a worker to share with.', { workerId: 'Choose a worker.' });
+    }
+    const permissions = body.permissions ?? {};
+    const errors = validateConsentPermissions(permissions);
+    if (Object.keys(errors).length > 0) {
+      throw new ApiError(400, 'Those permissions could not be saved.', errors);
+    }
+    if (!Object.values(permissions).some(Boolean)) {
+      throw new ApiError(400, 'Choose at least one area to share.', {
+        permissions: 'Tick at least one area — otherwise there is nothing to grant.',
+      });
+    }
+
+    const worker = await prisma.user.findFirst({
+      where: {
+        id: workerId,
+        status: ACCOUNT_STATUS.ACTIVE,
+        roles: { has: ROLES.WORKER },
+        relational_profile: { status: WORKER_PROFILE_STATUS.PUBLISHED, opt_in: true },
+      },
+      select: { id: true },
+    });
+    if (!worker) {
+      throw new ApiError(404, 'That worker is not in the directory.', {
+        workerId: 'Only workers with a published profile can be given access.',
+      });
+    }
+
+    const existing = await prisma.consent.findFirst({
+      where: { participant_id: participantId, worker_id: workerId, status: CONSENT_STATUS.ACTIVE },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ApiError(409, 'This worker already has access. Change or remove it from the list instead.', {
+        consentId: existing.id,
+      });
+    }
+
+    const columns = Object.fromEntries(
+      Object.entries(permissions).map(([key, value]) => [PERMISSION_BY_KEY[key]!, value])
+    );
+    const created = await prisma.consent.create({
+      data: {
+        participant_id: participantId,
+        worker_id: workerId,
+        consent_type: CONSENT_TYPE_WORKER_ACCESS,
+        status: CONSENT_STATUS.ACTIVE,
+        granted_at: new Date(),
+        ...columns,
+      },
+      include: consentInclude,
+    });
+
+    await writeAudit(req, {
+      actorId: participantId,
+      action: 'consent_granted',
+      targetId: created.id,
+      details: { workerId, granted: Object.keys(permissions).filter((k) => permissions[k]) },
+    });
+
+    res.status(201).json(new ApiResponse(201, 'access granted', toConsent(created as unknown as ConsentRow)));
+  } catch (error) {
+    catchResponse(error, res);
+  }
+});
 
 /**
  * PATCH /participant/privacy/consents/:id

@@ -266,6 +266,7 @@ export declare const CONSENT_STATUS: {
   readonly SUPERSEDED: 'superseded';
   readonly REVOKED: 'revoked';
 };
+export declare const CONSENT_TYPE_WORKER_ACCESS: string;
 
 export interface ConsentPermission {
   key: string;

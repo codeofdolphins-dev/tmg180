@@ -11,6 +11,7 @@ import { prisma } from '../config/prisma.js';
 import type { Prisma } from '../generated/prisma/client.js';
 import { badRequest, notFoundError, unauthorized } from '../middleware/errors.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { GOALS_SECTION_KEY, syncParticipantGoals } from './goals.controller.js';
 
 /**
  * The participant Personal Profile (Final Override P1-01..03).
@@ -163,6 +164,11 @@ export const saveSection = asyncHandler(async (req, res) => {
       },
     });
   });
+
+  // Goals are rows the evidence chain points at (logs link to them), derived
+  // from this section. Derive them on save, not only on the next read — a
+  // worker may already be on the log form waiting for them.
+  if (section.key === GOALS_SECTION_KEY) await syncParticipantGoals(participantId);
 
   const profile = await loadProfile(participantId);
   res.json(toPayload(profile!));

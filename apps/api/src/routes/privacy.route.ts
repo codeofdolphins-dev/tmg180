@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ROLES } from '@tmg180/shared';
 import {
   getPrivacy,
+  grantConsent,
   revokeConsent,
   savePreferences,
   updateConsent,
@@ -19,5 +20,6 @@ privacyRoutes.use(requireAuth, requireRole(ROLES.PARTICIPANT));
 
 privacyRoutes.get('/privacy', getPrivacy);
 privacyRoutes.patch('/privacy/preferences', savePreferences);
+privacyRoutes.post('/privacy/consents', grantConsent);
 privacyRoutes.patch('/privacy/consents/:id', updateConsent);
 privacyRoutes.post('/privacy/consents/:id/revoke', revokeConsent);

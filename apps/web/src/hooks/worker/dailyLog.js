@@ -64,12 +64,20 @@ export function useWorkerParticipants() {
 }
 
 /** A consented participant's goals — what a log can link to. 403 when consent is gone. */
+/**
+ * The participant's goals, as the worker may link them. Goals are written by
+ * the participant on *their* profile, often while the worker is already on
+ * the form — so this is the one worker query that refetches on window focus
+ * and never holds an empty answer as fresh: "no goals yet" is exactly the
+ * state most likely to change underneath them.
+ */
 export function useParticipantGoals(participantId) {
   return useQuery({
     queryKey: workerDailyLogKeys.goals(participantId),
     queryFn: () => api.get(`/worker/participants/${encodeURIComponent(participantId)}/goals`),
     enabled: Boolean(participantId),
-    staleTime: 60_000,
+    staleTime: (query) => (query.state.data?.length ? 60_000 : 0),
+    refetchOnWindowFocus: true,
     retry: (count, error) => error?.status !== 403 && count < 2,
   });
 }

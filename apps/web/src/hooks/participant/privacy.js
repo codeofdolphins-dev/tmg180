@@ -37,6 +37,18 @@ export function useSavePreferences() {
   });
 }
 
+/**
+ * The grant — names a worker from the directory and says what they may see.
+ * 409 when that worker already has active access (edit or remove that one).
+ */
+export function useGrantConsent() {
+  return useMutation({
+    mutationFn: ({ workerId, permissions }) =>
+      api.post(`${BASE}/consents`, { workerId, permissions }),
+    onSuccess: refresh,
+  });
+}
+
 /** Changing a grant supersedes it server-side; the list comes back rewritten. */
 export function useUpdateConsent() {
   return useMutation({

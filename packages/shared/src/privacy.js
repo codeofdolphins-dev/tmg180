@@ -53,6 +53,13 @@ export const DEFAULT_PREFERENCES = Object.fromEntries(
   SHARING_PREFERENCES.map((preference) => [preference.key, preference.default])
 );
 
+/**
+ * The one consent type the app issues today: a participant letting a named
+ * worker into parts of their record. Other types (external invitations,
+ * research) exist in the DDL and would each be a new value here.
+ */
+export const CONSENT_TYPE_WORKER_ACCESS = 'worker_access';
+
 export const CONSENT_STATUS = {
   ACTIVE: 'active',
   /** Replaced by a newer grant; kept for the record. */

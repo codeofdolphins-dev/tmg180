@@ -24,12 +24,15 @@ import {
 import { formatShortDate, formatTimestamp } from '../../lib/dates';
 import {
   activeConsents,
+  useGrantConsent,
   usePrivacy,
   useRevokeConsent,
   useSavePreferences,
   useUpdateConsent,
 } from '../../hooks/participant/privacy';
+import { useDirectory } from '../../hooks/participant/directory';
 import { useSnapshots } from '../../hooks/participant/snapshot';
+import Select from '../../components/ui/Select';
 
 /**
  * Privacy & Sharing (Figma 1169:2326).
@@ -39,11 +42,12 @@ import { useSnapshots } from '../../hooks/participant/snapshot';
  * protection note — with the portal's type scale and card treatment
  * (md/frontend/TMG180_Participant_UI_Scale.md).
  *
- * Two parts of the frame have nothing behind them yet and say so instead of
- * pretending: Grant Access needs the consent-granting journey (M-09 — the
- * directory it picks from is live at /participant/browse-workers since 19 Aug,
- * the grant step is not), and time-limited share links need the external
- * access layer. What is
+ * One part of the frame has nothing behind it yet and says so instead of
+ * pretending: time-limited share links need the external access layer. Grant
+ * Access is real (M-09, built 19 Aug): it names a worker from the published
+ * directory and creates the consent record the worker's whole workspace
+ * reads — participant-only, no acceptance step, because canon is that the
+ * participant decides. What is
  * real: the preferences, the consent records (reviewing and removing access,
  * both append-only), the audit log, and the export history.
  *
@@ -168,6 +172,143 @@ function ConsentReview({ consent, onClose }) {
   );
 }
 
+/**
+ * The grant. Who: any worker with a published profile (the same list Browse
+ * Directory shows — picked from the directory so "who is this" is always
+ * answerable). What: the same four areas a review edits. One active grant
+ * per worker; the API says so with a 409 and the list already shows them.
+ */
+function GrantAccess({ existing, onClose }) {
+  const [workerId, setWorkerId] = useState(null);
+  const [permissions, setPermissions] = useState(
+    Object.fromEntries(CONSENT_PERMISSIONS.map((p) => [p.key, false]))
+  );
+  const directory = useDirectory();
+  const grant = useGrantConsent();
+
+  const alreadyGranted = new Set(existing.map((consent) => consent.workerId));
+  const options = (directory.data?.workers ?? []).map((worker) => ({
+    value: worker.workerId,
+    label: worker.name,
+    meta: [worker.location, worker.experienceLabel].filter(Boolean).join(' · '),
+    taken: alreadyGranted.has(worker.workerId),
+  }));
+  const anyArea = Object.values(permissions).some(Boolean);
+  const fieldErrors = grant.error?.status === 400 ? (grant.error.data ?? {}) : {};
+
+  const save = async () => {
+    try {
+      await grant.mutateAsync({ workerId, permissions });
+      onClose();
+    } catch {
+      // grant.error renders below.
+    }
+  };
+
+  return (
+    <div className="bg-slate-50 rounded-xl p-5 mt-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">Give a worker access</h3>
+          <p className="text-xs text-slate-500 mt-1">
+            Choose someone from the directory and tick what they may see. They will see your
+            name in their workspace straight away; you can change or remove this at any time.
+          </p>
+        </div>
+        <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-slate-600">
+          <X size={16} />
+        </button>
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="grantWorker" className="block text-sm text-slate-600 mb-2">
+          Worker
+        </label>
+        {directory.isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <LoaderCircle size={14} className="animate-spin" />
+            Loading the directory…
+          </div>
+        ) : options.length === 0 ? (
+          <p className="text-sm text-slate-600 bg-white rounded-lg px-4 py-3">
+            No worker has published a profile yet, so there is no one to choose. The worker
+            you have in mind needs to publish theirs first.
+          </p>
+        ) : (
+          <Select
+            inputId="grantWorker"
+            options={options}
+            value={options.find((o) => o.value === workerId) ?? null}
+            onChange={(option) => setWorkerId(option?.value ?? null)}
+            isOptionDisabled={(option) => option.taken}
+            placeholder="Choose from the directory…"
+            formatOptionLabel={(option, { context }) => (
+              <span className="flex items-baseline gap-2">
+                <span>{option.label}</span>
+                {context === 'menu' && option.meta && (
+                  <span className="text-xs text-slate-500">{option.meta}</span>
+                )}
+                {context === 'menu' && option.taken && (
+                  <span className="text-xs text-slate-400">already has access</span>
+                )}
+              </span>
+            )}
+          />
+        )}
+        {fieldErrors.workerId && (
+          <p className="text-xs text-rose-700 mt-1.5">{fieldErrors.workerId}</p>
+        )}
+      </div>
+
+      <p className="text-sm text-slate-600 mt-4 mb-2">What they may see</p>
+      <div className="flex flex-col gap-2">
+        {CONSENT_PERMISSIONS.map((permission) => (
+          <label
+            key={permission.key}
+            className="flex items-start justify-between gap-4 bg-white rounded-lg px-4 py-3"
+          >
+            <span>
+              <span className="block text-sm text-slate-700">{permission.label}</span>
+              <span className="block text-xs text-slate-500 mt-0.5">{permission.description}</span>
+            </span>
+            <Toggle
+              label={permission.label}
+              checked={permissions[permission.key] === true}
+              onChange={(value) =>
+                setPermissions((current) => ({ ...current, [permission.key]: value }))
+              }
+            />
+          </label>
+        ))}
+      </div>
+      {fieldErrors.permissions && (
+        <p className="text-xs text-rose-700 mt-1.5">{fieldErrors.permissions}</p>
+      )}
+
+      {grant.error && !Object.keys(fieldErrors).length && (
+        <p className="flex items-start gap-2 text-sm text-rose-700 mt-3">
+          <TriangleAlert size={14} className="shrink-0 mt-0.5" />
+          {grant.error.message}
+        </p>
+      )}
+
+      <div className="flex items-center gap-3 mt-4">
+        <button
+          onClick={save}
+          disabled={grant.isPending || !workerId || !anyArea}
+          title={!workerId ? 'Choose a worker first' : !anyArea ? 'Tick at least one area' : undefined}
+          className="bg-brand-600 text-white text-sm rounded-full px-5 py-2 shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {grant.isPending ? 'Granting…' : 'Grant access'}
+        </button>
+        <button onClick={onClose} className="text-sm text-slate-500 hover:text-slate-700">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ConsentRow({ consent }) {
   const [reviewing, setReviewing] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -283,6 +424,7 @@ function AuditEntry({ entry }) {
 
 export default function PrivacySharing() {
   const [isAllAudiListShow, setIsAllAudiListShow] = useState(false);
+  const [granting, setGranting] = useState(false);
 
 
   const { data, isLoading, error } = usePrivacy({ allAuditList: isAllAudiListShow });
@@ -404,14 +546,16 @@ export default function PrivacySharing() {
                 </div>
                 <button
                   type="button"
-                  disabled
-                  title="Granting a worker access is the next step for this screen — the directory is live, the grant step is not yet."
-                  className="flex items-center gap-2 bg-[#d3e4fe] text-[#0b1c30] text-sm rounded-full px-5 py-2.5 opacity-60 cursor-not-allowed shrink-0"
+                  onClick={() => setGranting((open) => !open)}
+                  aria-expanded={granting}
+                  className="flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-5 py-2.5 shadow-md hover:bg-brand-700 transition-colors shrink-0"
                 >
                   <UserPlus size={15} />
                   Grant Access
                 </button>
               </div>
+
+              {granting && <GrantAccess existing={consents} onClose={() => setGranting(false)} />}
 
               {consents.length === 0 ? (
                 <div className="bg-white/60 rounded-lg px-4 py-6 text-center mt-5">
@@ -419,9 +563,9 @@ export default function PrivacySharing() {
                     No one has access to your information.
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    Granting a worker access — choosing someone from the directory and what
-                    they may see — is the next step for this screen. Until then, everything
-                    you record is yours alone.
+                    Everything you record is yours alone until you choose to share it. When
+                    you are working with someone, use Grant Access to pick them from the
+                    directory and say what they may see.
                   </p>
                 </div>
               ) : (

@@ -14,6 +14,7 @@ import {
   ShieldOff,
   Lock,
   ArrowRight,
+  RotateCw,
 } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -137,6 +138,17 @@ export default function DailyLogForm() {
     if (participantId) clearErrors('participantId');
   }, [goalIds.length, domainTags.length, participantId, clearErrors]);
 
+  // One consented participant and nothing chosen yet: choose them. A worker
+  // who supports one person should not have to say who every time; with two
+  // or more the choice stays theirs.
+  useEffect(() => {
+    if (id || participantId || presetParticipantId) return;
+    const people = participants.data ?? [];
+    if (people.length === 1) {
+      setValue('participantId', String(people[0].id), { shouldDirty: false });
+    }
+  }, [id, participantId, presetParticipantId, participants.data, setValue]);
+
   if (isLocked) return <Navigate to={workerDailyLogPath.detail(log.id)} replace />;
 
   if (isLoading) {
@@ -185,7 +197,14 @@ export default function DailyLogForm() {
     <>
       <div className="flex flex-col gap-10 max-w-250 mx-auto pb-6">
         {/* ---------- who this support was for ---------- */}
-        <div className="bg-[#f8f9ff] rounded-4xl px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div
+          id="participant-strip"
+          className={`rounded-4xl px-6 py-4 flex flex-wrap items-center justify-between gap-4 ${
+            id || selectedParticipant
+              ? 'bg-[#f8f9ff]'
+              : 'bg-white border-2 border-brand-600 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
+          }`}
+        >
           {id || selectedParticipant ? (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#e5eeff] text-[#0b1c30] text-sm font-bold flex items-center justify-center">
@@ -201,7 +220,14 @@ export default function DailyLogForm() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-[#4d4354]">Choose who this support was for to begin.</p>
+            <div>
+              <p className="text-base font-semibold text-[#0b1c30]">Who was this support for?</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {participants.isLoading
+                  ? 'Loading the people you support…'
+                  : 'Pick a participant to begin — their goals and the rest of the log unlock from there.'}
+              </p>
+            </div>
           )}
 
           <div className="flex items-center gap-3">
@@ -359,9 +385,19 @@ export default function DailyLogForm() {
               </SectionTitle>
               <div className="mt-5">
                 {!participantId ? (
-                  <p className="text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3">
-                    Choose who this support was for and their goals will appear here.
-                  </p>
+                  <div className="text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3">
+                    Choose who this support was for and their goals will appear here.{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        document.getElementById('participant-strip')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => document.getElementById('participantId')?.focus(), 350);
+                      }}
+                      className="text-brand-700 font-semibold hover:underline"
+                    >
+                      Choose a participant ↑
+                    </button>
+                  </div>
                 ) : goalsBlocked ? (
                   <p className="text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3 flex items-start gap-2">
                     <ShieldOff size={15} className="shrink-0 mt-0.5 text-slate-500" />
@@ -373,11 +409,22 @@ export default function DailyLogForm() {
                     <LoaderCircle size={14} className="animate-spin" /> Loading goals…
                   </p>
                 ) : goals.data?.length === 0 ? (
-                  <p className="text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3">
-                    This participant hasn&rsquo;t added goals to My Personal Profile yet. A log
-                    needs at least one linked goal before it can be submitted — it can still
-                    be saved as a draft.
-                  </p>
+                  <div className="text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3">
+                    <p>
+                      This participant hasn&rsquo;t added goals to the <strong>My Goals</strong>{' '}
+                      section of their Personal Profile yet. A log needs at least one linked goal
+                      before it can be submitted — it can still be saved as a draft.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => goals.refetch()}
+                      disabled={goals.isFetching}
+                      className="inline-flex items-center gap-1.5 text-brand-700 font-semibold mt-2 hover:underline disabled:opacity-60"
+                    >
+                      <RotateCw size={13} className={goals.isFetching ? 'animate-spin' : ''} />
+                      {goals.isFetching ? 'Checking…' : 'Check again'}
+                    </button>
+                  </div>
                 ) : (
                   <Select
                     inputId="goalPicker"

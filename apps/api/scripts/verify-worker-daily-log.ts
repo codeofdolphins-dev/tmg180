@@ -80,17 +80,17 @@ async function main() {
   const strangerId: number = q.json.data.user.id;
   const created: number[] = [];
 
-  // Participant goals: seed the My Goals profile answers the goal sync reads.
-  const profile = await prisma.participantProfile.create({ data: { participant_id: participantId } });
-  const section = await prisma.participantProfileSection.create({
-    data: { profile_id: profile.id, section_key: 'my-goals', status: 'in_progress' },
+  // Participant goals: written the way a participant really writes them —
+  // through the My Goals profile section — so this also proves the save
+  // derives the goal rows immediately (write-through, not read-on-demand).
+  console.log('\nParticipant writes goals');
+  const savedGoals = await call('PATCH', '/participant/profile/sections/my-goals', {
+    token: participantToken,
+    body: { answers: { primary_aspiration: 'Get out into the community more', goal_steps: [{ text: 'Catch the bus on my own', done: false }, { text: 'Join the Tuesday art group', done: false }] } },
   });
-  await prisma.participantProfileAnswer.createMany({
-    data: [
-      { section_id: section.id, question_key: 'primary_aspiration', value: 'Get out into the community more' },
-      { section_id: section.id, question_key: 'goal_steps', value: [{ text: 'Catch the bus on my own', done: false }, { text: 'Join the Tuesday art group', done: false }] },
-    ],
-  });
+  check('My Goals section saves', savedGoals.status === 200, savedGoals.json);
+  const goalRows = await prisma.participantGoal.findMany({ where: { participant_id: participantId, is_active: true }, orderBy: { goal_order: 'asc' } });
+  check('goal rows exist immediately after the save, before anyone reads them', goalRows.length === 3 && goalRows[0].goal_text === 'Get out into the community more', goalRows.map((g) => g.goal_text));
   // A stranger's goal, to prove goals are checked against the right participant.
   const strangerGoal = await prisma.participantGoal.create({
     data: { participant_id: strangerId, goal_text: 'Someone else\'s goal', goal_order: 1 },
@@ -110,10 +110,30 @@ async function main() {
   check('participant token → 403 on worker logs', (await call('GET', '/worker/daily-logs', { token: participantToken })).status === 403);
   check('anonymous → 401', (await call('GET', '/worker/participants')).status === 401);
 
-  // --- grant ---------------------------------------------------------------
-  const consent = await prisma.consent.create({
-    data: { participant_id: participantId, worker_id: workerId, consent_type: 'worker_access', status: CONSENT_STATUS.ACTIVE, granted_at: new Date(), can_add_daily_note: true },
-  });
+  // --- grant (M-09: through the real API) -----------------------------------
+  console.log('\nGranting access (POST /participant/privacy/consents)');
+  const grantUnpublished = await call('POST', '/participant/privacy/consents', { token: participantToken, body: { workerId, permissions: { canAddDailyNote: true } } });
+  check('grant to a worker with no published profile → 404 on workerId', grantUnpublished.status === 404 && grantUnpublished.json.data?.workerId, grantUnpublished.json);
+  await call('PATCH', '/worker/profile', { token: workerToken, body: { relational_intro: 'Hello, I am the log worker.', optIn: true } });
+  check('…worker publishes', (await call('POST', '/worker/profile/publish', { token: workerToken })).json.data?.publication?.isPublished === true);
+  check('grant with no workerId → 400', (await call('POST', '/participant/privacy/consents', { token: participantToken, body: { permissions: { canAddDailyNote: true } } })).status === 400);
+  const noAreas = await call('POST', '/participant/privacy/consents', { token: participantToken, body: { workerId, permissions: {} } });
+  check('grant with no areas ticked → 400 on permissions', noAreas.status === 400 && noAreas.json.data?.permissions, noAreas.json);
+  check('grant with an unknown permission key → 400', (await call('POST', '/participant/privacy/consents', { token: participantToken, body: { workerId, permissions: { canDoAnything: true } } })).status === 400);
+  check('worker token cannot grant → 403', (await call('POST', '/participant/privacy/consents', { token: workerToken, body: { workerId, permissions: { canAddDailyNote: true } } })).status === 403);
+  check('anonymous grant → 401', (await call('POST', '/participant/privacy/consents', { body: { workerId, permissions: { canAddDailyNote: true } } })).status === 401);
+  const granted = await call('POST', '/participant/privacy/consents', { token: participantToken, body: { workerId, permissions: { canAddDailyNote: true } } });
+  check('a valid grant → 201 active with exactly those permissions', granted.status === 201 && granted.json.data.status === CONSENT_STATUS.ACTIVE && granted.json.data.permissions.canAddDailyNote === true && granted.json.data.permissions.canViewProfile === false, granted.json);
+  check('…named by the worker\'s account name (no display name set)', granted.json.data.workerName === 'Log Worker', granted.json.data.workerName);
+  const dup = await call('POST', '/participant/privacy/consents', { token: participantToken, body: { workerId, permissions: { canViewSnapshot: true } } });
+  check('a second grant to the same worker → 409 pointing at the existing one', dup.status === 409 && dup.json.data?.consentId === granted.json.data.id, dup.json);
+  check('audit row consent_granted written', (await prisma.auditLog.count({ where: { actor_id: participantId, action: 'consent_granted', target_id: granted.json.data.id } })) === 1);
+  const consent = { id: granted.json.data.id as number };
+  // A display name on the worker's profile renames the consent row too.
+  await call('PATCH', '/worker/profile', { token: workerToken, body: { displayName: 'Logan Shown' } });
+  const privacyView = await call('GET', '/participant/privacy', { token: participantToken });
+  check('consent row follows the worker\'s directory display name', privacyView.json.data.consents.some((c: any) => c.id === consent.id && c.workerName === 'Logan Shown'), privacyView.json.data.consents);
+  await call('PATCH', '/worker/profile', { token: workerToken, body: { displayName: null } });
   // A view-only grant to the stranger: logs may not be added under it.
   const viewOnly = await prisma.consent.create({
     data: { participant_id: strangerId, worker_id: workerId, consent_type: 'worker_access', status: CONSENT_STATUS.ACTIVE, granted_at: new Date(), can_view_snapshot: true },
@@ -242,14 +262,17 @@ async function main() {
   await prisma.dailyNoteStructured.deleteMany({ where: { id: { in: created } } });
   await prisma.dailyNotePrivate.deleteMany({ where: { id: { in: privateIds } } });
   await prisma.consent.deleteMany({ where: { id: { in: [consent.id, viewOnly.id] } } });
+  await prisma.workerProfileSupportingDetails.deleteMany({ where: { worker_id: { in: [workerId, otherId] } } });
+  await prisma.workerRelationalProfile.deleteMany({ where: { worker_id: { in: [workerId, otherId] } } });
   await prisma.participantGoal.deleteMany({ where: { participant_id: { in: [participantId, strangerId] } } });
-  await prisma.participantProfileAnswer.deleteMany({ where: { section_id: section.id } });
-  await prisma.participantProfileSection.deleteMany({ where: { profile_id: profile.id } });
-  await prisma.participantProfile.deleteMany({ where: { id: profile.id } });
+  await prisma.participantProfileAnswer.deleteMany({ where: { section: { profile: { participant_id: participantId } } } });
+  await prisma.participantProfileSection.deleteMany({ where: { profile: { participant_id: participantId } } });
+  await prisma.participantProfile.deleteMany({ where: { participant_id: participantId } });
   await prisma.workerCredential.deleteMany({ where: { worker_id: { in: [workerId, otherId] } } });
   for (const id of [workerId, otherId, participantId, strangerId]) {
     await prisma.refreshToken.deleteMany({ where: { user_id: id } });
     await prisma.auditLog.deleteMany({ where: { actor_id: id } });
+    await prisma.participantPrivacySettings.deleteMany({ where: { participant_id: id } });
     await prisma.user.delete({ where: { id } });
   }
 

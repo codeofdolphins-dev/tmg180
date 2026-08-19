@@ -42,13 +42,17 @@ import { WORKER_PATHS, workerLearningPath } from '../../routes/paths';
 
 const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
-/** Per-module accent from the frame — colour distinguishes topic, not decoration. */
+/**
+ * Per-module icon and accent, verbatim from the frame — a circular tile per
+ * topic. Colour distinguishes topic here, it is not decoration, so it stays
+ * even though the card chrome around it is on the shared scale.
+ */
 const MODULE_STYLE = {
-  mandatory_policies: { icon: ScrollText, tile: 'bg-rose-50 text-[#a80710]' },
-  practice_standards: { icon: BadgeCheck, tile: 'bg-emerald-50 text-[#007a53]' },
-  support_interpretation: { icon: Handshake, tile: 'bg-[#dce9ff] text-[#2170e4]' },
-  relational_discipline: { icon: Users, tile: 'bg-purple-50 text-brand-600' },
-  templates_how_to: { icon: FolderOpen, tile: 'bg-[#dce9ff] text-[#2170e4]' },
+  mandatory_policies: { icon: ScrollText, tile: 'bg-[#ffdad6] text-[#a80710]' },
+  practice_standards: { icon: BadgeCheck, tile: 'bg-[#007a53] text-white' },
+  support_interpretation: { icon: Handshake, tile: 'bg-[#2170e4] text-white' },
+  relational_discipline: { icon: Users, tile: 'bg-[#861fdd] text-white' },
+  templates_how_to: { icon: FolderOpen, tile: 'bg-[#cbdbf5] text-[#2170e4]' },
 };
 
 const KIND_ICON = {
@@ -60,6 +64,15 @@ const KIND_ICON = {
   template: FileText,
 };
 
+/**
+ * One link row inside a module card — the frame's pill: icon, one line, chevron.
+ *
+ * The single line is the reading's own title once there is one to name, and
+ * falls back to the kind ("Full manual", "Quick guide") while its text is still
+ * to come. That reproduces the frame exactly for the four canonical modules,
+ * whose readings are all unwritten, without leaving the six published readings
+ * under "How-to guide" five times over.
+ */
 function ReadingRow({ reading, onOpen }) {
   const available = reading.status === LEARNING_RESOURCE_STATUS.PUBLISHED;
   const Icon = KIND_ICON[reading.kind] ?? FileText;
@@ -70,25 +83,18 @@ function ReadingRow({ reading, onOpen }) {
       onClick={available ? onOpen : undefined}
       disabled={!available}
       title={available ? undefined : 'Not published yet'}
-      className={`w-full flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition-colors ${
-        available ? 'bg-slate-50 hover:bg-purple-50' : 'bg-slate-50/60 cursor-not-allowed'
+      className={`w-full flex items-center justify-between gap-3 rounded-full px-4 py-3.5 text-left transition-colors ${
+        available ? 'bg-[#f8f9ff] hover:bg-purple-50' : 'bg-[#f8f9ff]/60 cursor-not-allowed'
       }`}
     >
       <span className="flex items-center gap-3 min-w-0">
         <Icon size={16} className={available ? 'text-brand-600 shrink-0' : 'text-slate-400 shrink-0'} />
-        <span className="min-w-0">
-          <span
-            className={`block text-sm font-medium truncate ${
-              available ? 'text-slate-900' : 'text-slate-500'
-            }`}
-          >
-            {learningKindLabel(reading.kind)}
-          </span>
-          <span className="block text-xs text-slate-500 truncate">
-            {available
-              ? `${reading.title}${reading.readMinutes ? ` · ${reading.readMinutes} min read` : ''}`
-              : 'Content to come'}
-          </span>
+        <span
+          className={`text-sm font-medium truncate ${
+            available ? 'text-slate-900' : 'text-slate-500'
+          }`}
+        >
+          {available ? reading.title : learningKindLabel(reading.kind)}
         </span>
       </span>
       <span className="flex items-center gap-2 shrink-0">
@@ -98,27 +104,37 @@ function ReadingRow({ reading, onOpen }) {
             Read
           </span>
         )}
-        {available && <ChevronRight size={15} className="text-slate-400" />}
+        {available ? (
+          <ChevronRight size={15} className="text-slate-400" />
+        ) : (
+          <span className="text-[11px] text-slate-400">To come</span>
+        )}
       </span>
     </button>
   );
 }
 
+/**
+ * The frame lays five cards over three columns: three modules on the top row,
+ * then Relational Discipline beside a double-width Templates & How-to Guides.
+ * `wide` is what earns that second column, and only that card carries a blurb
+ * under its title — the others are a title and their two links, as drawn.
+ */
 function ModuleCard({ module, readings, wide, onOpen }) {
   const style = MODULE_STYLE[module.key] ?? MODULE_STYLE.templates_how_to;
   const Icon = style.icon;
   return (
     <section className={`${CARD} ${wide ? 'md:col-span-2' : ''} flex flex-col`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${style.tile}`}>
-          <Icon size={19} />
+      <div className="flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${style.tile}`}>
+          <Icon size={21} />
         </div>
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-slate-900 leading-snug">{module.title}</h2>
-          <p className="text-xs text-slate-500 mt-0.5">{module.blurb}</p>
+          {wide && <p className="text-xs text-slate-500 mt-0.5">{module.blurb}</p>}
         </div>
       </div>
-      <div className={`grid gap-2 mt-5 ${wide ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
+      <div className={`grid gap-3 mt-6 ${wide ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
         {readings.map((reading) => (
           <ReadingRow key={reading.slug} reading={reading} onOpen={() => onOpen(reading)} />
         ))}
@@ -219,7 +235,7 @@ export default function LearningHub() {
       )}
 
       {data && inLibrary.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {data.modules.map((module) => {
             const readings = inLibrary.filter((reading) => reading.moduleKey === module.key);
             if (readings.length === 0) return null;

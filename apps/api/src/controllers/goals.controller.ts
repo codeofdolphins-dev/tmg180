@@ -17,7 +17,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
  * deleted, so a log submitted against it still resolves.
  */
 
-const GOALS_SECTION_KEY = 'my-goals';
+export const GOALS_SECTION_KEY = 'my-goals';
 const MAX_GOALS = 21; // one aspiration + the 20 steps the profile allows
 
 type Answer = { question_key: string; value: unknown };

@@ -1,271 +1,281 @@
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
-  Calendar,
-  Users,
-  Receipt,
-  Landmark,
-  GraduationCap,
-  Settings,
+  ArrowRight,
   Bookmark,
+  BookOpen,
+  Calendar,
+  Check,
+  CheckCircle2,
   Clock,
   Download,
-  Info,
   FileText,
-  Shield,
+  Info,
+  LoaderCircle,
+  TriangleAlert,
 } from 'lucide-react';
-import Button from '../../components/ui/Button';
+import { learningKindLabel } from '@tmg180/shared';
+import { formatShortDate } from '../../lib/dates';
+import { useLearningResource, useUpdateLearningProgress } from '../../hooks/worker/learning';
+import { WORKER_PATHS, workerLearningPath } from '../../routes/paths';
 
-import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../../navigation/useRoleNav';
-import { WORKER_PATHS } from '../../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Calendar', icon: Calendar },
-  { label: 'Participants I support', icon: Users },
-  { label: 'Invoices', icon: Receipt },
-  { label: 'Governance Standing', icon: Landmark },
-  { label: 'Learning Hub', icon: GraduationCap },
-  { label: 'Settings', icon: Settings },
-];
+/**
+ * One reading — Figma 1170:8551, on the UI scale.
+ *
+ * The frame's "Download .docx" belongs to a world where the evidence template
+ * is a Word file you fill in offline. On TMG180 the log form *is* the
+ * template, so the control stays where the frame puts it, switched off and
+ * saying why, and the reading's own action ("Start a log") sits beside it.
+ *
+ * Saving and marking as read are the worker's own bookkeeping and both undo —
+ * unlike a governance acknowledgement, which is a statement of record.
+ */
 
-const STEPS = [
-  {
-    title: 'Download and Save',
-    desc: 'Save a master copy of this template to your device for easy access.',
-  },
-  {
-    title: 'Daily Completion',
-    desc: 'Fill out the log at the end of each shift while details are fresh. Be objective and factual.',
-  },
-  {
-    title: 'Submission',
-    desc: "Attach the completed log to relevant invoices or upload directly to the participant's portal securely.",
-  },
-];
+const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
-const RELATED = [
-  {
-    tag: 'Guide',
-    tagTone: 'bg-slate-100 text-slate-600',
-    icon: FileText,
-    iconTone: 'bg-sky-100 text-sky-600',
-    title: 'Best Practices for Progress Notes',
-    desc: 'Learn how to write objective, clear, and impactful progress notes.',
-  },
-  {
-    tag: 'Policy',
-    tagTone: 'bg-emerald-100 text-emerald-700',
-    icon: Shield,
-    iconTone: 'bg-emerald-100 text-emerald-600',
-    title: 'Incident Reporting Guidelines',
-    desc: 'Understanding the steps and required detail for reporting incidents.',
-  },
-  {
-    tag: 'Template',
-    tagTone: 'bg-purple-100 text-brand-700',
-    icon: FileText,
-    iconTone: 'bg-purple-100 text-brand-600',
-    title: 'Monthly Participant Summary',
-    desc: 'A template for summarizing monthly support outcomes and goals.',
-  },
-];
-
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('worker');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left rounded-full transition-colors ${
-        active ? 'bg-teal-100 text-teal-800 font-medium' : 'text-slate-600 hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
+/** A reading's `action.target` names a screen; this is the only place they meet. */
+const ACTION_PATH = {
+  daily_log_new: WORKER_PATHS.dailyLogNew,
+  daily_logs: WORKER_PATHS.dailyLogs,
+  snapshots: WORKER_PATHS.snapshots,
+  participants: WORKER_PATHS.participants,
+  governance: WORKER_PATHS.governance,
+  profile: WORKER_PATHS.profile,
+};
 
 export default function LearningHubResource() {
+  const { slug } = useParams();
   const navigate = useNavigate();
+  const reading = useLearningResource(slug);
+  const progress = useUpdateLearningProgress(slug);
+
+  const resource = reading.data?.resource;
+  const body = resource?.body;
+  const saved = Boolean(resource?.progress?.savedAt);
+  const completed = Boolean(resource?.progress?.completedAt);
+  const actionPath = resource?.action ? ACTION_PATH[resource.action.target] : null;
+
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="mb-6 px-2">
-          <div className="text-lg font-black tracking-wider text-brand-700 leading-none">
-            TMG180
-          </div>
-          <div className="text-xs text-slate-400 mt-0.5">Worker Management</div>
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <button
+        onClick={() => navigate(WORKER_PATHS.learningHub)}
+        className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors w-fit"
+      >
+        <ArrowLeft size={14} />
+        Back to Learning Hub
+      </button>
+
+      {reading.isLoading && (
+        <div className={`flex items-center gap-3 text-slate-500 ${CARD}`}>
+          <LoaderCircle size={18} className="animate-spin" />
+          Loading this reading…
         </div>
+      )}
+      {reading.error && (
+        <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-6 text-rose-800">
+          <TriangleAlert size={18} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold">We couldn’t open this reading.</p>
+            <p className="text-sm mt-1">{reading.error.message}</p>
+          </div>
+        </div>
+      )}
 
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Learning Hub'} />
-          ))}
-        </nav>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto flex flex-col gap-5">
-            <button
-              onClick={() => navigate(WORKER_PATHS.resources)}
-              className="flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-800 transition-colors w-fit"
-            >
-              <ArrowLeft size={14} />
-              Back to Resources
-            </button>
-
-            <div className="relative overflow-hidden bg-purple-50/60 rounded-2xl p-6">
-              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full">
-                      <Bookmark size={11} />
-                      Template
-                    </span>
+      {resource && (
+        <>
+          <section className="bg-purple-50/60 rounded-xl p-6">
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full">
+                    <Bookmark size={11} />
+                    {learningKindLabel(resource.kind)}
+                  </span>
+                  {resource.readMinutes && (
                     <span className="inline-flex items-center gap-1 text-xs text-slate-500">
                       <Clock size={11} />
-                      5 min read
+                      {resource.readMinutes} min read
                     </span>
+                  )}
+                  {resource.updatedAt && (
                     <span className="inline-flex items-center gap-1 text-xs text-slate-500">
                       <Calendar size={11} />
-                      Updated: June 2026
+                      Updated {formatShortDate(resource.updatedAt)}
                     </span>
-                  </div>
-                  <h1 className="text-3xl font-bold text-brand-700 leading-snug">
-                    Daily Support Evidence Log template
-                  </h1>
-                  <p className="text-sm text-slate-600 mt-3 max-w-xl leading-relaxed">
-                    A standardized template for documenting daily support activities,
-                    ensuring compliance and clear communication with participants and
-                    coordinators.
-                  </p>
+                  )}
+                  {completed && (
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
+                      <Check size={11} />
+                      Read
+                    </span>
+                  )}
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button variant="outline" icon={Bookmark} className="w-auto! px-4! py-2.5!">
-                    Save resource
-                  </Button>
-                  <Button variant="primary" icon={Download} className="w-auto! px-4! py-2.5!">
-                    Download
-                  </Button>
-                </div>
+                <h1 className="text-3xl font-bold text-slate-900 mt-3">{resource.title}</h1>
+                <p className="text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
+                  {resource.summary}
+                </p>
               </div>
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-purple-200/40" />
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => progress.mutate({ saved: !saved })}
+                  disabled={progress.isPending}
+                  className={`inline-flex items-center gap-2 text-sm rounded-full px-4 py-2.5 border transition-colors disabled:opacity-60 ${
+                    saved
+                      ? 'bg-purple-100 border-purple-200 text-brand-700'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <Bookmark size={15} />
+                  {saved ? 'Saved' : 'Save'}
+                </button>
+                <button
+                  onClick={() => progress.mutate({ completed: !completed })}
+                  disabled={progress.isPending}
+                  className={`inline-flex items-center gap-2 text-sm rounded-full px-4 py-2.5 transition-colors disabled:opacity-60 ${
+                    completed
+                      ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                      : 'bg-brand-600 text-white shadow-md hover:bg-brand-700'
+                  }`}
+                >
+                  <CheckCircle2 size={15} />
+                  {completed ? 'Mark unread' : 'Mark as read'}
+                </button>
+              </div>
             </div>
+            {progress.error && (
+              <p className="text-xs text-rose-600 mt-3">{progress.error.message}</p>
+            )}
+          </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 items-start">
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <h2 className="text-sm font-bold text-slate-900 mb-3">Overview</h2>
-                  <p className="text-sm text-slate-600 leading-relaxed mb-3">
-                    This template provides a clear, structured format for recording
-                    daily support evidence. Consistent use of this log ensures that all
-                    necessary details regarding participant interaction, support
-                    provided, and any incidents are accurately captured.
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-6 items-start">
+            <div className="flex flex-col gap-6">
+              <section className={CARD}>
+                <h2 className="text-lg font-semibold text-slate-900">Overview</h2>
+                {body.overview.map((paragraph) => (
+                  <p key={paragraph} className="text-sm text-slate-600 leading-relaxed mt-3">
+                    {paragraph}
                   </p>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    Regular and accurate documentation is essential for maintaining
-                    practice standing, supporting invoice claims, and most importantly,
-                    ensuring the ongoing wellbeing and progress of participants.
-                  </p>
-                </div>
+                ))}
+              </section>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <h2 className="text-sm font-bold text-slate-900 mb-4">
-                    How to use this template
-                  </h2>
-                  <div className="flex flex-col gap-4">
-                    {STEPS.map((s, i) => (
-                      <div key={s.title} className="flex items-start gap-3">
+              {body.steps.length > 0 && (
+                <section className={CARD}>
+                  <h2 className="text-lg font-semibold text-slate-900">What it covers</h2>
+                  <div className="flex flex-col gap-4 mt-4">
+                    {body.steps.map((step, index) => (
+                      <div key={step.title} className="flex items-start gap-3">
                         <div className="w-6 h-6 rounded-full bg-purple-100 text-brand-700 text-xs font-bold flex items-center justify-center shrink-0">
-                          {i + 1}
+                          {index + 1}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">
-                            {s.title}
-                          </p>
-                          <p className="text-sm text-slate-500 mt-0.5 leading-relaxed">
-                            {s.desc}
-                          </p>
+                          <p className="text-sm font-semibold text-slate-900">{step.title}</p>
+                          <p className="text-sm text-slate-600 mt-0.5 leading-relaxed">{step.detail}</p>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </section>
+              )}
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <h2 className="text-sm font-bold text-slate-900 mb-4">
-                    Example Structure
+              {body.example && (
+                <section className={CARD}>
+                  <h2 className="text-lg font-semibold text-slate-900">{body.example.title}</h2>
+                  <pre className="bg-slate-50 border border-slate-100 rounded-xl p-4 mt-4 text-xs text-slate-600 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap">
+                    {body.example.lines.join('\n')}
+                  </pre>
+                </section>
+              )}
+
+              {body.notes.length > 0 && (
+                <section className="bg-[#eff4ff]/70 rounded-xl p-6">
+                  <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                    <Info size={17} className="text-[#2170e4]" />
+                    Worth knowing
                   </h2>
-                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm text-slate-600 font-mono leading-relaxed">
-                    <p>Date: [DD/MM/YYYY] &nbsp; Duration: [Start Time] - [End Time]</p>
-                    <p className="mt-2">
-                      Support Type: [e.g., Community Access, In-home Support]
+                  {body.notes.map((note) => (
+                    <p key={note} className="text-sm text-slate-600 leading-relaxed mt-3">
+                      {note}
                     </p>
-                    <p className="mt-3">Activities Completed:</p>
-                    <p className="text-slate-500">Assisted with morning routine...</p>
-                    <p className="text-slate-500">Accompanied to grocery store.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center">
-                  <div className="w-11 h-11 rounded-full bg-brand-600 text-white flex items-center justify-center mb-3">
-                    <Download size={18} />
-                  </div>
-                  <h3 className="text-sm font-bold text-slate-900 mb-1">Ready to use?</h3>
-                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    Download the template in Word format (.docx) to start documenting
-                    your support evidence.
-                  </p>
-                  <Button variant="primary" className="w-full!">
-                    Download .docx
-                  </Button>
-                </div>
-
-                <div className="bg-sky-50 border border-sky-100 rounded-2xl p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Info size={14} className="text-sky-600" />
-                    <h3 className="text-sm font-bold text-slate-900">AI Search Notice</h3>
-                  </div>
-                  <p className="text-xs text-sky-900/70 leading-relaxed">
-                    AI search uses Core Library only. Content is sourced directly from
-                    approved platform materials.
-                  </p>
-                </div>
-              </div>
+                  ))}
+                </section>
+              )}
             </div>
 
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Related resources</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {RELATED.map((r) => (
-                  <div
-                    key={r.title}
-                    className="bg-white border border-slate-200 rounded-xl p-5"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span
-                        className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${r.tagTone}`}
-                      >
-                        {r.tag}
-                      </span>
-                      <div
-                        className={`w-7 h-7 rounded-lg flex items-center justify-center ${r.iconTone}`}
-                      >
-                        <r.icon size={14} />
-                      </div>
-                    </div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1">{r.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{r.desc}</p>
+            <div className="flex flex-col gap-6">
+              {actionPath && (
+                <section className={`${CARD} text-center`}>
+                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                    <ArrowRight size={19} />
                   </div>
-                ))}
-              </div>
+                  <h2 className="text-lg font-semibold text-slate-900 mt-3">Put it to use</h2>
+                  <button
+                    onClick={() => navigate(actionPath)}
+                    className="w-full bg-brand-600 text-white text-sm rounded-full py-2.5 mt-4 shadow-md hover:bg-brand-700 transition-colors"
+                  >
+                    {resource.action.label}
+                  </button>
+                </section>
+              )}
+
+              <section className={CARD}>
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                  <Download size={17} className="text-slate-400" />
+                  Download
+                </h2>
+                <button
+                  disabled
+                  title="No file to download"
+                  className="w-full bg-slate-50 text-slate-400 text-sm rounded-full py-2.5 mt-4 cursor-not-allowed"
+                >
+                  Download a copy
+                </button>
+                <p className="text-xs text-slate-500 mt-3 leading-relaxed">
+                  There is no file to download — everything this reading describes happens in the
+                  workspace itself.
+                </p>
+              </section>
+
+              <section className="bg-sky-50 rounded-xl p-6">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                  <Info size={17} className="text-sky-600" />
+                  AI search notice
+                </h2>
+                <p className="text-xs text-sky-900/70 leading-relaxed mt-2">
+                  AI search uses Core Library only, and is not switched on yet. When it is, it will draw
+                  on approved platform material and nothing else.
+                </p>
+              </section>
             </div>
           </div>
-        </main>
-      </div>
+
+          {reading.data.related.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Related readings</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {reading.data.related.map((other) => (
+                  <button
+                    key={other.slug}
+                    onClick={() => navigate(workerLearningPath.resource(other.slug))}
+                    className="bg-white/80 rounded-xl p-5 text-left shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-brand-700">
+                        {learningKindLabel(other.kind)}
+                      </span>
+                      <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-500 flex items-center justify-center">
+                        {other.kind === 'template' ? <FileText size={14} /> : <BookOpen size={14} />}
+                      </div>
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-900 leading-snug">{other.title}</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed mt-1">{other.summary}</p>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
     </div>
   );
 }

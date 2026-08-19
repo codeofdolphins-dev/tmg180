@@ -1,386 +1,426 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Calendar,
-  Users,
-  NotebookPen,
-  TrendingUp,
-  Folder,
-  GraduationCap,
-  ShieldCheck,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Plus,
-  Bell,
-  CheckCircle2,
-  ClipboardClock,
-  CalendarCheck,
-  BookOpenCheck,
-  FolderCheck,
-  UserRoundCheck,
-  Info,
-  CircleAlert,
-  Gavel,
-  ListX,
-  ListChecks,
-  Clock,
   ArrowRight,
   BadgeCheck,
+  BookOpenCheck,
+  CalendarCheck2,
+  ChevronRight,
+  ClipboardClock,
+  Clock,
+  FolderCheck,
+  LoaderCircle,
+  NotebookPen,
+  ShieldCheck,
+  ShieldOff,
+  TriangleAlert,
+  UserRoundCheck,
+  X,
 } from 'lucide-react';
+import {
+  CREDENTIAL_STATUS,
+  GOVERNANCE_ITEM_STATUS,
+  credentialStatusLabel,
+  governanceItemStatusLabel,
+} from '@tmg180/shared';
+import DateField from '../../components/ui/DateField';
+import { formatShortDate } from '../../lib/dates';
+import { governanceKeys, useGovernanceStanding } from '../../hooks/worker/governance';
+import { useUpdateCredential } from '../../hooks/worker/credentials';
+import { queryClient } from '../../lib/queryClient';
+import { workerGovernancePath } from '../../routes/paths';
 
-import { useRoleNav } from '../../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'Calendar', icon: Calendar },
-  { label: 'Participants I support', icon: Users },
-  { label: 'Daily Logs', icon: NotebookPen },
-  { label: 'Monthly Snapshots', icon: TrendingUp },
-  { label: 'Resources', icon: Folder },
-  { label: 'Learning Hub', icon: GraduationCap },
-  { label: 'Governance Standing', icon: ShieldCheck },
-  { label: 'Settings', icon: Settings },
-  { label: 'Help Centre', icon: HelpCircle },
-];
+/**
+ * Governance Standing — Figma 1169:3916, on the UI scale.
+ *
+ * Everything on it is the worker's own: the items they have read and
+ * confirmed, and the credentials they hold. Two rules from canon shape it:
+ *
+ *  - **Standing is a count, never a rating.** The frame's "Excellent" badge is
+ *    gone; the card says how many things are in order out of how many, and
+ *    "Needs review" means "you have not told us yet", not a finding.
+ *  - **Acknowledgements are append-only per version.** Confirming happens on
+ *    the item's own page, after the item has been read; there is no way to
+ *    un-confirm one, here or anywhere.
+ *
+ * Renewals are editable in place — this is the screen the dashboard's "Update
+ * documents" button points at, so the dates have to be recordable here.
+ */
 
-const SUMMARY_CARDS = [
-  {
-    icon: CheckCircle2,
-    iconTone: 'text-[#7800ce]',
-    badge: 'Excellent',
-    badgeTone: 'bg-[#6ffbbe] text-[#002113]',
-    badgeDot: 'bg-[#005f40]',
-    label: 'Overall Readiness',
-    value: '14 / 16 Items',
-    glow: 'bg-[#ddb8ff]/20',
-  },
-  {
-    icon: ClipboardClock,
-    iconTone: 'text-[#2170e4]',
-    badge: '2 Pending',
-    badgeTone: 'bg-[#d8e2ff] text-[#001a42]',
-    label: 'Awaiting Review',
-    value: 'Documents',
-    glow: 'bg-[#adc6ff]/20',
-  },
-  {
-    icon: CalendarCheck,
-    iconTone: 'text-[#007a53]',
-    badge: 'Next: Nov 15',
-    badgeTone: 'bg-[#d3e4fe] text-[#4d4354]',
-    label: 'Next Renewal Milestone',
-    value: 'First Aid Cert',
-    glow: 'bg-[#4edea3]/20',
-  },
-];
+const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
-const ACKNOWLEDGEMENT_ROWS = [
-  {
-    icon: Info,
-    title: 'Privacy & Data Handling Acknowledgement',
-    sub: 'Last updated October 2023',
-    badge: 'Completed',
-    badgeTone: 'bg-[#6ffbbe] text-[#002113]',
-    buttonTone: 'bg-[#d3e4fe] text-[#7800ce]',
-  },
-  {
-    icon: CircleAlert,
-    title: 'Incident and Complaint Process',
-    sub: 'Annual acknowledgement required',
-    badge: 'Needs review',
-    badgeTone: 'bg-[#d8e2ff] text-[#001a42]',
-    buttonTone: 'bg-[#7800ce] text-white',
-  },
-];
+const GROUP_STYLE = {
+  acknowledgement: { icon: BookOpenCheck, tile: 'bg-purple-50 text-brand-600' },
+  document: { icon: FolderCheck, tile: 'bg-[#dce9ff] text-[#2170e4]' },
+  readiness: { icon: UserRoundCheck, tile: 'bg-emerald-50 text-[#005f40]' },
+};
 
-const DOCUMENT_ROWS = [
-  {
-    icon: Gavel,
-    title: 'Mandatory Policies',
-    sub: 'Code of Conduct, Worker Safety',
-    badge: 'Completed',
-    badgeTone: 'bg-[#6ffbbe] text-[#002113]',
-    buttonTone: 'bg-[#d3e4fe] text-[#0058be]',
-  },
-  {
-    icon: ListX,
-    title: 'Practice Standards',
-    sub: 'Core support guidelines',
-    badge: 'Not completed yet',
-    badgeTone: 'bg-[#d3e4fe] text-[#4d4354]',
-    buttonTone: 'bg-[#d3e4fe] text-[#0058be]',
-  },
-];
+const ITEM_CHIP = {
+  [GOVERNANCE_ITEM_STATUS.CONFIRMED]: 'bg-emerald-50 text-emerald-700',
+  [GOVERNANCE_ITEM_STATUS.NEEDS_REVIEW]: 'bg-amber-50 text-amber-700',
+  [GOVERNANCE_ITEM_STATUS.NOT_STARTED]: 'bg-slate-100 text-slate-600',
+};
 
-const READINESS_ROWS = [
-  {
-    icon: ListChecks,
-    title: 'Worker Onboarding Pathway',
-    sub: 'Foundation training modules',
-    badge: 'Completed',
-    badgeTone: 'bg-[#6ffbbe] text-[#002113]',
-    buttonTone: 'bg-[#d3e4fe] text-[#005f40]',
-  },
-];
+const CREDENTIAL_CHIP = {
+  [CREDENTIAL_STATUS.UP_TO_DATE]: 'bg-emerald-50 text-emerald-700',
+  [CREDENTIAL_STATUS.DUE_SOON]: 'bg-amber-50 text-amber-700',
+  [CREDENTIAL_STATUS.EXPIRED]: 'bg-rose-50 text-rose-700',
+  [CREDENTIAL_STATUS.NEEDS_REVIEW]: 'bg-slate-100 text-slate-600',
+};
 
-const RENEWALS = [
-  {
-    badge: 'Due soon',
-    badgeTone: 'bg-[#f0dbff] text-[#6800b4]',
-    dotTone: 'bg-[#f0dbff]',
-    title: 'First Aid Certification',
-    expires: 'Expires: Nov 15, 2023',
-    action: 'Update Details',
-    actionTone: 'text-[#7800ce]',
-  },
-  {
-    badge: 'Next year',
-    badgeTone: 'bg-[#d3e4fe] text-[#4d4354]',
-    dotTone: 'bg-[#dce9ff]',
-    title: 'NDIS Worker Screening',
-    expires: 'Expires: Mar 22, 2024',
-    action: 'Review',
-    actionTone: 'text-[#4d4354]',
-  },
-  {
-    badge: 'Next year',
-    badgeTone: 'bg-[#d3e4fe] text-[#4d4354]',
-    dotTone: 'bg-[#dce9ff]',
-    title: 'Working with Children Check',
-    expires: 'Expires: Aug 10, 2024',
-    action: 'Review',
-    actionTone: 'text-[#4d4354]',
-  },
-];
+const CREDENTIAL_DOT = {
+  [CREDENTIAL_STATUS.UP_TO_DATE]: 'bg-emerald-200',
+  [CREDENTIAL_STATUS.DUE_SOON]: 'bg-amber-300',
+  [CREDENTIAL_STATUS.EXPIRED]: 'bg-rose-300',
+  [CREDENTIAL_STATUS.NEEDS_REVIEW]: 'bg-slate-200',
+};
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('worker');
+function LoadError({ title, error }) {
   return (
-    <button
-      onClick={() => go(label)}
-      className={`relative w-full flex items-center gap-3 text-sm px-4 py-3 text-left rounded-full transition-colors ${
-        active
-          ? 'bg-[#7800ce]/10 text-[#7800ce] font-bold'
-          : 'text-[#4d4354] font-medium hover:bg-slate-100'
-      }`}
-    >
-      {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#7800ce] rounded-full" />
-      )}
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function SectionCard({ icon: Icon, iconTone, title, rows }) {
-  return (
-    <div className="bg-white/90 rounded-[48px] overflow-hidden shadow-sm shadow-purple-100/40">
-      <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-100">
-        <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconTone}`}
-        >
-          <Icon size={18} />
-        </div>
-        <h3 className="text-2xl font-semibold text-[#0b1c30]">{title}</h3>
-      </div>
-      <div className="p-2">
-        {rows.map((row) => (
-          <div
-            key={row.title}
-            className="flex items-center justify-between gap-4 rounded-[32px] px-4 py-4 hover:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-4 min-w-0">
-              <row.icon size={18} className="text-[#4d4354] shrink-0" />
-              <div className="min-w-0">
-                <p className="text-base font-medium text-[#0b1c30]">{row.title}</p>
-                <p className="text-xs font-semibold text-[#4d4354] mt-0.5">
-                  {row.sub}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-6 shrink-0">
-              <span
-                className={`text-xs font-semibold px-3 py-1 rounded-full ${row.badgeTone}`}
-              >
-                {row.badge}
-              </span>
-              <button
-                className={`text-sm font-medium px-5 py-2 rounded-full ${row.buttonTone}`}
-              >
-                Review
-              </button>
-            </div>
-          </div>
-        ))}
+    <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-6 text-rose-800">
+      <TriangleAlert size={18} className="shrink-0 mt-0.5" />
+      <div>
+        <p className="font-semibold">{title}</p>
+        <p className="text-sm mt-1">{error.message}</p>
       </div>
     </div>
   );
 }
 
-export default function WorkerGovernanceStanding() {
+function SummaryCard({ icon: Icon, tone, label, value, note, chip, chipTone }) {
   return (
-    <div className="min-h-screen flex bg-white font-sans text-slate-800">
-      <aside className="w-72 shrink-0 bg-white/80 border-r border-slate-100 flex flex-col py-6 px-6 overflow-y-auto">
-        <div className="mb-6">
-          <div className="w-12 h-12 rounded-full bg-purple-100 text-[#7800ce] text-sm font-bold flex items-center justify-center ring-2 ring-purple-200 mb-4">
-            AW
-          </div>
-          <h2 className="text-2xl font-semibold text-[#7800ce]">Welcome back</h2>
-          <p className="text-sm font-medium text-[#4d4354] mt-1">
-            Your dashboard is ready
-          </p>
-        </div>
+    <div className={CARD}>
+      <div className="flex items-start justify-between gap-3">
+        <Icon size={22} className={tone} />
+        {chip && (
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${chipTone}`}>{chip}</span>
+        )}
+      </div>
+      <p className="text-sm text-slate-600 mt-6">{label}</p>
+      <p className="text-2xl font-semibold text-slate-900 mt-1">{value}</p>
+      {note && <p className="text-xs text-slate-500 mt-1">{note}</p>}
+    </div>
+  );
+}
 
-        <button className="w-full flex items-center justify-center gap-2 bg-[#7800ce] text-white text-sm font-medium rounded-full py-3 mb-8 hover:bg-[#6800b4] transition-colors">
-          <Plus size={14} />
-          New Log Entry
+function ItemRow({ item, onOpen }) {
+  const confirmed = item.status === GOVERNANCE_ITEM_STATUS.CONFIRMED;
+  return (
+    <button
+      onClick={onOpen}
+      className="w-full text-left flex items-center justify-between gap-4 rounded-xl px-4 py-3.5 hover:bg-slate-50 transition-colors"
+    >
+      <div className="min-w-0">
+        <p className="text-base font-medium text-slate-900">{item.title}</p>
+        <p className="text-xs text-slate-500 mt-0.5">
+          {confirmed && item.acknowledgedAt
+            ? `Confirmed ${formatShortDate(item.acknowledgedAt)} · ${item.acknowledgedVersion}`
+            : item.summary}
+        </p>
+      </div>
+      <div className="flex items-center gap-3 shrink-0">
+        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${ITEM_CHIP[item.status]}`}>
+          {governanceItemStatusLabel(item.status)}
+        </span>
+        <ChevronRight size={16} className="text-slate-400" />
+      </div>
+    </button>
+  );
+}
+
+function GroupCard({ group, items, onOpen }) {
+  const style = GROUP_STYLE[group.key] ?? GROUP_STYLE.document;
+  const Icon = style.icon;
+  return (
+    <section className={CARD}>
+      <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${style.tile}`}>
+          <Icon size={19} />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900">{group.label}</h2>
+          <p className="text-xs text-slate-500 mt-0.5">{group.blurb}</p>
+        </div>
+      </div>
+      <div className="pt-2">
+        {items.map((item) => (
+          <ItemRow key={item.key} item={item} onOpen={() => onOpen(item)} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** Recording what you hold. Clearing both dates takes a credential back to "Needs review". */
+function CredentialForm({ credential, onDone }) {
+  const [fields, setFields] = useState({
+    issuedAt: credential.issuedAt ?? '',
+    expiresAt: credential.expiresAt ?? '',
+    reference: credential.reference ?? '',
+  });
+  const save = useUpdateCredential();
+  const errors = save.error?.data ?? {};
+
+  const submit = (event) => {
+    event.preventDefault();
+    save.mutate(
+      { type: credential.type, fields },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: governanceKeys.standing() });
+          onDone();
+        },
+      }
+    );
+  };
+
+  return (
+    <form onSubmit={submit} className="bg-white border border-slate-200 rounded-xl p-4 mt-3">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-slate-900">{credential.label}</p>
+        <button type="button" onClick={onDone} aria-label="Close" className="text-slate-400 hover:text-slate-600">
+          <X size={15} />
         </button>
+      </div>
 
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem
-              key={item.label}
-              {...item}
-              active={item.label === 'Governance Standing'}
+      <label className="block text-sm text-slate-600 mb-2" htmlFor={`issued-${credential.type}`}>
+        Issued
+      </label>
+      <DateField
+        id={`issued-${credential.type}`}
+        look="box"
+        value={fields.issuedAt}
+        onChange={(value) => setFields((current) => ({ ...current, issuedAt: value }))}
+        ariaLabel={`${credential.label} issue date`}
+      />
+      {errors.issuedAt && <p className="text-xs text-rose-600 mt-1">{errors.issuedAt}</p>}
+
+      <label className="block text-sm text-slate-600 mt-3 mb-2" htmlFor={`expires-${credential.type}`}>
+        Expires
+      </label>
+      <DateField
+        id={`expires-${credential.type}`}
+        look="box"
+        value={fields.expiresAt}
+        onChange={(value) => setFields((current) => ({ ...current, expiresAt: value }))}
+        ariaLabel={`${credential.label} expiry date`}
+      />
+      {errors.expiresAt && <p className="text-xs text-rose-600 mt-1">{errors.expiresAt}</p>}
+
+      <label className="block text-sm text-slate-600 mt-3 mb-2" htmlFor={`ref-${credential.type}`}>
+        Reference <span className="text-slate-400">(optional)</span>
+      </label>
+      <input
+        id={`ref-${credential.type}`}
+        value={fields.reference}
+        onChange={(event) => setFields((current) => ({ ...current, reference: event.target.value }))}
+        placeholder="Certificate or policy number"
+        className="w-full bg-white border border-slate-300 rounded-full px-4 h-12.5 text-base text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-600/40"
+      />
+      {errors.reference && <p className="text-xs text-rose-600 mt-1">{errors.reference}</p>}
+
+      {save.error && !Object.keys(errors).length && (
+        <p className="text-xs text-rose-600 mt-3">{save.error.message}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={save.isPending}
+        className="w-full bg-brand-600 text-white text-sm rounded-full py-2.5 mt-4 shadow-md hover:bg-brand-700 disabled:opacity-60 transition-colors"
+      >
+        {save.isPending ? 'Please wait…' : 'Save details'}
+      </button>
+      <p className="text-xs text-slate-500 mt-3 leading-relaxed">
+        Standing is worked out from the expiry date each time this screen loads — it is never stored.
+      </p>
+    </form>
+  );
+}
+
+function credentialNote(credential) {
+  if (credential.status === CREDENTIAL_STATUS.NEEDS_REVIEW) return 'No dates recorded yet';
+  if (credential.status === CREDENTIAL_STATUS.EXPIRED) {
+    return `Expired ${formatShortDate(credential.expiresAt)}`;
+  }
+  return `Expires ${formatShortDate(credential.expiresAt)}`;
+}
+
+function Renewals({ credentials }) {
+  const [editing, setEditing] = useState(null);
+
+  // Soonest first; anything with no date recorded sits at the bottom, because
+  // it is a gap to fill rather than a deadline.
+  const ordered = [...credentials].sort((a, b) => {
+    if (a.daysLeft === null) return 1;
+    if (b.daysLeft === null) return -1;
+    return a.daysLeft - b.daysLeft;
+  });
+  const settled = credentials.filter((c) => c.status === CREDENTIAL_STATUS.UP_TO_DATE).length;
+
+  return (
+    <section className="bg-[#eff4ff]/70 rounded-xl p-6">
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+        <Clock size={18} className="text-brand-600" />
+        Upcoming Renewals
+      </h2>
+
+      <div className="ml-2 border-l border-slate-200 pl-6 flex flex-col gap-6 mt-6">
+        {ordered.map((credential) => (
+          <div key={credential.type} className="relative">
+            <span
+              className={`absolute -left-8 top-1 w-4 h-4 rounded-full border-2 border-white ${
+                CREDENTIAL_DOT[credential.status]
+              }`}
             />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-slate-100">
-          <NavItem icon={LogOut} label="Sign Out" />
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="h-20 shrink-0 bg-[#f8f9ff]/80 flex items-center justify-between px-10">
-          <h1 className="text-2xl font-bold text-[#7800ce]">
-            Governance Standing
-          </h1>
-          <div className="flex items-center gap-2">
-            <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#4d4354] hover:bg-slate-100 transition-colors">
-              <Bell size={18} />
-            </button>
-            <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#4d4354] hover:bg-slate-100 transition-colors">
-              <Settings size={18} />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center ml-2 ring-1 ring-slate-200">
-              AW
-            </div>
+            <span
+              className={`inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                CREDENTIAL_CHIP[credential.status]
+              }`}
+            >
+              {credentialStatusLabel(credential.status)}
+            </span>
+            <p className="text-sm font-medium text-slate-900 mt-1.5 leading-snug">{credential.label}</p>
+            <p className="text-xs text-slate-500 mt-1">{credentialNote(credential)}</p>
+            {editing === credential.type ? (
+              <CredentialForm credential={credential} onDone={() => setEditing(null)} />
+            ) : (
+              <button
+                onClick={() => setEditing(credential.type)}
+                className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700 mt-1.5"
+              >
+                {credential.expiresAt ? 'Update details' : 'Record dates'}
+                <ArrowRight size={12} />
+              </button>
+            )}
           </div>
-        </header>
+        ))}
+      </div>
 
-        <main className="flex-1 bg-[#f8f9ff]/50 px-10 py-10">
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-5xl font-bold text-[#0b1c30]">
-                Governance Standing
-              </h2>
-              <p className="text-lg text-[#4d4354]">
-                Your own documents, acknowledgements, and readiness items.
-                Maintained securely in your account.
-              </p>
-            </div>
+      <div className="border-t border-slate-200 mt-6 pt-4 flex items-start gap-3">
+        <BadgeCheck size={15} className="text-slate-400 mt-0.5 shrink-0" />
+        <p className="text-xs text-slate-500 leading-relaxed">
+          {settled === credentials.length
+            ? 'All of your credentials are up to date.'
+            : `${settled} of ${credentials.length} credentials are up to date. Nothing here is shared with participants.`}
+        </p>
+      </div>
+    </section>
+  );
+}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {SUMMARY_CARDS.map((card) => (
-                <div
-                  key={card.label}
-                  className="relative overflow-hidden bg-white/80 rounded-[48px] p-6 shadow-sm shadow-purple-100/40"
-                >
-                  <div
-                    className={`absolute -top-10 -right-2 w-32 h-32 rounded-full blur-2xl pointer-events-none ${card.glow}`}
+export default function WorkerGovernanceStanding() {
+  const navigate = useNavigate();
+  const standing = useGovernanceStanding();
+  const data = standing.data;
+
+  const nextRenewal = data?.summary.nextRenewal
+    ? data.credentials.find((credential) => credential.type === data.summary.nextRenewal.type)
+    : null;
+
+  return (
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Governance Standing</h1>
+        <p className="text-base text-slate-600 mt-2 max-w-2xl">
+          Your own documents, acknowledgements, and readiness items. Held in your account, and never
+          shown to participants.
+        </p>
+      </div>
+
+      {standing.isLoading && (
+        <div className={`flex items-center gap-3 text-slate-500 ${CARD}`}>
+          <LoaderCircle size={18} className="animate-spin" />
+          Loading your standing…
+        </div>
+      )}
+      {standing.error && <LoadError title="We couldn’t load your standing." error={standing.error} />}
+
+      {data && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SummaryCard
+              icon={ShieldCheck}
+              tone="text-brand-600"
+              label="Overall readiness"
+              value={`${data.summary.readiness.inOrder} of ${data.summary.readiness.total} in order`}
+              note="Items confirmed and credentials up to date. Not a score."
+              chip={data.summary.allInOrder ? 'All in order' : 'Needs attention'}
+              chipTone={
+                data.summary.allInOrder ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+              }
+            />
+            <SummaryCard
+              icon={ClipboardClock}
+              tone="text-[#2170e4]"
+              label="Awaiting your review"
+              value={
+                data.summary.awaitingReview === 0
+                  ? 'Nothing waiting'
+                  : `${data.summary.awaitingReview} ${data.summary.awaitingReview === 1 ? 'item' : 'items'}`
+              }
+              note={data.summary.awaitingReview === 0 ? 'Every item is confirmed.' : 'Read, then confirm.'}
+            />
+            <SummaryCard
+              icon={CalendarCheck2}
+              tone="text-[#005f40]"
+              label="Next renewal milestone"
+              value={nextRenewal ? nextRenewal.label : 'None recorded'}
+              note={
+                nextRenewal
+                  ? `Expires ${formatShortDate(nextRenewal.expiresAt)}`
+                  : 'Record a credential’s expiry date to see it here.'
+              }
+              chip={
+                data.summary.nextRenewal
+                  ? `${data.summary.nextRenewal.daysLeft} ${
+                      data.summary.nextRenewal.daysLeft === 1 ? 'day' : 'days'
+                    }`
+                  : null
+              }
+              chipTone="bg-slate-100 text-slate-600"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6 items-start">
+            <div className="flex flex-col gap-6">
+              {data.groups.map((group) => {
+                const items = data.items.filter((item) => item.group === group.key);
+                if (items.length === 0) return null;
+                return (
+                  <GroupCard
+                    key={group.key}
+                    group={group}
+                    items={items}
+                    onOpen={(item) => navigate(workerGovernancePath.item(item.key))}
                   />
-                  <div className="relative flex items-center justify-between mb-8">
-                    <card.icon size={24} className={card.iconTone} />
-                    <span
-                      className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${card.badgeTone}`}
-                    >
-                      {card.badgeDot && (
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${card.badgeDot}`}
-                        />
-                      )}
-                      {card.badge}
-                    </span>
+                );
+              })}
+
+              {data.items.length === 0 && (
+                <div className={`${CARD} text-center py-12`}>
+                  <div className="w-14 h-14 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                    <NotebookPen size={24} />
                   </div>
-                  <div className="relative">
-                    <p className="text-base text-[#4d4354]">{card.label}</p>
-                    <p className="text-[32px] font-semibold text-[#0b1c30] leading-tight mt-1">
-                      {card.value}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
-              <div className="flex flex-col gap-8">
-                <SectionCard
-                  icon={BookOpenCheck}
-                  iconTone="bg-[#f0dbff] text-[#7800ce]"
-                  title="Required Acknowledgements"
-                  rows={ACKNOWLEDGEMENT_ROWS}
-                />
-                <SectionCard
-                  icon={FolderCheck}
-                  iconTone="bg-[#d8e2ff] text-[#2170e4]"
-                  title="Document Status"
-                  rows={DOCUMENT_ROWS}
-                />
-                <SectionCard
-                  icon={UserRoundCheck}
-                  iconTone="bg-[#6ffbbe] text-[#005f40]"
-                  title="Professional Readiness"
-                  rows={READINESS_ROWS}
-                />
-              </div>
-
-              <div className="bg-[#eff4ff]/60 rounded-[48px] p-6">
-                <div className="flex items-start gap-2 mb-8">
-                  <Clock size={20} className="text-[#0b1c30] mt-1.5 shrink-0" />
-                  <h3 className="text-2xl font-semibold text-[#0b1c30] leading-tight">
-                    Upcoming Renewals
-                  </h3>
-                </div>
-
-                <div className="ml-2 border-l border-[#d3e4fe] pl-6 flex flex-col gap-8">
-                  {RENEWALS.map((item) => (
-                    <div key={item.title} className="relative">
-                      <span
-                        className={`absolute -left-8 top-1 w-4 h-4 rounded-full border-2 border-white shadow-sm ${item.dotTone}`}
-                      />
-                      <span
-                        className={`inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full ${item.badgeTone}`}
-                      >
-                        {item.badge}
-                      </span>
-                      <p className="text-base font-medium text-[#0b1c30] mt-1.5 leading-snug">
-                        {item.title}
-                      </p>
-                      <p className="text-xs font-semibold text-[#4d4354] mt-1.5">
-                        {item.expires}
-                      </p>
-                      <button
-                        className={`flex items-center gap-1 text-sm font-medium mt-1.5 ${item.actionTone}`}
-                      >
-                        {item.action}
-                        <ArrowRight size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-[#d3e4fe] mt-6 pt-5 flex items-start gap-3">
-                  <BadgeCheck size={15} className="text-[#4d4354] mt-0.5 shrink-0" />
-                  <p className="text-xs font-semibold text-[#4d4354] leading-relaxed">
-                    All other credentials are up to date.
+                  <h2 className="text-lg font-semibold text-slate-900 mt-4">
+                    No governance items yet
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-2 max-w-md mx-auto">
+                    Items appear here once they are published. Nothing is waiting on you.
                   </p>
                 </div>
-              </div>
+              )}
             </div>
+
+            <Renewals credentials={data.credentials} />
           </div>
-        </main>
-      </div>
+
+          <p className="flex items-start gap-2 text-xs text-slate-500">
+            <ShieldOff size={13} className="shrink-0 mt-0.5" />
+            Confirmations are recorded against the version you read and are never removed. If a document
+            is published in a new version, its item returns to this list.
+          </p>
+        </>
+      )}
     </div>
   );
 }

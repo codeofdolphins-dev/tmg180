@@ -1,7 +1,8 @@
+import axios from 'axios';
 import { useAuthStore } from '../store';
 
 /**
- * The app's API client: one fetch wrapper, one place the tokens live, one
+ * The app's API client: one axios instance, one place the tokens live, one
  * place an expired session is handled.
  *
  * Base URL is relative in dev so Vite's /api proxy handles it (see
@@ -25,11 +26,15 @@ const REFRESH_KEY = 'tmg180-refresh';
  *   { statusCode: 200, message: 'log in successful', data: { ... }, success: true }
  *   { statusCode: 400, message: 'Email not registered!!!', data: null, success: false }
  *
- * `request` unwraps `data` on success and throws `ApiError` on failure, so
+ * The client unwraps `data` on success and throws `ApiError` on failure, so
  * callers never see the envelope.
  */
 
-/** The API answered with an error: `status` (HTTP), `message`, optional `data`. */
+/**
+ * The API answered with an error: `status` (HTTP), `message`, optional `data`.
+ * A dead network is deliberately NOT an ApiError — callers use that
+ * distinction to decide whether the message is worth showing.
+ */
 export class ApiError extends Error {
   constructor(status, message, data = null) {
     super(message);
@@ -82,8 +87,8 @@ const clearSession = () => {
 let refreshInFlight = null;
 
 /**
- * Raw fetch rather than `request` — this is what `request` calls when it hits
- * a 401, so going back through it would recurse.
+ * Bare `axios`, not the `http` instance — the instance's interceptors call
+ * this on a 401, so going back through them would recurse.
  *
  * @returns true if a new access token is now stored.
  */
@@ -92,11 +97,11 @@ async function rotateSession() {
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
+    const response = await axios.post(
+      `${BASE_URL}/auth/refresh`,
+      { refreshToken },
+      { headers: { Accept: 'application/json' }, validateStatus: () => true }
+    );
 
     // A rejected refresh token is final — the session is genuinely over.
     // Anything else (network down, API restarting, a 500) is not the session's
@@ -105,9 +110,9 @@ async function rotateSession() {
       clearSession();
       return false;
     }
-    if (!response.ok) return false;
+    if (response.status < 200 || response.status >= 300) return false;
 
-    const session = unwrap(await response.json().catch(() => null));
+    const session = unwrap(response.data);
     if (!session?.accessToken) return false;
 
     storeSession(session);
@@ -125,39 +130,57 @@ function refreshSessionOnce() {
   return refreshInFlight;
 }
 
-/**
- * @param {boolean} [options.recoverFrom401] false for the /auth endpoints you
- *   can call while signed out — a rejected sign-in must not try to refresh a
- *   session or clear a live one.
- * @param {boolean} [options.retry] internal: guards the single replay after a
- *   successful refresh so a persistent 401 cannot loop.
- */
-async function request(method, path, { body, recoverFrom401 = true, retry = true } = {}) {
+const http = axios.create({
+  baseURL: BASE_URL,
+  headers: { Accept: 'application/json' },
+});
+
+http.interceptors.request.use((config) => {
   const token = read(TOKEN_KEY);
-  const headers = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-  if (token) headers.Authorization = `Bearer ${token}`;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-
-  // A 401 means the access token is gone or past its 15 minutes. That is the
-  // expected state most of the time, not an error: rotate and replay the call
-  // once, and only end the session if the refresh token is dead too.
-  if (response.status === 401 && recoverFrom401) {
-    if (retry && (await refreshSessionOnce())) {
-      return request(method, path, { body, recoverFrom401, retry: false });
+/**
+ * Success side: unwrap the envelope so callers get `data` directly. A 2xx
+ * carrying `success: false` still counts as the API saying no.
+ *
+ * Error side: a 401 means the access token is gone or past its 15 minutes.
+ * That is the expected state most of the time, not an error: rotate and
+ * replay the call once (`_retried` guards the replay so a persistent 401
+ * cannot loop), and only end the session if the refresh token is dead too.
+ * Config flags ride on the axios config: `recoverFrom401: false` for the
+ * /auth endpoints you can call while signed out — a rejected sign-in must not
+ * try to refresh a session or clear a live one.
+ */
+http.interceptors.response.use(
+  (response) => {
+    if (response.status === 204) return null;
+    const payload = response.data;
+    if (payload?.success === false) {
+      throw new ApiError(
+        payload.statusCode ?? response.status,
+        payload.message ?? 'Something went wrong.',
+        payload.data ?? null
+      );
     }
-    useAuthStore.getState().signOut();
-  }
+    return unwrap(payload);
+  },
+  async (error) => {
+    const { config, response } = error;
 
-  if (response.status === 204) return null;
+    // No response at all — network down, CORS, aborted. Not the API
+    // answering, so not an ApiError; callers show a generic message.
+    if (!response) throw error;
 
-  const payload = await response.json().catch(() => null);
-  if (!response.ok || payload?.success === false) {
+    if (response.status === 401 && config?.recoverFrom401 !== false) {
+      if (!config?._retried && (await refreshSessionOnce())) {
+        return http({ ...config, _retried: true });
+      }
+      useAuthStore.getState().signOut();
+    }
+
+    const payload = response.data;
     throw new ApiError(
       payload?.statusCode ?? response.status,
       // A non-JSON failure (proxy down, HTML error page) still needs words.
@@ -165,8 +188,10 @@ async function request(method, path, { body, recoverFrom401 = true, retry = true
       payload?.data ?? null
     );
   }
-  return unwrap(payload);
-}
+);
+
+const request = (method, path, { body, params, recoverFrom401 = true } = {}) =>
+  http({ method, url: path, data: body, params, recoverFrom401 });
 
 /** Sign-in and sign-up both answer with data: { user, accessToken, refreshToken }. */
 async function authenticate(path, body) {
@@ -176,7 +201,7 @@ async function authenticate(path, body) {
 }
 
 export const api = {
-  get: (path) => request('GET', path),
+  get: (path, params) => request('GET', path, { params }),
   post: (path, body) => request('POST', path, { body }),
   patch: (path, body) => request('PATCH', path, { body }),
   delete: (path) => request('DELETE', path),

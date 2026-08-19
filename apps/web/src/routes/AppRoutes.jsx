@@ -5,7 +5,8 @@ import RequireRole, { RequireSession, RootRedirect } from './RequireRole';
 import { publicRoutes, sessionRoutes } from './auth/publicRoutes';
 import { participantRoutes, participantStandaloneRoutes } from './participant/participantRoutes';
 import ParticipantLayout from '../components/layout/participant/ParticipantLayout';
-import { workerRoutes } from './worker/workerRoutes';
+import { workerRoutes, workerStandaloneRoutes } from './worker/workerRoutes';
+import WorkerLayout from '../components/layout/worker/WorkerLayout';
 import { adminRoutes } from './admin/adminRoutes';
 
 export default function AppRoutes() {
@@ -36,7 +37,13 @@ export default function AppRoutes() {
       </Route>
 
       <Route path="/worker" element={<RequireRole role={ROLES.WORKER} />}>
-        {workerRoutes.map(({ path, element }) => (
+        {/* Shared workspace chrome; pages render into its <Outlet />. */}
+        <Route element={<WorkerLayout />}>
+          {workerRoutes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
+        </Route>
+        {workerStandaloneRoutes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
         ))}
       </Route>

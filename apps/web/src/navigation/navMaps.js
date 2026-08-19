@@ -3,9 +3,14 @@ import { PARTICIPANT_PATHS, WORKER_PATHS, ADMIN_PATHS } from '../routes/paths';
 
 /**
  * Sidebar label -> route path, per role.
- * Pages render their own sidebars with hardcoded labels (mirroring individual
- * Figma frames), so navigation resolves by label. Labels not listed here are
- * intentional no-ops (screen not built yet).
+ * Admin pages still render their own sidebars with hardcoded labels (mirroring
+ * individual Figma frames), so their navigation resolves by label. Labels not
+ * listed here are intentional no-ops (screen not built yet).
+ *
+ * The participant and worker workspaces no longer go through this map: each has
+ * one shared layout route (ParticipantLayout / WorkerLayout) whose sidebar
+ * navigates by path and derives the active item from the URL. WORKER_NAV is kept
+ * for the generic `layout/Sidebar.jsx` until the admin side gets the same treatment.
  */
 
 export const SIGN_OUT = Symbol('sign-out');

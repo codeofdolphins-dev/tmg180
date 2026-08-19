@@ -54,8 +54,8 @@ Paths are `apps/web/src/pages/…`. "Superseded" = build from the named v2 frame
 | Privacy & Sharing Dashboard | `1169:2326` | participant/PrivacySharing.jsx | |
 | Session Preferences Dashboard | `1170:5652` | participant/SessionPreferences.jsx | |
 | Participant Library | `1170:5926` | participant/Library.jsx | |
-| Worker Profile Detail | `1170:6090` | participant/WorkerDirectoryProfile.jsx | Older directory profile — v2 `3239:95` is the profile to build |
-| Worker Directory - Favourites Tab | `1170:6301` | participant/WorkerDirectory.jsx | Older directory — v2 `3238:388` is the directory to build |
+| Worker Profile Detail | `1170:6090` | — (WorkerDirectoryProfile.jsx deleted 2026-08-19) | Older directory profile — v2 `3239:95` built instead |
+| Worker Directory - Favourites Tab | `1170:6301` | — (WorkerDirectory.jsx deleted 2026-08-19) | Older directory — v2 `3238:388` built instead |
 | Browse Verified Workers | `1219:2237` | participant/BrowseVerifiedWorkers.jsx | Superseded → v2 `3238:388` (R-06/R-04) |
 | Relational Worker Profile - Sarah Mitchell | `1221:3413` | participant/RelationalWorkerProfile.jsx | Superseded → v2 `3239:95` (F-1..F-4) |
 | My Personal Profile (hub) | `1207:5` | participant/MyPersonalProfile.jsx | Superseded → v2 `3238:2` (R-01/R-03) |
@@ -88,7 +88,7 @@ Section-page button system (guide §3): **Save Draft / Save & Continue** only.
 | Worker Workspace Dashboard | `1169:2660` | worker/WorkerDashboard.jsx | |
 | Participants I Support | `1169:2956` | worker/ParticipantsISupport.jsx | |
 | Worker Daily Support Evidence Log | `1169:3172` | worker/DailyLogForm.jsx | Worker layer of R-09; comparison chips: Typical / More support needed / Less support needed / Different support needed |
-| Approved Monthly Snapshots | `1169:3455` | worker/ApprovedSnapshots.jsx | |
+| Approved Monthly Snapshots | `1169:3455` | worker/ApprovedSnapshots.jsx + worker/WorkerSnapshotDetail.jsx | Dynamic 2026-08-19. The frame's Status filter has one possible value (only locked snapshots reach a worker), so it renders as a fixed statement, not a control. "View Snapshot" goes to the detail page, which the frame does not draw — built in the portal idiom. |
 | Worker Portal - Learning Hub | `1169:3676` | worker/LearningHub.jsx | Onboarding pill copy → v2 `3240:126` (R-07) |
 | Worker Governance Standing | `1169:3916` | worker/WorkerGovernanceStanding.jsx | |
 | Worker Portal - Resources | `1170:6813` | worker/Resources.jsx | |
@@ -120,7 +120,7 @@ Section-page button system (guide §3): **Save Draft / Save & Continue** only.
 
 ### Empty / error / privacy states (10 — all built)
 
-No Daily Logs `1205:943` → worker/EmptyDailyLogs · No Consent Access `1205:1061` → worker/NoConsentAccess · No Export `1205:1210` → worker/EmptyExport · No Favourites `1205:1320` → worker/EmptyFavourites · Something Went Wrong `1205:1427` → auth/SomethingWentWrong · No Monthly Snapshot `1205:1457` → worker/EmptyMonthlySnapshot · Permission Denied Participant/Worker/Admin `1205:1556`/`1600`/`1683` → participant/PermissionDeniedParticipant, worker/PermissionDeniedWorker, admin/PermissionDeniedAdmin · Link Expired / Revoked `1205:1755` → auth/LinkExpired.
+No Daily Logs `1205:943` → worker/EmptyDailyLogs · No Consent Access `1205:1061` → worker/NoConsentAccess · No Export `1205:1210` → worker/EmptyExport · No Favourites `1205:1320` → worker/EmptyFavourites · Something Went Wrong `1205:1427` → auth/SomethingWentWrong · No Monthly Snapshot `1205:1457` → folded into worker/ApprovedSnapshots' empty state 2026-08-19 (`EmptyMonthlySnapshot.jsx` deleted) · Permission Denied Participant/Worker/Admin `1205:1556`/`1600`/`1683` → participant/PermissionDeniedParticipant, worker/PermissionDeniedWorker, admin/PermissionDeniedAdmin · Link Expired / Revoked `1205:1755` → auth/LinkExpired.
 
 ### Mobile (8 — not built; M-14 mobile scope pending)
 
@@ -187,6 +187,6 @@ Sized S/M/L. Details and file:line refs are in the archived audit ([../archive/T
 2. **Auth (M-01 / W-01 / D-01) — M.** Sign In "Sign up" link text; "Return to Sign In" on CreateNewPassword / ResetPassword / LinkExpired; SignUp title/subtitle, Confirm password + mismatch error, role-card copy, button copy, email-taken state, success screen; one dynamic chooser reachable for multi-role accounts; retire ResetPassword.jsx.
 3. **Check-in (M-04) — L.** Page + 4 states, service/hooks, API `POST/GET/PATCH /api/v1/participant/checkins` on the existing `tmg_participant_checkin` model (+ `updated_at`, midnight lock, participant-only middleware); wire the dashboard banner.
 4. **Dashboard (R-02) — M.** 4-card config array, banner, drop Export card, greeting copy, "N of 11" from `useProfile()`.
-5. **Directory + profile (R-06 / R-04 / F-1..4) — M.** Remove keyword filter + availability from list, retitle, meta line; rename "What participants appreciate" → "What I bring to support", un-quote chips, footer notice; retire/align WorkerDirectory.jsx + WorkerDirectoryProfile.jsx.
+5. **Directory + profile (R-06 / R-04 / F-1..4) — M.** **Done 2026-08-19** (both pages dynamic on the new worker-profile tables; `WorkerDirectory.jsx` / `WorkerDirectoryProfile.jsx` retired). Was: Remove keyword filter + availability from list, retitle, meta line; rename "What participants appreciate" → "What I bring to support", un-quote chips, footer notice; retire/align WorkerDirectory.jsx + WorkerDirectoryProfile.jsx.
 6. **Copy sweep + R-05 / R-07 / R-08 — S/M.** Sidebar "My Personal Profile" / "Browse Directory" / "Sign Out"; ~25 banned-term lines (FCA baseline in Library, baseline chips in both daily logs, APP Compliant, Compliance notices, Governance Admin ×4, Assigned ×5, clinical ×3); remove Admin Participant Overview + nav items; pill copy ×3; exports/report notices.
 7. **Tokens — M**, pending Saf's answer above: `@theme` brand → violet scale, Inter, sweep hard-coded hexes.

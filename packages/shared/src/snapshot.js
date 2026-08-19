@@ -236,3 +236,43 @@ export function validateSnapshotAddendum({ text, reason } = {}) {
   }
   return errors;
 }
+
+/**
+ * What an approved snapshot shows a *worker* (Figma 1169:3455, "Consent Level").
+ *
+ * The frame offers two values and the brief derives them "from the consent's
+ * flag set". A label saying "Summary only" while the whole narrative is on
+ * screen would be a lie, so the level is load-bearing rather than decorative:
+ *
+ *   summary_only — the grant is `can_view_snapshot` alone. The worker sees the
+ *     month's shape: the counts, the areas of daily life engaged, how the month
+ *     compared with usual, and the non-linear statement. Not the participant's
+ *     written words.
+ *   full_shared  — the grant also carries `can_view_intake` ("My Personal
+ *     Profile"), which is the participant's own writing. The snapshot narrative
+ *     is the same kind of thing, so it travels with the same permission, along
+ *     with the goals it names and any addenda.
+ *
+ * A grant without `can_view_snapshot` is not an access level — it is no access,
+ * and the snapshot never appears at all.
+ */
+export const SNAPSHOT_ACCESS = {
+  FULL: 'full_shared',
+  SUMMARY: 'summary_only',
+};
+
+export const SNAPSHOT_ACCESS_LABELS = {
+  [SNAPSHOT_ACCESS.FULL]: 'Full shared',
+  [SNAPSHOT_ACCESS.SUMMARY]: 'Summary only',
+};
+
+/** @returns 'full_shared' | 'summary_only' | null when the grant does not reach snapshots. */
+export function snapshotAccessLevel(permissions = {}) {
+  if (permissions.canViewSnapshot !== true) return null;
+  return permissions.canViewProfile === true ? SNAPSHOT_ACCESS.FULL : SNAPSHOT_ACCESS.SUMMARY;
+}
+
+export const snapshotAccessLabel = (level) => SNAPSHOT_ACCESS_LABELS[level] ?? '';
+
+/** Whether this level reaches the participant's written words. */
+export const showsNarrative = (level) => level === SNAPSHOT_ACCESS.FULL;

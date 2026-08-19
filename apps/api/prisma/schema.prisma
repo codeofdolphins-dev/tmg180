@@ -31,32 +31,39 @@ model User {
   created_at    DateTime  @default(now()) @db.Timestamptz
   updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz
 
-  profile                  ParticipantProfile?        @relation("ParticipantProfile")
-  intakes                  FcaIntake[]                @relation("ParticipantIntakes")
-  goals                    ParticipantGoal[]          @relation("ParticipantGoals")
-  checkins                 ParticipantCheckin[]       @relation("ParticipantCheckins")
-  snapshots                MonthlySnapshot[]          @relation("ParticipantSnapshots")
-  private_notes_authored   DailyNotePrivate[]         @relation("WorkerPrivateNotes")
-  private_notes_about      DailyNotePrivate[]         @relation("ParticipantPrivateNotes")
-  notes_authored           DailyNoteStructured[]      @relation("WorkerNotes")
-  notes_written            DailyNoteStructured[]      @relation("AuthoredNotes")
-  notes_about              DailyNoteStructured[]      @relation("ParticipantNotes")
-  note_addenda             DailyNoteAddendum[]        @relation("NoteAddenda")
-  snapshot_addenda         SnapshotAddendum[]         @relation("SnapshotAddenda")
-  privacy_settings         ParticipantPrivacySettings? @relation("ParticipantPrivacySettings")
-  consents_given           Consent[]                  @relation("ParticipantConsents")
-  consents_held            Consent[]                  @relation("WorkerConsents")
-  invitations_sent         ExternalWorkerInvitation[] @relation("ParticipantInvitations")
-  invitations_revoked      ExternalWorkerInvitation[] @relation("InvitationRevocations")
-  external_notes           ExternalSupportNote[]      @relation("ParticipantExternalNotes")
-  invoices_raised          Invoice[]                  @relation("WorkerInvoices")
-  invoices_received        Invoice[]                  @relation("ParticipantInvoices")
-  invoice_audit_entries    InvoiceAudit[]             @relation("InvoiceAuditChanges")
-  notifications            Notification[]             @relation("UserNotifications")
-  audit_entries            AuditLog[]                 @relation("AuditActor")
-  refresh_tokens           RefreshToken[]             @relation("UserRefreshTokens")
-  deletion_requests        DeletionRequest[]          @relation("ParticipantDeletionRequests")
-  deletion_requests_closed DeletionRequest[]          @relation("DeletionRequestsProcessed")
+  profile                  ParticipantProfile?               @relation("ParticipantProfile")
+  intakes                  FcaIntake[]                       @relation("ParticipantIntakes")
+  goals                    ParticipantGoal[]                 @relation("ParticipantGoals")
+  checkins                 ParticipantCheckin[]              @relation("ParticipantCheckins")
+  snapshots                MonthlySnapshot[]                 @relation("ParticipantSnapshots")
+  private_notes_authored   DailyNotePrivate[]                @relation("WorkerPrivateNotes")
+  private_notes_about      DailyNotePrivate[]                @relation("ParticipantPrivateNotes")
+  notes_authored           DailyNoteStructured[]             @relation("WorkerNotes")
+  notes_written            DailyNoteStructured[]             @relation("AuthoredNotes")
+  notes_about              DailyNoteStructured[]             @relation("ParticipantNotes")
+  note_addenda             DailyNoteAddendum[]               @relation("NoteAddenda")
+  snapshot_addenda         SnapshotAddendum[]                @relation("SnapshotAddenda")
+  privacy_settings         ParticipantPrivacySettings?       @relation("ParticipantPrivacySettings")
+  consents_given           Consent[]                         @relation("ParticipantConsents")
+  consents_held            Consent[]                         @relation("WorkerConsents")
+  invitations_sent         ExternalWorkerInvitation[]        @relation("ParticipantInvitations")
+  invitations_revoked      ExternalWorkerInvitation[]        @relation("InvitationRevocations")
+  external_notes           ExternalSupportNote[]             @relation("ParticipantExternalNotes")
+  invoices_raised          Invoice[]                         @relation("WorkerInvoices")
+  invoices_received        Invoice[]                         @relation("ParticipantInvoices")
+  invoice_audit_entries    InvoiceAudit[]                    @relation("InvoiceAuditChanges")
+  notifications            Notification[]                    @relation("UserNotifications")
+  audit_entries            AuditLog[]                        @relation("AuditActor")
+  refresh_tokens           RefreshToken[]                    @relation("UserRefreshTokens")
+  deletion_requests        DeletionRequest[]                 @relation("ParticipantDeletionRequests")
+  deletion_requests_closed DeletionRequest[]                 @relation("DeletionRequestsProcessed")
+  session_preferences      ParticipantSessionPreferences?    @relation("ParticipantSessionPreferences")
+  credentials              WorkerCredential[]                @relation("WorkerCredentials")
+  relational_profile       WorkerRelationalProfile?          @relation("WorkerRelationalProfile")
+  supporting_details       WorkerProfileSupportingDetails?   @relation("WorkerProfileSupportingDetails")
+  governance_acks          WorkerGovernanceAcknowledgement[] @relation("WorkerGovernanceAcknowledgements")
+  governance_notes         WorkerGovernanceNote[]            @relation("WorkerGovernanceNotes")
+  learning_progress        WorkerLearningProgress[]          @relation("WorkerLearningProgress")
 
   @@index([status])
   @@index([roles(ops: ArrayOps)], type: Gin)
@@ -746,4 +753,185 @@ model DeletionRequest {
   processor   User? @relation("DeletionRequestsProcessed", fields: [processed_by], references: [id])
 
   @@map("tmg_deletion_requests")
+}
+
+model ParticipantSessionPreferences {
+  id                   Int      @id @default(autoincrement())
+  participant_id       Int      @unique
+  support_focus        String[] @default([])
+  availability         String[] @default([])
+  communication_format String[] @default([])
+  setting              String[] @default([])
+  languages            String[] @default([])
+  relational_style     String[] @default([])
+  status               String   @default("draft") @db.VarChar(20)
+  created_at           DateTime @default(now()) @db.Timestamptz
+  updated_at           DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  participant User @relation("ParticipantSessionPreferences", fields: [participant_id], references: [id])
+
+  @@map("tmg_participant_session_preferences")
+}
+
+// ============================================================
+// WORKER WORKSPACE — credentials (worker-owned data, Technical Brief §7)
+// ============================================================
+
+// One row per worker per credential type, created lazily on first read so the
+// Governance Summary always has the full set to show. The dates are what the
+// worker tells us; standing ("Up to date" / "Due soon" / "Expired" / "Needs
+// review") is derived from expires_at at read time by @tmg180/shared — never
+// stored, so it can never go stale. The type list itself lives in
+// WORKER_CREDENTIAL_TYPES (shared), not in a table, for the same reason the
+// profile sections do: adding a credential is a seed edit, not a migration.
+// Document upload / admin verification is not built; verified_at is the seam.
+model WorkerCredential {
+  id              Int       @id @default(autoincrement())
+  worker_id       Int
+  credential_type String    @db.VarChar(50)
+  issued_at       DateTime? @db.Date
+  expires_at      DateTime? @db.Date
+  verified_at     DateTime? @db.Timestamptz
+  reference       String?   @db.VarChar(255)
+  notes           String?
+  created_at      DateTime  @default(now()) @db.Timestamptz
+  updated_at      DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  worker User @relation("WorkerCredentials", fields: [worker_id], references: [id])
+
+  @@unique([worker_id, credential_type])
+  @@index([worker_id])
+  @@index([expires_at])
+  @@map("tmg_worker_credentials")
+}
+
+// ============================================================
+// WORKER PROFILE — relational-first (Override P3-01…P3-04, WF-06)
+// ============================================================
+
+// What a worker says about themselves as a person: the seven plain-language
+// prompts (WORKER_PROFILE_PROMPTS in @tmg180/shared holds the labels; the
+// columns are the Handoff's worker_relational_profiles), a one-line
+// philosophy (the quote on the directory card) and relational tags. This row
+// also carries publication state (R-07): `opt_in` is the worker's explicit
+// choice to appear in the directory, `status`/`published_at` say whether
+// they currently do. Workspace access never depends on any of it. Publishing
+// is "publishable on relational content alone" — the relational intro plus
+// opt-in; see workerProfileReadiness().
+model WorkerRelationalProfile {
+  id                      Int       @id @default(autoincrement())
+  worker_id               Int       @unique
+  display_name            String?   @db.VarChar(120)
+  relational_intro        String?
+  natural_support_style   String?
+  communication_style     String[]  @default([])
+  preferred_environments  String?
+  interests               String[]  @default([])
+  participants_appreciate String[]  @default([])
+  boundaries_and_fit      String?
+  values_tags             String[]  @default([])
+  support_philosophy      String?   @db.VarChar(255)
+  opt_in                  Boolean   @default(false)
+  status                  String    @default("draft") @db.VarChar(20)
+  published_at            DateTime? @db.Timestamptz
+  created_at              DateTime  @default(now()) @db.Timestamptz
+  updated_at              DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  worker User @relation("WorkerRelationalProfile", fields: [worker_id], references: [id])
+
+  @@index([status])
+  @@map("tmg_worker_relational_profiles")
+}
+
+// Résumé details, kept in their own table so they are structurally
+// "supporting content" (P3-03): support areas (SUPPORT_AREAS keys),
+// availability as AM/PM × day slot keys ('mon_am' … 'sun_pm' — the design
+// system's grid, 3233:59), location, languages, years of experience and the
+// worker's preferred contact method. Availability is only ever returned in
+// one profile's detail, never in a directory list (R-04). Credentials are
+// not here — they are the rows in tmg_worker_credentials.
+model WorkerProfileSupportingDetails {
+  id                 Int      @id @default(autoincrement())
+  worker_id          Int      @unique
+  support_areas      String[] @default([])
+  availability       String[] @default([])
+  location_area      String?  @db.VarChar(120)
+  languages          String[] @default([])
+  experience_years   Int?
+  contact_preference String?  @db.VarChar(255)
+  created_at         DateTime @default(now()) @db.Timestamptz
+  updated_at         DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  worker User @relation("WorkerProfileSupportingDetails", fields: [worker_id], references: [id])
+
+  @@map("tmg_worker_profile_supporting_details")
+}
+
+// ============================================================
+// WORKER GOVERNANCE STANDING + LEARNING HUB (frames 1169:3916 / 1170:7877 /
+// 1169:3676 / 1170:8551)
+// ============================================================
+// The catalogues themselves — which governance items exist, which readings
+// exist — are content and live in @tmg180/shared (GOVERNANCE_ITEMS,
+// LEARNING_RESOURCES), the same way PROFILE_SECTIONS and
+// WORKER_CREDENTIAL_TYPES do. What is stored per worker is only what the
+// worker themselves did: confirmed a version, wrote a private note, opened or
+// finished a reading.
+
+// Append-only, one row per (worker, item, version): confirming is a fact that
+// happened on a date, never a flag to be toggled off. A new version of an item
+// asks for a new row and leaves the earlier one standing as history — which is
+// exactly what the item detail's History rail reads.
+model WorkerGovernanceAcknowledgement {
+  id              Int      @id @default(autoincrement())
+  worker_id       Int
+  item_key        String   @db.VarChar(60)
+  item_version    String   @db.VarChar(20)
+  acknowledged_at DateTime @default(now()) @db.Timestamptz
+
+  worker User @relation("WorkerGovernanceAcknowledgements", fields: [worker_id], references: [id])
+
+  @@unique([worker_id, item_key, item_version])
+  @@index([worker_id])
+  @@map("tmg_worker_governance_acknowledgements")
+}
+
+// "A private space for your own reflections or reminders" (1170:7877). The
+// worker's own note about one governance item — mutable, never shared, and no
+// part of the acknowledgement.
+model WorkerGovernanceNote {
+  id         Int      @id @default(autoincrement())
+  worker_id  Int
+  item_key   String   @db.VarChar(60)
+  note       String?
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  worker User @relation("WorkerGovernanceNotes", fields: [worker_id], references: [id])
+
+  @@unique([worker_id, item_key])
+  @@index([worker_id])
+  @@map("tmg_worker_governance_notes")
+}
+
+// One worker's relationship with one reading: opened, saved for later, marked
+// as read. `resource_slug` refers to LEARNING_RESOURCES in @tmg180/shared, so
+// a reading that is retired from the catalogue leaves its rows harmlessly
+// behind rather than breaking a foreign key.
+model WorkerLearningProgress {
+  id            Int       @id @default(autoincrement())
+  worker_id     Int
+  resource_slug String    @db.VarChar(80)
+  opened_at     DateTime? @db.Timestamptz
+  open_count    Int       @default(0)
+  saved_at      DateTime? @db.Timestamptz
+  completed_at  DateTime? @db.Timestamptz
+  created_at    DateTime  @default(now()) @db.Timestamptz
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  worker User @relation("WorkerLearningProgress", fields: [worker_id], references: [id])
+
+  @@unique([worker_id, resource_slug])
+  @@index([worker_id])
+  @@map("tmg_worker_learning_progress")
 }

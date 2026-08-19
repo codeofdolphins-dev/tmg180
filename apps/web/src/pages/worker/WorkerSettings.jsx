@@ -1,462 +1,398 @@
+import { useEffect, useState } from 'react';
 import {
-  ShieldCheck,
-  Plus,
-  LayoutDashboard,
-  Calendar,
-  Users,
-  NotebookPen,
-  TrendingUp,
-  Folder,
-  GraduationCap,
-  Landmark,
-  Settings,
-  HelpCircle,
-  Search,
   Bell,
-  User,
-  Palette,
-  CalendarCheck,
+  BadgeCheck,
+  CircleAlert,
+  ExternalLink,
+  LoaderCircle,
+  Lock,
+  PencilLine,
+  Send,
   Shield,
-  MapPin,
-  Globe,
-  Link as LinkIcon,
-  Monitor,
-  Smartphone,
-  X,
-  CheckCircle2,
+  TriangleAlert,
+  Undo2,
+  User,
+  UserRound,
 } from 'lucide-react';
-import Button from '../../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
+import {
+  usePublishProfile,
+  useUnpublishProfile,
+  useUpdateAccountName,
+  useWorkerProfile,
+} from '../../hooks/worker/profile';
+import { WORKER_PATHS } from '../../routes/paths';
+import { useAuthStore } from '../../store';
 
-import { useRoleNav } from '../../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'Calendar', icon: Calendar },
-  { label: 'Participants I support', icon: Users },
-  { label: 'Daily Logs', icon: NotebookPen },
-  { label: 'Monthly Snapshots', icon: TrendingUp },
-  { label: 'Resources', icon: Folder },
-  { label: 'Learning Hub', icon: GraduationCap },
-  { label: 'Governance Standing', icon: Landmark },
-  { label: 'Settings', icon: Settings },
-  { label: 'Help Centre', icon: HelpCircle },
-];
+/**
+ * Worker Settings (Figma `1170:7043`) — the account, the state of the
+ * public profile, and how TMG180 contacts you.
+ *
+ * The frame's "Professional Profile" card duplicates the authoring form on
+ * `1170:8069` field for field. Rather than build two screens that write the
+ * same rows, this card carries what settings should: whether the profile is
+ * listed, what is still outstanding, and the publish / take-down controls —
+ * with the writing itself one click away on Worker Profile & Availability
+ * (brief decision 9).
+ *
+ * Frame slips carried to Saf: the sub-heading is a broken string ("2
+ * preferences and define your professional profile."), and the account
+ * fields use US placeholders (+1 (555)…, Vancouver BC, Pacific Time).
+ *
+ * Notifications, two-factor, session management and password change have no
+ * backend yet, so they render where the frame puts them, visibly inactive,
+ * saying so — never a live-looking control that does nothing.
+ */
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('worker');
+const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
+const FIELD =
+  'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 transition-colors';
+
+function CardHeader({ icon: Icon, tone, title, sub }) {
   return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function Toggle({ defaultChecked }) {
-  return (
-    <button
-      className={`relative w-10 h-5.5 rounded-full shrink-0 transition-colors ${
-        defaultChecked ? 'bg-brand-600' : 'bg-slate-200'
-      }`}
-      style={{ height: '22px' }}
-    >
-      <span
-        className={`absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white shadow transition-all ${
-          defaultChecked ? 'left-5' : 'left-0.5'
-        }`}
-        style={{ width: '18px', height: '18px' }}
-      />
-    </button>
-  );
-}
-
-function Chip({ label, selected, checkmark }) {
-  return (
-    <button
-      className={`inline-flex items-center gap-1 text-sm px-3 py-1.5 rounded-full border transition-colors ${
-        selected
-          ? 'bg-brand-600 border-brand-600 text-white font-medium'
-          : 'bg-white border-slate-200 text-slate-500'
-      }`}
-    >
-      {checkmark && selected && <CheckCircle2 size={13} />}
-      {label}
-    </button>
-  );
-}
-
-function CardHeader({ icon: Icon, iconTone, title }) {
-  return (
-    <div className="flex items-center gap-2.5 mb-4">
-      <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconTone}`}
-      >
-        <Icon size={15} />
+    <div className="flex items-start gap-3 mb-4">
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${tone}`}>
+        <Icon size={18} />
       </div>
-      <h2 className="text-sm font-bold text-slate-900">{title}</h2>
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
+        {sub && <p className="text-sm text-slate-600 mt-0.5">{sub}</p>}
+      </div>
     </div>
+  );
+}
+
+/** A control the frame shows but nothing stands behind yet. */
+function NotYet({ label, description }) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-2.5">
+      <div>
+        <p className="text-sm font-medium text-slate-500">{label}</p>
+        {description && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{description}</p>}
+      </div>
+      <span className="text-xs text-slate-400 border border-slate-200 rounded-full px-3 py-1 shrink-0">
+        Not yet available
+      </span>
+    </div>
+  );
+}
+
+function AccountDetails() {
+  const user = useAuthStore((state) => state.user);
+  const rename = useUpdateAccountName();
+  const [name, setName] = useState(user?.name ?? '');
+
+  // The store is the authority on the account; adopt its name whenever it
+  // changes underneath (another tab, a background refresh) unless the field
+  // is being edited.
+  useEffect(() => {
+    setName((current) => (rename.isPending ? current : (user?.name ?? '')));
+  }, [user?.name, rename.isPending]);
+
+  const dirty = name.trim() !== (user?.name ?? '');
+  const fieldError = rename.error?.status === 400 ? rename.error.data?.full_name : null;
+
+  return (
+    <section className={CARD}>
+      <CardHeader
+        icon={User}
+        tone="bg-sky-50 text-sky-600"
+        title="Account details"
+        sub="Who you are on TMG180."
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="sm:col-span-2">
+          <label htmlFor="full_name" className="block text-sm text-slate-600 mb-2">
+            Your name
+          </label>
+          <input
+            id="full_name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className={FIELD}
+          />
+          <p className="text-xs text-slate-500 mt-1.5">
+            Used across your workspace, and on your directory profile unless you set a display
+            name there.
+          </p>
+          {fieldError && (
+            <p className="flex items-center gap-1.5 text-xs text-rose-700 mt-1.5">
+              <CircleAlert size={12} />
+              {fieldError}
+            </p>
+          )}
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="email" className="block text-sm text-slate-600 mb-2">
+            Email address
+          </label>
+          <input
+            id="email"
+            value={user?.email ?? ''}
+            readOnly
+            className={`${FIELD} bg-slate-50 text-slate-500 cursor-not-allowed`}
+          />
+          <p className="text-xs text-slate-500 mt-1.5">
+            Your email is how you sign in. Changing it needs a verification step that is not
+            built yet.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-100 mt-4 pt-2">
+        <NotYet
+          label="Phone number"
+          description="TMG180 doesn't store a phone number for you. Participants contact you the way you describe on your profile."
+        />
+        <NotYet
+          label="Timezone"
+          description="Dates and times follow your device. A stored timezone arrives with reminders."
+        />
+      </div>
+
+      {dirty && (
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <button
+            type="button"
+            onClick={() => setName(user?.name ?? '')}
+            className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => rename.mutate(name.trim())}
+            disabled={rename.isPending}
+            className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-6 py-3 shadow-md hover:bg-brand-700 transition-colors disabled:opacity-60"
+          >
+            {rename.isPending && <LoaderCircle size={15} className="animate-spin" />}
+            Save changes
+          </button>
+        </div>
+      )}
+      {rename.isSuccess && !dirty && <p className="text-xs text-emerald-700 mt-3">Name saved.</p>}
+    </section>
+  );
+}
+
+function ProfileCard() {
+  const navigate = useNavigate();
+  const { data: profile, isLoading, error } = useWorkerProfile();
+  const publish = usePublishProfile();
+  const unpublish = useUnpublishProfile();
+
+  return (
+    <section className={CARD}>
+      <CardHeader
+        icon={UserRound}
+        tone="bg-purple-50 text-brand-600"
+        title="Your directory profile"
+        sub="What participants can read about you, and whether it is listed."
+      />
+
+      {isLoading && (
+        <div className="flex items-center gap-3 text-slate-500 text-sm">
+          <LoaderCircle size={16} className="animate-spin" />
+          Loading your profile…
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4 text-rose-800">
+          <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold">We couldn&rsquo;t load your profile.</p>
+            <p className="text-xs mt-1">{error.message}</p>
+          </div>
+        </div>
+      )}
+
+      {profile && (
+        <>
+          <div className="flex flex-wrap items-center gap-3">
+            {profile.publication.isPublished ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700">
+                <BadgeCheck size={12} />
+                Listed in the directory
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-amber-50 text-amber-700">
+                <Lock size={12} />
+                Not listed
+              </span>
+            )}
+            <span className="text-sm text-slate-500">
+              {profile.publication.isPublished
+                ? 'Participants can find you when they browse.'
+                : 'Only you can see it.'}
+            </span>
+          </div>
+
+          <p className="text-sm text-slate-600 leading-relaxed mt-4">
+            {profile.publication.isPublished
+              ? 'Anything you change on your profile appears in the directory straight away. You can take it down whenever you like — nothing you have written is lost.'
+              : 'Publishing is optional and never affects your workspace. Your logs, calendar and resources work exactly the same either way.'}
+          </p>
+
+          <ul className="flex flex-col gap-2 mt-4">
+            {profile.readiness.steps.map((step) => (
+              <li key={step.key} className="flex items-start gap-2 text-sm">
+                <span
+                  className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center text-[9px] font-bold ${
+                    step.done ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
+                  {step.done ? '✓' : ''}
+                </span>
+                <span className="text-slate-700">
+                  {step.label}
+                  {step.required && !step.done && (
+                    <span className="text-xs text-amber-700"> — needed to publish</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {publish.error && (
+            <p className="flex items-start gap-1.5 text-xs text-amber-800 bg-amber-50 rounded-lg px-3 py-2 mt-3">
+              <CircleAlert size={12} className="shrink-0 mt-0.5" />
+              {publish.error.message}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3 mt-5">
+            <button
+              type="button"
+              onClick={() => navigate(WORKER_PATHS.profile)}
+              className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-6 py-3 hover:bg-slate-50 transition-colors"
+            >
+              <PencilLine size={15} />
+              {profile.readiness.steps[0].done ? 'Edit my profile' : 'Write my profile'}
+            </button>
+
+            {profile.publication.isPublished ? (
+              <button
+                type="button"
+                onClick={() => unpublish.mutate()}
+                disabled={unpublish.isPending}
+                className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-6 py-3 hover:bg-slate-50 transition-colors disabled:opacity-60"
+              >
+                {unpublish.isPending ? (
+                  <LoaderCircle size={15} className="animate-spin" />
+                ) : (
+                  <Undo2 size={15} />
+                )}
+                Take my profile down
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => publish.mutate()}
+                disabled={publish.isPending || !profile.readiness.canPublish}
+                title={
+                  profile.readiness.canPublish
+                    ? undefined
+                    : 'Finish the steps above on your profile page first'
+                }
+                className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-6 py-3 shadow-md hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {publish.isPending ? (
+                  <LoaderCircle size={15} className="animate-spin" />
+                ) : (
+                  <Send size={15} />
+                )}
+                Publish my profile
+              </button>
+            )}
+
+            {profile.publication.isPublished && (
+              <a
+                href={`/participant/browse-workers/${profile.workerId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-brand-700 hover:underline"
+              >
+                <ExternalLink size={14} />
+                See my public profile
+              </a>
+            )}
+          </div>
+
+          <p className="text-xs text-slate-500 mt-4">{profile.contactNotice}</p>
+        </>
+      )}
+    </section>
   );
 }
 
 export default function WorkerSettings() {
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="flex items-center gap-2 mb-4 px-2">
-          <div className="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center shrink-0">
-            <ShieldCheck size={15} className="text-white" />
-          </div>
-          <div>
-            <div className="text-base font-black tracking-wider text-brand-700 leading-none">
-              TMG180
-            </div>
-            <div className="text-xs text-slate-400 mt-0.5">Worker Portal</div>
-          </div>
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
+        <p className="text-base text-slate-600 mt-2 max-w-2xl">
+          Your account, your directory profile, and how TMG180 contacts you.
+        </p>
+      </div>
+
+      <AccountDetails />
+      <ProfileCard />
+
+      <section className={CARD}>
+        <CardHeader
+          icon={Bell}
+          tone="bg-purple-50 text-brand-600"
+          title="Notifications"
+          sub="TMG180 doesn't send any of these yet — the settings arrive with them."
+        />
+        <div className="divide-y divide-slate-100">
+          <NotYet
+            label="Email updates"
+            description="A summary of the support you have logged."
+          />
+          <NotYet
+            label="Reminders"
+            description="A nudge when a support session has no log yet."
+          />
+          <NotYet
+            label="Snapshot access"
+            description="When a participant approves a monthly snapshot you can see."
+          />
         </div>
+      </section>
 
-        <button className="w-full flex items-center justify-center gap-2 bg-brand-700 hover:bg-brand-800 text-white text-sm font-medium rounded-full py-2.5 mb-4 transition-colors">
-          <Plus size={16} />
-          <span>New Entry</span>
-        </button>
-
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Settings'} />
-          ))}
-        </nav>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-end gap-4 px-6 py-4 text-slate-500">
-          <button className="hover:text-slate-700 transition-colors">
-            <Search size={18} />
-          </button>
-          <button className="hover:text-slate-700 transition-colors">
-            <Bell size={18} />
-          </button>
-          <button className="hover:text-slate-700 transition-colors">
-            <Settings size={18} />
-          </button>
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0">
-            <img
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
-              alt="User avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </header>
-
-        <main className="flex-1 px-6 pb-6">
-          <div className="max-w-4xl mx-auto flex flex-col gap-5">
+      <section className={CARD}>
+        <CardHeader
+          icon={Shield}
+          tone="bg-rose-50 text-rose-600"
+          title="Security & privacy"
+          sub="How your account is protected."
+        />
+        <div className="divide-y divide-slate-100">
+          <div className="flex items-start justify-between gap-4 py-2.5">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                2 preferences and define your professional profile.
+              <p className="text-sm font-medium text-slate-800">Password</p>
+              <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                Reset it from the sign-in screen — we email you a link. Changing it from inside
+                your workspace is not built yet.
               </p>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 items-start">
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <CardHeader icon={User} iconTone="bg-sky-100 text-sky-600" title="Account Details" />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="Alex"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="Morgan"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        defaultValue="alex.morgan@example.com"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        defaultValue="+1 (555) 123-4567"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Timezone
-                      </label>
-                      <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600">
-                        <option>Pacific Time (PT)</option>
-                        <option>Mountain Time (MT)</option>
-                        <option>Central Time (CT)</option>
-                        <option>Eastern Time (ET)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <CardHeader
-                    icon={Palette}
-                    iconTone="bg-purple-100 text-brand-600"
-                    title="Professional Profile"
-                  />
-
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className="w-14 h-14 rounded-full overflow-hidden shrink-0">
-                      <img
-                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
-                        alt="Alex Morgan"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-800">Profile Picture</p>
-                      <p className="text-xs text-slate-400 mb-1.5">
-                        JPG, GIF or PNG. Max size of 5MB.
-                      </p>
-                      <button className="text-xs font-medium text-brand-600 border border-purple-200 rounded-full px-3 py-1 hover:bg-purple-50 transition-colors">
-                        Upload new photo
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Professional Bio
-                      </label>
-                      <textarea
-                        rows={3}
-                        placeholder="Share a little about your experience and approach..."
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-brand-600 resize-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Support Areas
-                      </label>
-                      <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-                        {['Mental Health', 'Skill Building'].map((tag) => (
-                          <span
-                            key={tag}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full"
-                          >
-                            {tag}
-                            <X size={11} className="cursor-pointer" />
-                          </span>
-                        ))}
-                        <input
-                          type="text"
-                          placeholder="Add area..."
-                          className="bg-transparent outline-none text-sm text-slate-500 placeholder:text-slate-400 flex-1 min-w-[80px]"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                      <div>
-                        <label className="block text-xs font-medium text-slate-500 mb-2">
-                          Primary Location
-                        </label>
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5">
-                          <MapPin size={14} className="text-slate-400 shrink-0" />
-                          <span className="text-sm text-slate-700">Vancouver, BC</span>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-500 mb-2">
-                          Languages
-                        </label>
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5">
-                          <Globe size={14} className="text-slate-400 shrink-0" />
-                          <span className="text-sm text-slate-700">English, French</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-2">
-                        Personal Website or Portfolio (Optional)
-                      </label>
-                      <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5">
-                        <LinkIcon size={14} className="text-slate-400 shrink-0" />
-                        <input
-                          type="text"
-                          placeholder="https://"
-                          className="bg-transparent outline-none text-sm text-slate-500 placeholder:text-slate-400 flex-1"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                  <CardHeader
-                    icon={CalendarCheck}
-                    iconTone="bg-emerald-100 text-emerald-600"
-                    title="Availability"
-                  />
-                  <p className="text-xs text-slate-500 -mt-2 mb-4">
-                    Set your general working schedule preferences.
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">Weekdays</p>
-                      <p className="text-xs text-slate-400">Mon - Fri</p>
-                    </div>
-                    <Toggle defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">Weekends</p>
-                      <p className="text-xs text-slate-400">Sat - Sun</p>
-                    </div>
-                    <Toggle />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <Chip label="Morning" selected />
-                    <Chip label="Afternoon" selected checkmark />
-                    <Chip label="Evening" />
-                    <Chip label="Flexible" selected checkmark />
-                  </div>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                  <CardHeader
-                    icon={Bell}
-                    iconTone="bg-purple-100 text-brand-600"
-                    title="Notifications"
-                  />
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-slate-800">Email Updates</p>
-                        <p className="text-xs text-slate-400 leading-snug">
-                          Receive summary reports of your logged activities.
-                        </p>
-                      </div>
-                      <Toggle defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-slate-800">Reminders</p>
-                        <p className="text-xs text-slate-400 leading-snug">
-                          Get prompted to complete missing daily logs.
-                        </p>
-                      </div>
-                      <Toggle defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-slate-800">Snapshot Access</p>
-                        <p className="text-xs text-slate-400 leading-snug">
-                          Alerts when new monthly snapshots are published.
-                        </p>
-                      </div>
-                      <Toggle defaultChecked />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                  <CardHeader
-                    icon={Shield}
-                    iconTone="bg-rose-100 text-rose-600"
-                    title="Security & Privacy"
-                  />
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">Password</p>
-                      <p className="text-xs text-slate-400">Last changed 3 months ago</p>
-                    </div>
-                    <button className="text-xs font-medium text-slate-600 border border-slate-200 rounded-full px-3 py-1.5 hover:bg-slate-50 transition-colors">
-                      Update
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">
-                        Two-Factor Authentication
-                      </p>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Add an extra layer of security to your account.
-                      </p>
-                    </div>
-                    <Toggle />
-                  </div>
-
-                  <p className="text-xs font-medium text-slate-500 mb-2">Active Sessions</p>
-                  <div className="flex flex-col gap-3 mb-4">
-                    <div className="flex items-start gap-2.5">
-                      <Monitor size={15} className="text-slate-400 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-sm text-slate-700">Mac OS • Safari</p>
-                        <p className="text-xs text-emerald-600">
-                          Vancouver, CA • Current session
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Smartphone size={15} className="text-slate-400 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-sm text-slate-700">iOS • TMG180 App</p>
-                        <p className="text-xs text-slate-400">Active 2 hours ago</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-xs font-medium text-slate-500 mb-1">Consent &amp; Data</p>
-                  <button className="text-sm font-medium text-brand-600 hover:text-brand-800 transition-colors">
-                    Review Privacy Policy →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3">
-              <button className="text-sm text-slate-500 hover:text-slate-700 transition-colors">
-                Cancel
-              </button>
-              <Button variant="primary" className="w-auto! px-5! py-2.5!">
-                Save changes
-              </Button>
-            </div>
           </div>
-        </main>
-      </div>
+          <NotYet
+            label="Two-factor authentication"
+            description="An extra step at sign-in. Part of the security pass that is still to come."
+          />
+          <NotYet
+            label="Active sessions"
+            description="Signing out ends this device's session everywhere. Listing and ending other sessions individually is not built yet."
+          />
+        </div>
+        <p className="text-sm text-slate-600 leading-relaxed mt-4">
+          Your logs and private notes are yours. Participants control their own records, and you
+          see them only while their consent is active.
+        </p>
+      </section>
     </div>
   );
 }

@@ -30,3 +30,7 @@ apps/api/src/generated/
 *.njsproj
 *.sln
 *.sw?
+
+# Screenshots and browser profiles from apps/api/scripts/preview-*.ts — evidence
+# of a run, never part of the repo.
+apps/api/scripts/.shots/

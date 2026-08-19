@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 import { CONSENT_STATUS } from '@tmg180/shared';
 import { api } from '../../lib/apiClient';
 import { queryClient } from '../../lib/queryClient';
@@ -19,8 +19,12 @@ export const privacyKeys = {
   all: ['participant', 'privacy'],
 };
 
-export function usePrivacy() {
-  return useQuery({ queryKey: privacyKeys.all, queryFn: () => api.get(BASE) });
+export function usePrivacy(params = {}) {
+  return useQuery({
+    queryKey: [...privacyKeys.all, params],
+    queryFn: () => api.get(BASE, { ...params }),
+    placeholderData: keepPreviousData,
+  });
 }
 
 const refresh = () => queryClient.invalidateQueries({ queryKey: privacyKeys.all });

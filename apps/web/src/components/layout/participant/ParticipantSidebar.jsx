@@ -24,12 +24,7 @@ const NAV_ITEMS = [
   { label: 'My Profile', icon: User, path: P.profile },
   { label: 'Daily Log', icon: NotebookPen, path: P.dailyLog },
   { label: 'Monthly Snapshot', icon: CalendarDays, path: P.snapshot },
-  {
-    label: 'Verified Workers',
-    icon: Search,
-    path: P.browseWorkers,
-    match: [P.browseWorkers, P.directory],
-  },
+  { label: 'Verified Workers', icon: Search, path: P.browseWorkers },
 ];
 
 const BOTTOM_ITEMS = [

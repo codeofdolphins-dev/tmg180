@@ -1,307 +1,544 @@
+import { useMemo, useState } from 'react';
 import {
-  LayoutDashboard,
-  Calendar as CalendarIcon,
-  Users,
-  NotebookPen,
-  TrendingUp,
-  Folder,
-  GraduationCap,
-  Landmark,
-  Settings,
-  HelpCircle,
-  Bell,
-  User,
   ChevronLeft,
   ChevronRight,
   Lightbulb,
   Clock,
   MapPin,
-  Video,
+  BadgeCheck,
+  ShieldOff,
   CheckCircle2,
+  CirclePlus,
+  LoaderCircle,
+  TriangleAlert,
+  NotebookPen,
 } from 'lucide-react';
-
 import { useNavigate } from 'react-router-dom';
-import { useRoleNav } from '../../navigation/useRoleNav';
-import { WORKER_PATHS } from '../../routes/paths';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'Calendar', icon: CalendarIcon },
-  { label: 'Participants I support', icon: Users },
-  { label: 'Daily Logs', icon: NotebookPen },
-  { label: 'Monthly Snapshots', icon: TrendingUp },
-  { label: 'Resources', icon: Folder },
-  { label: 'Learning Hub', icon: GraduationCap },
-  { label: 'Governance Standing', icon: Landmark },
-  { label: 'Settings', icon: Settings },
-  { label: 'Help Centre', icon: HelpCircle },
-];
+import { DAILY_LOG_STATUS } from '@tmg180/shared';
+import { parseDay, toDayValue, todayValue, formatTimeRange, formatShortDate } from '../../lib/dates';
+import { useWorkerDailyLogs } from '../../hooks/worker/dailyLog';
+import { WORKER_PATHS, workerDailyLogPath } from '../../routes/paths';
 
+/**
+ * Worker Calendar — Figma 1170:7390, on the UI scale.
+ *
+ * TMG180 has no booking or roster concept (it is the one thing the platform
+ * must never become), so there is no sessions table to read. A "session" here
+ * is the same thing it is on the dashboard: one of the worker's own Daily
+ * Support Evidence Logs, placed on the day it records. The grid reads
+ * `/worker/daily-logs?from&to` for the visible range; the agenda shows the
+ * selected day; Week and List are the same data in a different shape. Until
+ * the worker log form is built, every card opens the Daily Logs list.
+ */
+
+const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-
-const CALENDAR_ROWS = [
-  [null, null, 1, 2, 3, 4, 5],
-  [6, 7, 8, 9, 10, 11, 12],
-  [13, 14, 15, 16, 17, 18, 19],
-  [20, 21, 22, 23, 24, 25, 26],
-  [27, 28, 29, 30, 31, null, null],
+const VIEWS = [
+  { key: 'month', label: 'Month' },
+  { key: 'week', label: 'Week' },
+  { key: 'list', label: 'List' },
 ];
+const PAGE_LIMIT = 100;
 
-const DAY_INDICATORS = {
-  8: ['bg-emerald-400'],
-  10: ['bg-violet-500'],
-  15: ['bg-emerald-400', 'bg-violet-500'],
-};
+// ---- calendar-day arithmetic (strings in, strings out; never via UTC) ------
 
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('worker');
-  return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active
-          ? 'bg-brand-700 text-white font-medium rounded-full'
-          : 'text-slate-600 hover:bg-slate-100 rounded-lg'
-      }`}
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </button>
+function addDays(day, count) {
+  const date = parseDay(day);
+  date.setDate(date.getDate() + count);
+  return toDayValue(date);
+}
+
+function addMonths(day, count) {
+  const date = parseDay(day);
+  date.setDate(1);
+  date.setMonth(date.getMonth() + count);
+  return toDayValue(date);
+}
+
+function firstOfMonth(day) {
+  const date = parseDay(day);
+  date.setDate(1);
+  return toDayValue(date);
+}
+
+function lastOfMonth(day) {
+  const date = parseDay(day);
+  date.setMonth(date.getMonth() + 1, 0);
+  return toDayValue(date);
+}
+
+/** The Sunday on or before `day` — the frame's week starts on Sunday. */
+function startOfWeek(day) {
+  const date = parseDay(day);
+  return addDays(day, -date.getDay());
+}
+
+function monthTitle(day) {
+  return parseDay(day).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+}
+
+function dayOfMonth(day) {
+  return parseDay(day).getDate();
+}
+
+/** The range a view needs: the month grid includes the padding days around it. */
+function visibleRange(view, cursor, selected) {
+  if (view === 'week') {
+    const from = startOfWeek(selected);
+    return { from, to: addDays(from, 6) };
+  }
+  const first = firstOfMonth(cursor);
+  const last = lastOfMonth(cursor);
+  if (view === 'list') return { from: first, to: last };
+  const from = startOfWeek(first);
+  const to = addDays(startOfWeek(last), 6);
+  return { from, to };
+}
+
+function daysBetween(from, to) {
+  const days = [];
+  for (let day = from; day <= to; day = addDays(day, 1)) days.push(day);
+  return days;
+}
+
+/** A session is upcoming until its end time (or start, or day) has passed. */
+function isUpcoming(log, today, nowClock) {
+  if (log.sessionDate > today) return true;
+  if (log.sessionDate < today) return false;
+  const end = log.endTime || log.startTime;
+  return end ? end > nowClock : false;
+}
+
+// ---- pieces -----------------------------------------------------------------
+
+function SessionChip({ upcoming }) {
+  return upcoming ? (
+    <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-purple-50 text-brand-700 shrink-0">
+      Upcoming
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 shrink-0">
+      <CheckCircle2 size={11} />
+      Completed
+    </span>
   );
 }
 
-function DayCell({ day }) {
-  if (!day) return <div className="aspect-square" />;
-
-  const selected = day === 15;
-  const indicators = DAY_INDICATORS[day];
+function SessionCard({ log, upcoming, onOpen }) {
+  const submitted = log.status === DAILY_LOG_STATUS.SUBMITTED;
+  const times = formatTimeRange(log.startTime, log.endTime);
+  const where = log.serviceType || log.location;
+  const cta = upcoming ? 'Open support tools' : submitted ? 'View details' : 'Continue Daily Log';
+  const ctaStyle = upcoming
+    ? 'bg-brand-600 text-white shadow-md hover:bg-brand-700'
+    : submitted
+      ? 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+      : 'bg-white border border-slate-200 text-brand-700 hover:bg-purple-50';
 
   return (
-    <div
-      className={`aspect-square rounded-lg flex flex-col items-center justify-center gap-1.5 border transition-colors ${
-        selected
-          ? 'border-brand-500 bg-purple-50'
-          : 'border-transparent hover:bg-slate-50'
-      }`}
-    >
-      <span className="text-sm text-slate-700">{day}</span>
-      {indicators && (
-        <div className="flex gap-0.5 w-6 h-1">
-          {indicators.map((c, i) => (
-            <span key={i} className={`flex-1 rounded-full ${c}`} />
-          ))}
-        </div>
+    <div className={`${CARD} ${submitted ? 'border-l-4 border-emerald-400' : ''}`}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 className="text-lg font-semibold text-slate-900">{log.participant.name}</h3>
+        <SessionChip upcoming={upcoming} />
+      </div>
+      <p className="flex items-center gap-2 text-sm text-slate-500 mt-1">
+        <Clock size={14} className="text-slate-400" />
+        {times || 'Time not recorded'}
+      </p>
+      {where && (
+        <p className="flex items-center gap-2 text-sm text-slate-600 mt-2">
+          <MapPin size={14} className="text-slate-400" />
+          {where}
+        </p>
       )}
+      <p
+        className={`flex items-center gap-2 text-sm mt-2 ${
+          log.consentActive ? 'text-emerald-700' : 'text-slate-500'
+        }`}
+      >
+        {log.consentActive ? <BadgeCheck size={14} /> : <ShieldOff size={14} />}
+        {log.consentActive ? 'Active consent' : 'No active consent'}
+      </p>
+      <p className="flex items-center gap-2 text-sm mt-2">
+        {submitted ? (
+          <>
+            <CheckCircle2 size={14} className="text-emerald-600" />
+            <span className="text-emerald-700">Log submitted</span>
+          </>
+        ) : (
+          <>
+            <span className="w-2 h-2 rounded-full bg-amber-400 ml-1 mr-1" />
+            <span className="text-slate-700">Log draft in progress</span>
+          </>
+        )}
+      </p>
+      <button
+        onClick={() => onOpen(log)}
+        className={`mt-4 w-full text-sm font-semibold rounded-full py-3 transition-colors ${ctaStyle}`}
+      >
+        {cta}
+      </button>
     </div>
   );
 }
 
+function Marker({ log }) {
+  return (
+    <span
+      className={`block h-1.5 rounded-full ${
+        log.status === DAILY_LOG_STATUS.SUBMITTED ? 'bg-emerald-400' : 'bg-brand-600'
+      }`}
+    />
+  );
+}
+
+function MonthGrid({ cursor, selected, today, logsByDay, onSelect }) {
+  const { from, to } = visibleRange('month', cursor, selected);
+  const month = parseDay(cursor).getMonth();
+  return (
+    <div>
+      <div className="grid grid-cols-7 gap-2 mb-2">
+        {WEEKDAYS.map((label) => (
+          <div key={label} className="text-[10px] font-bold uppercase tracking-wide text-slate-400 text-center">
+            {label}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-2">
+        {daysBetween(from, to).map((day) => {
+          const inMonth = parseDay(day).getMonth() === month;
+          const logs = logsByDay.get(day) ?? [];
+          const isSelected = day === selected;
+          const isToday = day === today;
+          return (
+            <button
+              key={day}
+              onClick={() => onSelect(day)}
+              aria-pressed={isSelected}
+              aria-label={`${formatShortDate(day)}${logs.length ? `, ${logs.length} session${logs.length === 1 ? '' : 's'}` : ''}`}
+              className={`aspect-square rounded-xl p-2 flex flex-col items-start justify-between border transition-colors ${
+                isSelected
+                  ? 'border-brand-600 bg-purple-50'
+                  : isToday
+                    ? 'border-brand-200 bg-white hover:bg-purple-50/60'
+                    : 'border-slate-100 bg-white/70 hover:bg-slate-50'
+              } ${inMonth ? '' : 'opacity-40'}`}
+            >
+              <span
+                className={`text-sm ${
+                  isToday || isSelected ? 'font-bold text-brand-700' : 'text-slate-700'
+                }`}
+              >
+                {dayOfMonth(day)}
+              </span>
+              {logs.length > 0 && (
+                <span className="w-full flex flex-col gap-0.5">
+                  {logs.slice(0, 3).map((log) => (
+                    <Marker key={log.id} log={log} />
+                  ))}
+                  {logs.length > 3 && (
+                    <span className="text-[10px] text-slate-500 leading-none">+{logs.length - 3}</span>
+                  )}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WeekStrip({ selected, today, logsByDay, onSelect }) {
+  const from = startOfWeek(selected);
+  return (
+    <div className="grid grid-cols-7 gap-2">
+      {daysBetween(from, addDays(from, 6)).map((day, index) => {
+        const logs = logsByDay.get(day) ?? [];
+        const isSelected = day === selected;
+        const isToday = day === today;
+        return (
+          <button
+            key={day}
+            onClick={() => onSelect(day)}
+            aria-pressed={isSelected}
+            className={`min-h-40 rounded-xl p-2 flex flex-col gap-2 border text-left transition-colors ${
+              isSelected
+                ? 'border-brand-600 bg-purple-50'
+                : isToday
+                  ? 'border-brand-200 bg-white'
+                  : 'border-slate-100 bg-white/70 hover:bg-slate-50'
+            }`}
+          >
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{WEEKDAYS[index]}</div>
+              <div className={`text-sm ${isToday || isSelected ? 'font-bold text-brand-700' : 'text-slate-700'}`}>
+                {dayOfMonth(day)}
+              </div>
+            </div>
+            {logs.map((log) => (
+              <span
+                key={log.id}
+                className={`block text-[11px] leading-tight rounded-lg px-2 py-1 ${
+                  log.status === DAILY_LOG_STATUS.SUBMITTED
+                    ? 'bg-emerald-50 text-emerald-800'
+                    : 'bg-purple-100 text-brand-800'
+                }`}
+                title={`${log.participant.name}${log.startTime ? ` · ${formatTimeRange(log.startTime, log.endTime)}` : ''}`}
+              >
+                <span className="block font-semibold truncate">{log.participant.name.split(' ')[0]}</span>
+                {log.startTime && (
+                  <span className="block opacity-80">{formatTimeRange(log.startTime, null)}</span>
+                )}
+              </span>
+            ))}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ListView({ logs, today, nowClock, onOpen }) {
+  if (logs.length === 0) {
+    return <p className="text-sm text-slate-600">No sessions logged this month.</p>;
+  }
+  const groups = [];
+  for (const log of [...logs].sort((a, b) => (a.sessionDate < b.sessionDate ? -1 : 1))) {
+    const last = groups[groups.length - 1];
+    if (last && last.day === log.sessionDate) last.logs.push(log);
+    else groups.push({ day: log.sessionDate, logs: [log] });
+  }
+  return (
+    <div className="flex flex-col gap-6">
+      {groups.map((group) => (
+        <div key={group.day}>
+          <h3 className="text-sm font-semibold text-slate-500 mb-3">
+            {group.day === today ? 'Today · ' : ''}
+            {formatShortDate(group.day)}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {group.logs.map((log) => (
+              <SessionCard
+                key={log.id}
+                log={log}
+                upcoming={isUpcoming(log, today, nowClock)}
+                onOpen={onOpen}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---- page -------------------------------------------------------------------
+
 export default function Calendar() {
   const navigate = useNavigate();
+  const today = todayValue();
+  const [view, setView] = useState('month');
+  const [cursor, setCursor] = useState(() => firstOfMonth(today));
+  const [selected, setSelected] = useState(today);
+
+  const range = visibleRange(view, cursor, selected);
+  const { data: logs, isLoading, error } = useWorkerDailyLogs({
+    from: range.from,
+    to: range.to,
+    limit: PAGE_LIMIT,
+  });
+
+  const logsByDay = useMemo(() => {
+    const map = new Map();
+    for (const log of logs ?? []) {
+      if (!map.has(log.sessionDate)) map.set(log.sessionDate, []);
+      map.get(log.sessionDate).push(log);
+    }
+    // Earliest start first within a day.
+    for (const list of map.values()) {
+      list.sort((a, b) => String(a.startTime ?? '').localeCompare(String(b.startTime ?? '')));
+    }
+    return map;
+  }, [logs]);
+
+  const now = new Date();
+  const nowClock = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const agenda = logsByDay.get(selected) ?? [];
+
+  const openLog = (log) =>
+    navigate(
+      log.status === DAILY_LOG_STATUS.SUBMITTED
+        ? workerDailyLogPath.detail(log.id)
+        : workerDailyLogPath.edit(log.id)
+    );
+
+  const select = (day) => {
+    setSelected(day);
+    if (firstOfMonth(day) !== cursor) setCursor(firstOfMonth(day));
+  };
+  const step = (direction) => {
+    if (view === 'week') {
+      select(addDays(selected, 7 * direction));
+    } else {
+      setCursor((current) => addMonths(current, direction));
+    }
+  };
+  const goToday = () => {
+    setCursor(firstOfMonth(today));
+    setSelected(today);
+  };
+
+  const title = view === 'week' ? `Week of ${formatShortDate(startOfWeek(selected))}` : monthTitle(cursor);
+
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-4 overflow-y-auto">
-        <div className="flex items-center gap-2 mb-6 px-2">
-          <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center shrink-0 text-white font-bold">
-            T
-          </div>
-          <div>
-            <div className="text-base font-black tracking-wider text-brand-700 leading-none">
-              TMG180
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Calendar</h1>
+        <p className="text-base text-slate-600 mt-2 max-w-2xl">
+          View your upcoming support sessions and check-ins.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6 items-start">
+        {/* ---------- calendar column ---------- */}
+        <div className="flex flex-col gap-4">
+          <div className={`${CARD} flex flex-wrap items-center justify-between gap-3 py-4`}>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={goToday}
+                className="text-sm font-medium text-brand-700 border border-purple-200 rounded-full px-4 py-1.5 hover:bg-purple-50 transition-colors"
+              >
+                Today
+              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => step(-1)}
+                  aria-label={view === 'week' ? 'Previous week' : 'Previous month'}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <h2 className="text-lg font-semibold text-slate-900 min-w-44 text-center">{title}</h2>
+                <button
+                  onClick={() => step(1)}
+                  aria-label={view === 'week' ? 'Next week' : 'Next month'}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
             </div>
-            <div className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide">
-              Worker Portal
+            <div className="flex items-center bg-slate-100 rounded-full p-1" role="tablist">
+              {VIEWS.map((option) => (
+                <button
+                  key={option.key}
+                  role="tab"
+                  aria-selected={view === option.key}
+                  onClick={() => setView(option.key)}
+                  className={`text-sm px-4 py-1.5 rounded-full transition-colors ${
+                    view === option.key
+                      ? 'bg-white text-brand-700 font-semibold shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
 
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} active={item.label === 'Calendar'} />
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-4 flex items-center gap-2.5 px-2">
-          <div className="w-9 h-9 rounded-full bg-linear-to-br from-brand-400 to-fuchsia-400 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-slate-900 leading-none">
-              Alex Mercer
-            </p>
-            <p className="text-xs text-slate-400 mt-1">Worker</p>
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-end gap-4 px-6 py-4 text-brand-600">
-          <button className="hover:text-brand-800 transition-colors">
-            <Bell size={18} />
-          </button>
-          <button className="w-8 h-8 rounded-full border-2 border-brand-600 flex items-center justify-center">
-            <User size={16} />
-          </button>
-        </header>
-
-        <main className="flex-1 px-6 pb-6">
-          <div className="max-w-6xl mx-auto flex flex-col gap-5">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Calendar</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                View your upcoming support sessions and check-ins.
+          <div className={CARD}>
+            {isLoading && (
+              <p className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+                <LoaderCircle size={16} className="animate-spin" />
+                Loading your sessions…
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 items-start">
-              <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                  <div className="flex items-center gap-3">
-                    <button className="text-sm font-medium text-brand-600 border border-purple-200 rounded-full px-4 py-1.5 hover:bg-purple-50 transition-colors">
-                      Today
-                    </button>
-                    <div className="flex items-center gap-2">
-                      <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                        <ChevronLeft size={18} />
-                      </button>
-                      <h2 className="text-base font-bold text-slate-900 w-32 text-center">
-                        October 2023
-                      </h2>
-                      <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                        <ChevronRight size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center bg-slate-100 rounded-full p-1 text-sm">
-                    <button className="px-3.5 py-1.5 rounded-full bg-white shadow-sm font-medium text-slate-800">
-                      Month
-                    </button>
-                    <button className="px-3.5 py-1.5 rounded-full text-slate-500">
-                      Week
-                    </button>
-                    <button className="px-3.5 py-1.5 rounded-full text-slate-500">
-                      List
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1 mb-2">
-                  {WEEKDAYS.map((d) => (
-                    <div
-                      key={d}
-                      className="text-center text-xs font-medium text-slate-400 pb-2"
-                    >
-                      {d}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  {CALENDAR_ROWS.map((row, i) => (
-                    <div key={i} className="grid grid-cols-7 gap-1">
-                      {row.map((day, j) => (
-                        <DayCell key={j} day={day} />
-                      ))}
-                    </div>
-                  ))}
+            )}
+            {error && (
+              <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4 text-rose-800 mb-4">
+                <TriangleAlert size={18} className="shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">We couldn&rsquo;t load your sessions.</p>
+                  <p className="text-sm mt-1">{error.message}</p>
                 </div>
               </div>
+            )}
+            {logs?.length === PAGE_LIMIT && (
+              <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 mb-4">
+                Showing the first {PAGE_LIMIT} sessions in this range — narrow the range to see the rest.
+              </p>
+            )}
 
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3 bg-purple-50 rounded-2xl p-4">
-                  <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
-                    <Lightbulb size={15} className="text-white" />
-                  </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    Daily Support Evidence Logs can be added after a support session.
-                  </p>
-                </div>
+            {view === 'month' && (
+              <MonthGrid cursor={cursor} selected={selected} today={today} logsByDay={logsByDay} onSelect={select} />
+            )}
+            {view === 'week' && (
+              <WeekStrip selected={selected} today={today} logsByDay={logsByDay} onSelect={select} />
+            )}
+            {view === 'list' && <ListView logs={logs ?? []} today={today} nowClock={nowClock} onOpen={openLog} />}
 
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-slate-900">Agenda</h2>
-                  <span className="text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full">
-                    Oct 15
-                  </span>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-sm font-bold text-slate-900">Liam</h3>
-                    <span className="text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-0.5 rounded-full shrink-0">
-                      Upcoming
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 text-sm text-slate-500 mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <Clock size={13} className="text-slate-400" />
-                      10:00 AM - 11:30 AM
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin size={13} className="text-slate-400" />
-                      Community Centre Library
-                    </div>
-                    <div className="flex items-center gap-1.5 text-emerald-600">
-                      <CheckCircle2 size={13} />
-                      Active consent
-                    </div>
-                  </div>
-                  <button className="w-full bg-brand-600 hover:bg-brand-800 text-white text-sm font-medium rounded-full py-2.5 transition-colors">
-                    Open support tools
-                  </button>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-sm font-bold text-slate-900">Emma</h3>
-                    <span className="text-xs font-medium text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-full shrink-0">
-                      Completed
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 text-sm text-slate-500 mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <Clock size={13} className="text-slate-400" />
-                      1:00 PM - 2:00 PM
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Video size={13} className="text-slate-400" />
-                      Online Check-in
-                    </div>
-                    <div className="flex items-center gap-1.5 text-amber-600">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Log draft in progress
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigate(WORKER_PATHS.dailyLogNew)}
-                    className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-brand-600 text-sm font-medium rounded-full py-2.5 transition-colors"
-                  >
-                    Continue Daily Log
-                  </button>
-                </div>
-
-                <div className="bg-white border border-slate-200 border-l-4 border-l-emerald-500 rounded-2xl p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-sm font-bold text-slate-900">Noah</h3>
-                    <span className="text-xs font-medium text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
-                      Completed
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 text-sm text-slate-500 mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <Clock size={13} className="text-slate-400" />
-                      Yesterday, 3:30 PM
-                    </div>
-                    <div className="flex items-center gap-1.5 text-emerald-600">
-                      <CheckCircle2 size={13} />
-                      Log submitted
-                    </div>
-                  </div>
-                  <button className="w-full bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 text-sm font-medium rounded-full py-2.5 transition-colors">
-                    View details
-                  </button>
-                </div>
+            {view !== 'list' && (
+              <div className="flex items-center gap-4 text-xs text-slate-500 mt-4">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-1.5 rounded-full bg-brand-600" /> Draft log
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-1.5 rounded-full bg-emerald-400" /> Submitted log
+                </span>
               </div>
-            </div>
+            )}
           </div>
-        </main>
+        </div>
+
+        {/* ---------- agenda rail ---------- */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-start gap-3 bg-[#eef3fd] rounded-xl p-4">
+            <span className="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center shrink-0">
+              <Lightbulb size={18} />
+            </span>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              Daily Support Evidence Logs can be added after a support session.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-slate-900">Agenda</h2>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-brand-700">
+              {selected === today ? 'Today' : formatShortDate(selected)}
+            </span>
+          </div>
+
+          {agenda.length === 0 && !isLoading && (
+            <div className={`${CARD} text-center py-8`}>
+              <div className="w-12 h-12 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                <NotebookPen size={20} />
+              </div>
+              <p className="text-sm font-semibold text-slate-900 mt-3">
+                {selected === today ? 'Nothing logged for today' : 'Nothing logged on this day'}
+              </p>
+              <p className="text-sm text-slate-600 mt-1">
+                A session shows here once you start a Daily Support Evidence Log for it.
+              </p>
+              <button
+                onClick={() => navigate(WORKER_PATHS.dailyLogNew)}
+                className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-5 py-2.5 mt-4 shadow-md hover:bg-brand-700 transition-colors"
+              >
+                <CirclePlus size={15} />
+                New Support Entry
+              </button>
+            </div>
+          )}
+
+          {agenda.map((log) => (
+            <SessionCard
+              key={log.id}
+              log={log}
+              upcoming={isUpcoming(log, today, nowClock)}
+              onOpen={openLog}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

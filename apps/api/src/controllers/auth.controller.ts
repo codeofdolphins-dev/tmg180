@@ -212,6 +212,37 @@ export const me = asyncHandler(async (req, res) => {
 });
 
 /**
+ * PATCH /auth/me — the only thing an account holder can change about the
+ * account itself today: the name they are known by. Email is a credential
+ * (changing it is a verification flow, not a text field) and roles are
+ * server-issued, so neither is editable here.
+ */
+export const updateMe = asyncHandler(async (req, res) => {
+    if (!req.user) throw unauthorized();
+
+    const { full_name } = (req.body ?? {}) as { full_name?: unknown };
+    if (typeof full_name !== 'string' || full_name.trim() === '') {
+        throw new ApiError(400, 'Enter the name you would like to be known by.', {
+            full_name: 'Your name cannot be empty.',
+        });
+    }
+    if (full_name.trim().length > 255) {
+        throw new ApiError(400, 'That name is too long.', {
+            full_name: 'Your name must be 255 characters or fewer.',
+        });
+    }
+
+    const user = await prisma.user.update({
+        where: { id: req.user.id },
+        data: { full_name: full_name.trim() },
+        select: ACCOUNT_SELECT,
+    });
+    assertUsable(user);
+
+    res.json(new ApiResponse(200, 'account updated', toPublicUser(user)));
+});
+
+/**
  * Trades a refresh token for a fresh pair. Deliberately unauthenticated — the
  * refresh token IS the credential, and the whole point is that it works when
  * the access token has already expired.

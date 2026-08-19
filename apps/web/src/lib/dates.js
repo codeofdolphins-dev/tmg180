@@ -120,3 +120,59 @@ export function formatTimeRange(start, end) {
   if (from && to) return `${from} – ${to}`;
   return from || to || '';
 }
+
+/** Today as the API's `YYYY-MM-DD`, in the browser's own timezone. */
+export function todayValue() {
+  return toDayValue(new Date());
+}
+
+/** "Yesterday" / "Today" / "Mon, 14 Oct" — for recent-activity rows. */
+export function formatRelativeDay(value) {
+  const date = parseDay(value);
+  if (!date) return '';
+  const today = parseDay(todayValue());
+  const diffDays = Math.round((today - date) / 86_400_000);
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays === -1) return 'Tomorrow';
+  return date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+const RELATIVE = new Intl.RelativeTimeFormat('en-AU', { numeric: 'auto' });
+const RELATIVE_STEPS = [
+  ['second', 60],
+  ['minute', 60],
+  ['hour', 24],
+  ['day', 7],
+  ['week', 4.345],
+  ['month', 12],
+];
+
+/**
+ * "just now" / "yesterday" / "2 weeks ago" — for a timestamp whose exact
+ * moment matters less than how long ago it was ("Last viewed" on a snapshot).
+ * Unlike formatRelativeDay this takes an instant, not a calendar day.
+ */
+export function formatRelativeTime(value) {
+  if (!value) return '';
+  const then = new Date(value);
+  if (Number.isNaN(then.getTime())) return '';
+
+  let amount = (then.getTime() - Date.now()) / 1000;
+  for (const [unit, size] of RELATIVE_STEPS) {
+    if (Math.abs(amount) < size) return RELATIVE.format(Math.round(amount), unit);
+    amount /= size;
+  }
+  return RELATIVE.format(Math.round(amount), 'year');
+}
+
+/**
+ * "July 2023" — for credential dates, where the day is noise. Accepts a
+ * calendar day (`YYYY-MM-DD`) or a timestamp; both are read as dates.
+ */
+export function formatMonthYear(value) {
+  if (!value) return '';
+  const date = String(value).length <= 10 ? parseDay(value) : new Date(value);
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+}

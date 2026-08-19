@@ -109,6 +109,9 @@ async function loadPreferences(participantId: number) {
  * and historical), and the audit entries a participant is meant to read.
  */
 export const getPrivacy = asyncHandler(async (req, res) => {
+  // Query values arrive as strings — anything but the literal 'true' keeps
+  // the screen's default of the 10 most recent entries.
+  const allAuditList = req.query.allAuditList === 'true';
   try {
     const participantId = req.user!.id;
 
@@ -122,7 +125,7 @@ export const getPrivacy = asyncHandler(async (req, res) => {
       prisma.auditLog.findMany({
         where: { actor_id: participantId, action: { in: [...PRIVACY_AUDIT_ACTION_KEYS] } },
         orderBy: { created_at: 'desc' },
-        take: 20,
+        ...(!allAuditList && { take: 10 }),
       }),
     ]);
 

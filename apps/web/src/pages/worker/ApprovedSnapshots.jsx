@@ -1,240 +1,327 @@
+import { useMemo, useState } from 'react';
 import {
-  LayoutDashboard,
-  Calendar,
-  Users,
-  NotebookPen,
-  TrendingUp,
-  Folder,
-  GraduationCap,
-  Landmark,
-  Settings,
-  HelpCircle,
-  Plus,
-  Bell,
   ShieldCheck,
-  ChevronDown,
-  SlidersHorizontal,
   Lock,
   Eye,
+  LoaderCircle,
+  TriangleAlert,
+  NotebookPen,
+  X,
+  MessageSquarePlus,
+  CalendarRange,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { SNAPSHOT_ACCESS } from '@tmg180/shared';
+import Select from '../../components/ui/Select';
+import { formatRelativeTime, formatShortDate } from '../../lib/dates';
+import { useWorkerSnapshots } from '../../hooks/worker/snapshot';
+import { WORKER_PATHS, workerSnapshotPath } from '../../routes/paths';
 
-import { useRoleNav } from '../../navigation/useRoleNav';
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'Calendar', icon: Calendar },
-  { label: 'Participants I support', icon: Users },
-  { label: 'Daily Logs', icon: NotebookPen },
-  { label: 'Monthly Snapshots', icon: TrendingUp, active: true },
-  { label: 'Resources', icon: Folder },
-  { label: 'Learning Hub', icon: GraduationCap },
-  { label: 'Governance Standing', icon: Landmark },
+/**
+ * Approved Monthly Snapshots (Figma 1169:3455), on the UI scale.
+ *
+ * Every locked snapshot belonging to a participant who currently lets this
+ * worker see one. Nothing on this screen writes: a worker reads an approved
+ * month, they never add to it — that record is the participant's, and a worker
+ * with something to say writes their own daily log.
+ *
+ * The frame's third filter is Status ("Approved & Locked"). It has one value by
+ * definition — a draft is the participant's review and never reaches this
+ * surface — so it renders as a fixed statement rather than a control that
+ * cannot change anything.
+ *
+ * The two empty-state frames (1205:1457 "No snapshot yet", 1205:1210 "No export
+ * available yet") are folded in below as this screen's own empty state, which
+ * is why they are no longer routes of their own.
+ */
+
+/** Stable per person, so the same participant keeps the same colour between visits. */
+const AVATAR_TONES = [
+  'bg-purple-100 text-brand-700',
+  'bg-sky-100 text-sky-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-amber-100 text-amber-700',
+  'bg-rose-100 text-rose-700',
 ];
 
-const BOTTOM_ITEMS = [
-  { label: 'Settings', icon: Settings },
-  { label: 'Help Centre', icon: HelpCircle },
-];
+const toneFor = (id) => AVATAR_TONES[Math.abs(Number(id) || 0) % AVATAR_TONES.length];
 
-const FILTERS = [
-  { label: 'Participant', value: 'All Accessible Participants', width: 'w-72' },
-  { label: 'Month', value: 'October 2023', width: 'w-56' },
-  { label: 'Status', value: 'Approved & Locked', width: 'w-56' },
-];
+const initialsOf = (name = '') =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('') || '?';
 
-const SNAPSHOTS = [
-  {
-    nameLines: ['Sarah', 'Jenkins'],
-    initials: 'SJ',
-    avatarTone: 'bg-[#f0dbff] text-[#7800ce]',
-    monthLines: ['October 2023'],
-    consentLevel: 'Full Shared',
-    lastViewed: '2 days ago',
-  },
-  {
-    nameLines: ['David', 'Thompson'],
-    initials: 'DT',
-    avatarTone: 'bg-[#d8e2ff] text-[#2170e4]',
-    monthLines: ['October 2023'],
-    consentLevel: 'Summary Only',
-    lastViewed: 'Never',
-  },
-  {
-    nameLines: ['Elena', 'Rodriguez'],
-    initials: 'ER',
-    avatarTone: 'bg-[#6ffbbe] text-[#005236]',
-    monthLines: ['September', '2023'],
-    consentLevel: 'Full Shared',
-    lastViewed: '1 week ago',
-  },
-];
-
-function NavItem({ icon: Icon, label, active }) {
-  const go = useRoleNav('worker');
+function AccessChip({ snapshot }) {
+  const full = snapshot.access === SNAPSHOT_ACCESS.FULL;
   return (
-    <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-full text-left transition-colors ${
-        active
-          ? 'bg-[#9333ea] text-[#f6e6ff]'
-          : 'text-[#4d4354] hover:bg-white/70'
+    <span
+      title={
+        full
+          ? 'This grant also covers their Personal Profile, so you can read what they wrote.'
+          : 'This grant covers approved snapshots only — the month’s shape, not their written words.'
+      }
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
+        full ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
       }`}
     >
-      <Icon size={17} />
-      <span>{label}</span>
-    </button>
+      {snapshot.accessLabel}
+    </span>
+  );
+}
+
+function SnapshotCard({ snapshot, onOpen }) {
+  return (
+    <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow flex flex-col">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-semibold shrink-0 ${toneFor(
+              snapshot.participant.id
+            )}`}
+          >
+            {initialsOf(snapshot.participant.name)}
+          </div>
+          <div className="min-w-0">
+            {/* Wraps rather than truncates — a person's name is not metadata
+                to be clipped (Gaps §5 asks worker views to use names, not ids). */}
+            <h2 className="text-lg font-semibold text-slate-900 leading-tight">
+              {snapshot.participant.name}
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">{snapshot.monthLabel}</p>
+          </div>
+        </div>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 shrink-0">
+          <Lock size={11} />
+          Locked
+        </span>
+      </div>
+
+      <dl className="mt-5 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <dt className="text-sm text-slate-500">Consent level</dt>
+          <dd>
+            <AccessChip snapshot={snapshot} />
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <dt className="text-sm text-slate-500">Last viewed</dt>
+          <dd className="text-sm text-slate-900">
+            {snapshot.lastViewedAt ? formatRelativeTime(snapshot.lastViewedAt) : 'Never'}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-sm text-slate-500">Approved</dt>
+          <dd className="text-sm text-slate-900">{formatShortDate(snapshot.lockedAt)}</dd>
+        </div>
+      </dl>
+
+      <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-4">
+        <span>
+          Compiled from {snapshot.logsCount}{' '}
+          {snapshot.logsCount === 1 ? 'daily log' : 'daily logs'}
+        </span>
+        {snapshot.addendaCount > 0 && (
+          <span className="inline-flex items-center gap-1.5">
+            <MessageSquarePlus size={12} />
+            {snapshot.addendaCount} {snapshot.addendaCount === 1 ? 'note' : 'notes'} added
+          </span>
+        )}
+      </p>
+
+      <button
+        onClick={onOpen}
+        className="mt-5 w-full flex items-center justify-center gap-2 bg-purple-50 text-brand-700 text-sm font-medium rounded-full py-3 hover:bg-purple-100 transition-colors"
+      >
+        <Eye size={16} />
+        View snapshot
+      </button>
+    </div>
   );
 }
 
 export default function ApprovedSnapshots() {
+  const navigate = useNavigate();
+  const [participantId, setParticipantId] = useState('');
+  const [month, setMonth] = useState('');
+
+  // Unfiltered, so the filters always offer everything this worker can reach —
+  // narrowing to one person must not empty the month list. React Query serves
+  // both from one request while no filter is set.
+  const all = useWorkerSnapshots();
+  const filtered = useWorkerSnapshots({
+    ...(participantId ? { participantId } : {}),
+    ...(month ? { month } : {}),
+  });
+
+  const isLoading = all.isLoading || filtered.isLoading;
+  const error = all.error ?? filtered.error;
+  const snapshots = filtered.data ?? [];
+  const hasFilter = Boolean(participantId || month);
+
+  const { people, months } = useMemo(() => {
+    const rows = all.data ?? [];
+    const byPerson = new Map();
+    const byMonth = new Map();
+    for (const row of rows) {
+      byPerson.set(String(row.participant.id), row.participant.name);
+      byMonth.set(row.monthYear, row.monthLabel);
+    }
+    return {
+      people: [...byPerson]
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+      months: [...byMonth]
+        .sort(([a], [b]) => b.localeCompare(a))
+        .map(([value, label]) => ({ value, label })),
+    };
+  }, [all.data]);
+
+  const clearFilters = () => {
+    setParticipantId('');
+    setMonth('');
+  };
+
   return (
-    <div className="min-h-screen flex bg-white font-sans text-slate-800">
-      <aside className="w-64 shrink-0 bg-[#eff4ff] flex flex-col p-6">
-        <div className="mb-6">
-          <div className="text-2xl font-bold text-[#7800ce] leading-tight">
-            TMG180
-          </div>
-          <p className="text-sm font-medium text-[#4d4354] mt-0.5">
-            Worker Portal
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Approved Monthly Snapshots</h1>
+        <p className="text-base text-slate-600 mt-2 max-w-2xl">
+          View participant-approved snapshots within your permissions.
+        </p>
+      </div>
+
+      <div className="flex items-start gap-4 bg-sky-50 rounded-xl p-6">
+        <div className="w-11 h-11 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+          <ShieldCheck size={19} />
+        </div>
+        <div>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            Access is controlled by participant consent. You are viewing snapshots shared
+            securely.
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            A snapshot is read-only and belongs to the participant who approved it. Opening one
+            is recorded, so they can always see who has read their month.
           </p>
         </div>
+      </div>
 
-        <button className="w-full flex items-center justify-center gap-2 bg-[#9333ea] text-[#f6e6ff] text-sm font-medium rounded-full py-3 mb-6 hover:bg-[#7e22ce] transition-colors">
-          <Plus size={14} />
-          New Entry
-        </button>
+      {(all.data?.length ?? 0) > 0 && (
+        <div className="bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-wrap items-end gap-4">
+          <div className="w-full sm:w-72">
+            <label className="block text-sm text-slate-600 mb-2" htmlFor="filterParticipant">
+              Participant
+            </label>
+            <Select
+              look="box"
+              inputId="filterParticipant"
+              isClearable
+              placeholder="All accessible participants"
+              options={people}
+              value={people.find((option) => option.value === participantId) ?? null}
+              onChange={(option) => setParticipantId(option?.value ?? '')}
+            />
+          </div>
 
-        <nav className="flex flex-col gap-2">
-          {NAV_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
-          ))}
-        </nav>
+          <div className="w-full sm:w-56">
+            <label className="block text-sm text-slate-600 mb-2" htmlFor="filterMonth">
+              Month
+            </label>
+            <Select
+              look="box"
+              inputId="filterMonth"
+              isClearable
+              placeholder="All months"
+              options={months}
+              value={months.find((option) => option.value === month) ?? null}
+              onChange={(option) => setMonth(option?.value ?? '')}
+            />
+          </div>
 
-        <div className="mt-auto pt-4 flex flex-col gap-2 border-t border-[#dde5f5]">
-          {BOTTOM_ITEMS.map((item) => (
-            <NavItem key={item.label} {...item} />
+          <div className="w-full sm:w-56">
+            <p className="text-sm text-slate-600 mb-2">Status</p>
+            {/* min-h matches the Select control, so the three labels line up. */}
+            <p className="flex items-center gap-2 min-h-12.5 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-4">
+              <Lock size={13} className="shrink-0" />
+              Approved &amp; locked only
+            </p>
+          </div>
+
+          {hasFilter && (
+            <button
+              onClick={clearFilters}
+              className="ml-auto inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full bg-purple-100 text-brand-700 hover:bg-purple-200 transition-colors"
+            >
+              Clear filters
+              <X size={13} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="flex items-center gap-3 text-slate-500 bg-white/80 rounded-xl p-6">
+          <LoaderCircle size={18} className="animate-spin" />
+          Loading approved snapshots…
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-6 text-rose-800">
+          <TriangleAlert size={18} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold">We couldn&rsquo;t load these snapshots.</p>
+            <p className="text-sm mt-1">{error.message}</p>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !error && snapshots.length === 0 && (
+        <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+            {hasFilter ? <CalendarRange size={26} /> : <NotebookPen size={26} />}
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mt-6">
+            {hasFilter ? 'No snapshots match those filters' : 'No approved snapshots yet'}
+          </h2>
+          <p className="text-base text-slate-600 mt-2 max-w-md mx-auto">
+            {hasFilter
+              ? 'Try a different participant or month — only months a participant has approved and locked appear here.'
+              : 'Approved and locked snapshots will appear here. A snapshot is compiled from a participant’s daily logs and only reaches you once they have approved it and their consent covers snapshots.'}
+          </p>
+          {hasFilter ? (
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-6 py-3 mt-6 hover:bg-slate-50 transition-colors"
+            >
+              Clear filters
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate(WORKER_PATHS.dailyLogs)}
+              className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm rounded-full px-6 py-3 mt-6 shadow-md hover:bg-brand-700 transition-colors"
+            >
+              <NotebookPen size={16} />
+              View daily logs
+            </button>
+          )}
+        </div>
+      )}
+
+      {snapshots.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {snapshots.map((snapshot) => (
+            <SnapshotCard
+              key={snapshot.id}
+              snapshot={snapshot}
+              onOpen={() => navigate(workerSnapshotPath.detail(snapshot.id))}
+            />
           ))}
         </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="h-16 bg-[#f8f9ff]/80 flex items-center justify-end gap-4 px-10 shrink-0">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#4d4354] hover:bg-white">
-            <Bell size={18} />
-          </button>
-          <button className="w-9 h-9 rounded-full flex items-center justify-center text-[#4d4354] hover:bg-white">
-            <Settings size={19} />
-          </button>
-          <div className="w-10 h-10 rounded-full border-2 border-[#7800ce]/30 bg-[#f0dbff] text-[#7800ce] text-xs font-bold flex items-center justify-center">
-            AM
-          </div>
-        </header>
-
-        <main className="flex-1 px-10 py-8">
-          <div className="mb-8">
-            <h1 className="text-[32px] font-semibold text-[#0b1c30] leading-tight">
-              Approved Monthly Snapshots
-            </h1>
-            <p className="text-lg text-[#4d4354] mt-2">
-              View participant-approved snapshots within your permissions.
-            </p>
-          </div>
-
-          <div className="bg-[#dce9ff] rounded-full flex items-center gap-4 p-4 mb-8">
-            <div className="w-10 h-10 rounded-full bg-[#2170e4] flex items-center justify-center text-white shrink-0">
-              <ShieldCheck size={18} />
-            </div>
-            <p className="text-base text-[#0b1c30]">
-              Access is controlled by participant consent. You are viewing
-              snapshots shared securely.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-[#eef0fa] shadow-[0_10px_26px_rgba(11,28,48,0.05)] p-6 flex flex-wrap items-end gap-4 mb-8">
-            {FILTERS.map((f) => (
-              <div key={f.label} className={f.width}>
-                <p className="text-xs font-semibold text-[#4d4354] mb-2">
-                  {f.label}
-                </p>
-                <button className="w-full flex items-center justify-between gap-2 bg-white border border-[#e4e7f2] rounded-full px-4 py-3 text-left">
-                  <span className="text-base text-[#0b1c30] truncate">
-                    {f.value}
-                  </span>
-                  <ChevronDown size={16} className="text-[#4d4354] shrink-0" />
-                </button>
-              </div>
-            ))}
-            <button className="ml-auto flex items-center gap-2 bg-white border border-[#e4e7f2] rounded-full px-6 py-3 text-sm font-medium text-[#7800ce] hover:bg-purple-50 transition-colors">
-              <SlidersHorizontal size={14} />
-              Filter
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {SNAPSHOTS.map((s) => (
-              <div
-                key={s.initials}
-                className="bg-white rounded-3xl border border-[#eef0fa] shadow-[0_10px_26px_rgba(11,28,48,0.05)] p-6 flex flex-col"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-2 ${s.avatarTone}`}
-                    >
-                      {s.initials}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-[#0b1c30] leading-7">
-                        {s.nameLines.map((line) => (
-                          <span key={line} className="block">
-                            {line}
-                          </span>
-                        ))}
-                      </h3>
-                      <p className="text-sm font-medium text-[#4d4354] mt-1 leading-5">
-                        {s.monthLines.map((line) => (
-                          <span key={line} className="block">
-                            {line}
-                          </span>
-                        ))}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="inline-flex items-center gap-1 bg-[#007a53]/10 text-[#007a53] text-xs font-semibold rounded-full px-3 py-1 shrink-0">
-                    <Lock size={11} />
-                    Locked
-                  </span>
-                </div>
-
-                <div className="mt-5 flex flex-col gap-3">
-                  <div className="flex items-center justify-between text-sm border-b border-[#eef0fa] pb-3">
-                    <span className="font-medium text-[#4d4354]">
-                      Consent Level
-                    </span>
-                    <span className="font-medium text-[#0b1c30]">
-                      {s.consentLevel}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm border-b border-[#eef0fa] pb-3">
-                    <span className="font-medium text-[#4d4354]">
-                      Last Viewed
-                    </span>
-                    <span className="font-medium text-[#0b1c30]">
-                      {s.lastViewed}
-                    </span>
-                  </div>
-                </div>
-
-                <button className="mt-auto pt-5">
-                  <span className="w-full flex items-center justify-center gap-2 bg-[#e5eeff] text-[#7800ce] text-sm font-medium rounded-full py-3 hover:bg-[#d8e6ff] transition-colors">
-                    <Eye size={16} />
-                    View Snapshot
-                  </span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </main>
-      </div>
+      )}
     </div>
   );
 }

@@ -20,8 +20,6 @@ import MonthlySnapshotSummary from '../../pages/participant/MonthlySnapshotSumma
 import SnapshotExports from '../../pages/participant/SnapshotExports';
 import BrowseVerifiedWorkers from '../../pages/participant/BrowseVerifiedWorkers';
 import RelationalWorkerProfile from '../../pages/participant/RelationalWorkerProfile';
-import WorkerDirectory from '../../pages/participant/WorkerDirectory';
-import WorkerDirectoryProfile from '../../pages/participant/WorkerDirectoryProfile';
 import Library from '../../pages/participant/Library';
 import SessionPreferences from '../../pages/participant/SessionPreferences';
 import PrivacySharing from '../../pages/participant/PrivacySharing';
@@ -57,8 +55,6 @@ export const participantRoutes = [
   { path: rel(P.snapshotDetail), element: <MonthlySnapshotSummary /> },
   { path: rel(P.browseWorkers), element: <BrowseVerifiedWorkers /> },
   { path: rel(P.browseWorkersProfile), element: <RelationalWorkerProfile /> },
-  { path: rel(P.directory), element: <WorkerDirectory /> },
-  { path: rel(P.directoryProfile), element: <WorkerDirectoryProfile /> },
   { path: rel(P.library), element: <Library /> },
   { path: rel(P.preferences), element: <SessionPreferences /> },
   { path: rel(P.privacySharing), element: <PrivacySharing /> },

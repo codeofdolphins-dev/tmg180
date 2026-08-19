@@ -6,15 +6,19 @@
  * client can never submit a log the server would reject — and the server never
  * has to trust the client's word on the evidence rules.
  *
- * Two layers exist (Build Guide §5). This file covers the fields shared by
- * both; the participant layer is what is built. A worker-authored log carries
- * the same structured fields plus the private WCPS narrative, which is never
- * shared and therefore never described here.
+ * Two layers exist (Build Guide §5) and both are built on this contract. The
+ * structured fields are shared; a worker-authored log adds the participant
+ * voice, a public safety note, where/how the support happened, and the private
+ * WCPS narrative (`privateNarrative`) — which the API returns only to the
+ * worker who wrote it and never to anyone else. Pass `{ layer }` to the
+ * validators to get the right comparison vocabulary and field set.
  *
  * Wire shape (camelCase; the API maps to/from the snake_case columns):
  *   { id, status, sessionDate, startTime, endTime, goalIds, domainTags,
  *     impactText, supportText, outcomeText, comparison, additionalNotes,
  *     authorRole, submittedAt, createdAt, updatedAt, addenda: [...] }
+ *   worker layer adds: { participant: { id, name }, consentActive, serviceType,
+ *     location, participantVoice, safetyNote, privateNarrative }
  */
 
 export const DAILY_LOG_STATUS = {
@@ -68,12 +72,44 @@ export const USUAL_PATTERN_COMPARISONS = [
 
 export const COMPARISON_KEYS = USUAL_PATTERN_COMPARISONS.map((option) => option.key);
 
+/**
+ * The worker's version of the same question — "compared with this person's
+ * usual pattern, what did today's support look like?" — as the worker log
+ * frame (1169:3172) phrases it and the DB pack's comment on the column lists
+ * it (typical, more_support, less_support, different_support). Same column,
+ * different vocabulary: a worker describes the support level, a participant
+ * describes their own day. Neither label says "baseline".
+ */
+export const SUPPORT_LEVEL_COMPARISONS = [
+  { key: 'typical', label: 'Typical' },
+  { key: 'more_support', label: 'More support needed' },
+  { key: 'less_support', label: 'Less support needed' },
+  { key: 'different_support', label: 'Different support needed' },
+];
+
+export const SUPPORT_LEVEL_COMPARISON_KEYS = SUPPORT_LEVEL_COMPARISONS.map((option) => option.key);
+
+/** Which comparison vocabulary a layer writes. */
+export const comparisonKeysFor = (layer) =>
+  layer === DAILY_LOG_AUTHOR_ROLE.WORKER ? SUPPORT_LEVEL_COMPARISON_KEYS : COMPARISON_KEYS;
+
+/** Free-text fields by layer — the worker layer writes more of them. */
+const PARTICIPANT_TEXT_FIELDS = ['impactText', 'supportText', 'outcomeText', 'additionalNotes'];
+const WORKER_TEXT_FIELDS = [
+  ...PARTICIPANT_TEXT_FIELDS,
+  'participantVoice',
+  'safetyNote',
+  'privateNarrative',
+];
+
 export const DAILY_LOG_LIMITS = {
   minGoals: 1,
   maxGoals: 3,
   maxDomains: FUNCTIONAL_DOMAIN_KEYS.length,
   maxText: 5000,
   maxReason: 255,
+  maxServiceType: 100,
+  maxLocation: 255,
 };
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -95,8 +131,9 @@ const isKeyList = (value, allowed) =>
  *
  * @returns map of field -> message; empty object when valid.
  */
-export function validateDailyLogFields(fields = {}) {
+export function validateDailyLogFields(fields = {}, { layer = DAILY_LOG_AUTHOR_ROLE.PARTICIPANT } = {}) {
   const errors = {};
+  const isWorker = layer === DAILY_LOG_AUTHOR_ROLE.WORKER;
 
   if (!isBlank(fields.sessionDate) && !DATE_PATTERN.test(fields.sessionDate)) {
     errors.sessionDate = 'Needs to be a date.';
@@ -124,13 +161,22 @@ export function validateDailyLogFields(fields = {}) {
     errors.domainTags = 'Contains a domain tag that is not allowed.';
   }
 
-  if (!isBlank(fields.comparison) && !COMPARISON_KEYS.includes(fields.comparison)) {
+  if (!isBlank(fields.comparison) && !comparisonKeysFor(layer).includes(fields.comparison)) {
     errors.comparison = 'Not one of the allowed options.';
   }
 
-  for (const key of ['impactText', 'supportText', 'outcomeText', 'additionalNotes']) {
+  for (const key of isWorker ? WORKER_TEXT_FIELDS : PARTICIPANT_TEXT_FIELDS) {
     if (!isBlank(fields[key]) && !isTextWithin(fields[key], DAILY_LOG_LIMITS.maxText)) {
       errors[key] = `Must be text up to ${DAILY_LOG_LIMITS.maxText} characters.`;
+    }
+  }
+
+  if (isWorker) {
+    if (!isBlank(fields.serviceType) && !isTextWithin(fields.serviceType, DAILY_LOG_LIMITS.maxServiceType)) {
+      errors.serviceType = `Keep this under ${DAILY_LOG_LIMITS.maxServiceType} characters.`;
+    }
+    if (!isBlank(fields.location) && !isTextWithin(fields.location, DAILY_LOG_LIMITS.maxLocation)) {
+      errors.location = `Keep this under ${DAILY_LOG_LIMITS.maxLocation} characters.`;
     }
   }
 
@@ -144,8 +190,9 @@ export function validateDailyLogFields(fields = {}) {
  *
  * @returns {{ ok: boolean, errors: Record<string, string> }}
  */
-export function canSubmitDailyLog(log = {}) {
-  const errors = validateDailyLogFields(log);
+export function canSubmitDailyLog(log = {}, options = {}) {
+  const errors = validateDailyLogFields(log, options);
+  const isWorker = options.layer === DAILY_LOG_AUTHOR_ROLE.WORKER;
   const goalIds = log.goalIds ?? [];
   const domainTags = log.domainTags ?? [];
 
@@ -153,7 +200,9 @@ export function canSubmitDailyLog(log = {}) {
     errors.sessionDate = 'Add the date this support happened.';
   }
   if (!errors.goalIds && (goalIds.length < DAILY_LOG_LIMITS.minGoals || goalIds.length > DAILY_LOG_LIMITS.maxGoals)) {
-    errors.goalIds = `Link between ${DAILY_LOG_LIMITS.minGoals} and ${DAILY_LOG_LIMITS.maxGoals} of your goals before you submit.`;
+    errors.goalIds = isWorker
+      ? `Link between ${DAILY_LOG_LIMITS.minGoals} and ${DAILY_LOG_LIMITS.maxGoals} of the participant's goals before you submit.`
+      : `Link between ${DAILY_LOG_LIMITS.minGoals} and ${DAILY_LOG_LIMITS.maxGoals} of your goals before you submit.`;
   }
   if (!errors.domainTags && domainTags.length < 1) {
     errors.domainTags = 'Choose at least one area of daily life this support touched.';
@@ -184,4 +233,5 @@ export const domainLabel = (key) =>
   FUNCTIONAL_DOMAINS.find((domain) => domain.key === key)?.label ?? key;
 
 export const comparisonLabel = (key) =>
-  USUAL_PATTERN_COMPARISONS.find((option) => option.key === key)?.label ?? null;
+  [...USUAL_PATTERN_COMPARISONS, ...SUPPORT_LEVEL_COMPARISONS].find((option) => option.key === key)
+    ?.label ?? null;

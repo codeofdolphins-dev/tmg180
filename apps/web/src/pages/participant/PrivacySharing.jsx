@@ -40,8 +40,10 @@ import { useSnapshots } from '../../hooks/participant/snapshot';
  * (md/frontend/TMG180_Participant_UI_Scale.md).
  *
  * Two parts of the frame have nothing behind them yet and say so instead of
- * pretending: Grant Access needs the verified directory, which is still mock
- * data, and time-limited share links need the external access layer. What is
+ * pretending: Grant Access needs the consent-granting journey (M-09 — the
+ * directory it picks from is live at /participant/browse-workers since 19 Aug,
+ * the grant step is not), and time-limited share links need the external
+ * access layer. What is
  * real: the preferences, the consent records (reviewing and removing access,
  * both append-only), the audit log, and the export history.
  *
@@ -60,14 +62,12 @@ function Toggle({ checked, disabled, onChange, label }) {
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`w-11 h-6 rounded-full flex items-center px-0.5 shrink-0 transition-colors ${
-        checked ? 'bg-brand-600' : 'bg-slate-300'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      className={`w-11 h-6 rounded-full flex items-center px-0.5 shrink-0 transition-colors ${checked ? 'bg-brand-600' : 'bg-slate-300'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       <span
-        className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-          checked ? 'translate-x-5' : ''
-        }`}
+        className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-5' : ''
+          }`}
       />
     </button>
   );
@@ -282,7 +282,10 @@ function AuditEntry({ entry }) {
 }
 
 export default function PrivacySharing() {
-  const { data, isLoading, error } = usePrivacy();
+  const [isAllAudiListShow, setIsAllAudiListShow] = useState(false);
+
+
+  const { data, isLoading, error } = usePrivacy({ allAuditList: isAllAudiListShow });
   const savePreferences = useSavePreferences();
   const { data: snapshots } = useSnapshots();
 
@@ -292,6 +295,7 @@ export default function PrivacySharing() {
     (consent) => consent.status === CONSENT_STATUS.REVOKED
   );
   const exported = (snapshots ?? []).filter((snapshot) => snapshot.exportedAt);
+
 
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-6">
@@ -337,6 +341,8 @@ export default function PrivacySharing() {
       {data && (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_288px] gap-6 items-start">
           <div className="flex flex-col gap-6 min-w-0">
+
+            {/* Sharing */}
             <section className={CARD}>
               <div className="flex items-center gap-2">
                 <SlidersHorizontal size={17} className="text-brand-600" />
@@ -381,6 +387,7 @@ export default function PrivacySharing() {
               </div>
             </section>
 
+            {/*  Grant Access */}
             <section className={CARD}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -398,7 +405,7 @@ export default function PrivacySharing() {
                 <button
                   type="button"
                   disabled
-                  title="Granting access arrives with the verified worker directory."
+                  title="Granting a worker access is the next step for this screen — the directory is live, the grant step is not yet."
                   className="flex items-center gap-2 bg-[#d3e4fe] text-[#0b1c30] text-sm rounded-full px-5 py-2.5 opacity-60 cursor-not-allowed shrink-0"
                 >
                   <UserPlus size={15} />
@@ -412,8 +419,9 @@ export default function PrivacySharing() {
                     No one has access to your information.
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    Granting access to a worker arrives with the verified directory. Until
-                    then, everything you record is yours alone.
+                    Granting a worker access — choosing someone from the directory and what
+                    they may see — is the next step for this screen. Until then, everything
+                    you record is yours alone.
                   </p>
                 </div>
               ) : (
@@ -432,6 +440,7 @@ export default function PrivacySharing() {
               )}
             </section>
 
+            {/* Audit */}
             <section className={CARD}>
               <div className="flex items-center gap-2">
                 <History size={17} className="text-brand-600" />
@@ -452,6 +461,12 @@ export default function PrivacySharing() {
                   ))}
                 </div>
               )}
+              <div className="flex items-center justify-center">
+                <p
+                  className='text-sm text-slate-600 mt-1 hover:text-blue-500 hover:underline cursor-pointer'
+                  onClick={() => setIsAllAudiListShow(prev => !prev)}
+                > {isAllAudiListShow ? "Show Less" : "show all" }</p>
+              </div>
             </section>
           </div>
 

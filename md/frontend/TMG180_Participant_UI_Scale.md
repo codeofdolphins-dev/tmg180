@@ -51,3 +51,5 @@ Render them where the frame puts them, visibly inactive, with one line saying so
 ## Applied so far
 
 `DailyLogList.jsx` (reference) · `ParticipantHelpCentre.jsx`. The snapshot trio (`MonthlySnapshotList`, `MonthlySnapshotReview`, `MonthlySnapshotSummary`) and `SnapshotExports` were built Figma-faithful on 18 Aug and still carry frame-scale headings in places — normalise them the next time they are touched.
+
+**The worker workspace builds to the same ramp** (brief §7 decision 6, taken in practice from 19 Aug — Jiten's call still owed on renaming this doc "TMG180 UI scale"): `WorkerDashboard` · `Calendar` · `ParticipantsISupport` · `WorkerDailyLogList` · `WorkerDailyLogDetail` · `ApprovedSnapshots` · `WorkerSnapshotDetail`. Two worker-specific notes from the snapshot screens: a person's **name wraps, never truncates** in a card header (Gaps §5 asks worker views to use names rather than numbering people, and a clipped name is halfway back to an id), and a filter row mixing `Select` with a static field needs `min-h-12.5` on the static one or its label floats above the others.

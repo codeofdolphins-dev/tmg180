@@ -43,12 +43,15 @@
 }
 
 /*
- * Participant portal type scale. The app root is 18px; the participant frames
- * are drawn at a 16px scale, so inside the portal Tailwind's text-* sizes
- * resolve to their standard px values (text-sm 14, text-base 16, text-3xl 30…)
- * without touching auth / worker / admin. Line-heights are ratios and follow.
+ * Participant portal + worker workspace type scale. The app root is 18px; the
+ * participant and worker frames are drawn at a 16px scale, so inside either
+ * workspace Tailwind's text-* sizes resolve to their standard px values
+ * (text-sm 14, text-base 16, text-3xl 30…) without touching auth / admin.
+ * Line-heights are ratios and follow. Both roots share the rule so the shared
+ * chrome (sidebar, top bar) renders identically in each.
  */
-.participant-portal {
+.participant-portal,
+.worker-workspace {
   --text-xs: 0.6667rem;
   --text-sm: 0.7778rem;
   --text-base: 0.8889rem;

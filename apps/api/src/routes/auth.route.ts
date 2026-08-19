@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   forgotPassword,
   me,
+  updateMe,
   refresh,
   resetPassword,
   signIn,
@@ -26,6 +27,7 @@ authRoutes.post('/sign-in', signIn);
 authRoutes.post('/refresh', refresh);
 authRoutes.post('/sign-out', signOut);
 authRoutes.get('/me', requireAuth, me);
+authRoutes.patch('/me', requireAuth, updateMe);
 
 authRoutes.post('/forgot-password', forgotPassword);
 authRoutes.get('/reset-password/:token', verifyResetToken);

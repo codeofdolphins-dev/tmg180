@@ -10,7 +10,23 @@ import { parseDay, toDayValue } from '../../lib/dates';
  *
  * The value on the outside is always the API's `YYYY-MM-DD`; the Date object
  * the picker wants never leaves this component. Dates display AU-style.
+ *
+ * The header carries month and year dropdowns, not just the month arrows: the
+ * fields that use this are not all "some day near today" — a credential expires
+ * years out and was issued years back, and paging a year at a time through
+ * twelve clicks is the wrong tool for that. The dropdowns bound how far the
+ * calendar reaches, which also stops a mistyped year landing in the record.
  */
+
+const YEARS_BACK = 40;
+const YEARS_FORWARD = 20;
+
+/** A Date at the start of `offset` years from now — the year dropdown's edges. */
+function yearEdge(offset) {
+  const now = new Date();
+  return new Date(now.getFullYear() + offset, offset < 0 ? 0 : 11, offset < 0 ? 1 : 31);
+}
+
 export default function DateField({
   id,
   value,
@@ -19,6 +35,7 @@ export default function DateField({
   disabled = false,
   ariaLabel,
   look = 'pill',
+  minDate,
   maxDate,
   placeholder = 'dd/mm/yyyy',
 }) {
@@ -26,6 +43,12 @@ export default function DateField({
     look === 'box'
       ? 'bg-white border border-slate-300 rounded-full'
       : 'bg-white rounded-full';
+
+  // The year dropdown lists exactly the years between the picker's bounds, so
+  // the bounds are what makes it usable. Callers that care (a session date can
+  // never be in the future) pass their own; everyone else gets the window.
+  const from = minDate ?? yearEdge(-YEARS_BACK);
+  const to = maxDate ?? yearEdge(YEARS_FORWARD);
 
   return (
     <div className="relative">
@@ -35,7 +58,11 @@ export default function DateField({
         onChange={(date) => onChange(toDayValue(date))}
         onBlur={onBlur}
         disabled={disabled}
-        maxDate={maxDate}
+        minDate={from}
+        maxDate={to}
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"
         dateFormat="dd/MM/yyyy"
         placeholderText={placeholder}
         ariaLabelledBy={undefined}

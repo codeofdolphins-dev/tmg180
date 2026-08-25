@@ -113,6 +113,15 @@ export const updateCredential = asyncHandler(async (req, res) => {
       expires_at: fields.expiresAt === undefined ? undefined : clear(fields.expiresAt) ? null : fromDay(fields.expiresAt),
       reference: fields.reference === undefined ? undefined : clear(fields.reference) ? null : fields.reference,
       notes: body.notes === undefined ? undefined : clear(body.notes) ? null : (body.notes as string),
+      // Admin verification (verified_at) attests to what was on file when the
+      // admin looked. Touching the dates or reference changes what is on file,
+      // so the stamp comes off and the credential goes back to the admin's
+      // awaiting-verification queue. Notes are the worker's own and don't.
+      ...(fields.issuedAt !== undefined ||
+      fields.expiresAt !== undefined ||
+      fields.reference !== undefined
+        ? { verified_at: null }
+        : {}),
     };
 
     await prisma.workerCredential.upsert({

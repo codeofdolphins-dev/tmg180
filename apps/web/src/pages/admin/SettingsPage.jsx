@@ -1,10 +1,14 @@
-import { SlidersHorizontal, ChevronDown, UserCircle, Settings } from 'lucide-react';
-import GovernanceLayout from '../../components/layout/admin/GovernanceLayout';
-import { GOV_NAV_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
+import { SlidersHorizontal } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Select from '../../components/ui/Select';
 
-const NAV_ITEMS = [...GOV_NAV_ITEMS, { label: 'Settings', icon: Settings }];
-const BOTTOM_ITEMS = [{ label: 'Admin Profile', icon: UserCircle }];
+/**
+ * Settings — governance portal. Renders inside GovernanceLayout (shared
+ * fixed sidebar + top bar); this file is content only, on the portal card
+ * idiom shared with the participant / worker workspaces.
+ */
+
+const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
 function Field({ label, children }) {
   return (
@@ -25,41 +29,24 @@ function TextInput(props) {
   );
 }
 
-function Select({ options, defaultValue }) {
+/** Shared react-select in the portal theme; plain string options in, string out. */
+function SelectField({ options, defaultValue, ...props }) {
   return (
-    <div className="relative">
-      <select
-        defaultValue={defaultValue}
-        className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-full px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-600"
-      >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-      <ChevronDown
-        size={15}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-      />
-    </div>
+    <Select
+      look="box"
+      defaultValue={defaultValue ? { value: defaultValue, label: defaultValue } : null}
+      options={options.map((o) => ({ value: o, label: o }))}
+      {...props}
+    />
   );
 }
 
 export default function SettingsPage() {
   return (
-    <GovernanceLayout
-      portalLabel="Admin Console"
-      activeItem="Settings"
-      logo="diamond"
-      uppercaseLabel={false}
-      activeStyle="soft"
-      navItems={NAV_ITEMS}
-      bottomItems={BOTTOM_ITEMS}
-      showHelp
-      showSupport={false}
-    >
-      <h1 className="text-2xl font-bold text-slate-900 mb-4">Settings</h1>
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-8">
+      <section className={CARD}>
         <div className="flex items-center gap-2 mb-6">
           <SlidersHorizontal size={16} className="text-sky-600" />
           <h2 className="text-base font-bold text-slate-900">Platform Essentials</h2>
@@ -70,13 +57,17 @@ export default function SettingsPage() {
             <TextInput defaultValue="TMG180 Governance" />
           </Field>
           <Field label="Default Timezone">
-            <Select
+            <SelectField
+              inputId="default-timezone"
+              aria-label="Default Timezone"
               defaultValue="Australia/Sydney (AEST)"
               options={['Australia/Sydney (AEST)', 'UTC', 'America/New_York (EST)']}
             />
           </Field>
           <Field label="Default Language">
-            <Select
+            <SelectField
+              inputId="default-language"
+              aria-label="Default Language"
               defaultValue="English (Australia)"
               options={['English (Australia)', 'English (US)', 'French']}
             />
@@ -88,7 +79,7 @@ export default function SettingsPage() {
             Save Changes
           </Button>
         </div>
-      </div>
-    </GovernanceLayout>
+      </section>
+    </div>
   );
 }

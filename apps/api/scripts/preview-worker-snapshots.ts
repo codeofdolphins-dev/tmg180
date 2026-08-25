@@ -115,7 +115,7 @@ async function main() {
 
   const profile = await prisma.participantProfile.create({ data: { participant_id: participantId } });
   const section = await prisma.participantProfileSection.create({
-    data: { profile_id: profile.id, section_key: 'my-goals', status: 'in_progress' },
+    data: { profile_id: profile.id, section_key: 'goals', status: 'in_progress' },
   });
   await prisma.participantProfileAnswer.createMany({
     data: [

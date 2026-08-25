@@ -1,0 +1,322 @@
+<title>How TMG180 Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #faf9fc;
+    --card: #ffffff;
+    --ink: #221e33;
+    --muted: #6f6a84;
+    --line: #d9d5e6;
+    --line-soft: #e7e4f0;
+    --accent: #7c3aed;
+    --accent-soft: rgba(124, 58, 237, 0.06);
+    --off: #b45309;
+    --off-soft: rgba(180, 83, 9, 0.055);
+    --ok: #0f7a55;
+    --ok-soft: rgba(15, 122, 85, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #161320;
+      --card: #1f1b2c;
+      --ink: #eceaf4;
+      --muted: #9a94ad;
+      --line: #3a3450;
+      --line-soft: #2b2740;
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.09);
+      --off: #f0a848;
+      --off-soft: rgba(240, 168, 72, 0.07);
+      --ok: #3ecf95;
+      --ok-soft: rgba(62, 207, 149, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #161320;
+    --card: #1f1b2c;
+    --ink: #eceaf4;
+    --muted: #9a94ad;
+    --line: #3a3450;
+    --line-soft: #2b2740;
+    --accent: #a78bfa;
+    --accent-soft: rgba(167, 139, 250, 0.09);
+    --off: #f0a848;
+    --off-soft: rgba(240, 168, 72, 0.07);
+    --ok: #3ecf95;
+    --ok-soft: rgba(62, 207, 149, 0.09);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  header.top { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .thesis {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .thesis strong { color: var(--ink); font-weight: 600; }
+
+  figure.flow { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .fig-scroll { overflow-x: auto; }
+  .fig-scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  figcaption {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Diagram vocabulary — all colors via tokens so both themes hold. */
+  .zone { fill: var(--accent-soft); stroke: var(--line-soft); }
+  .zone-off { fill: var(--off-soft); stroke: var(--off); stroke-dasharray: 6 5; }
+  .chip { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; fill: var(--accent); }
+  .chip-off { fill: var(--off); }
+  .box { fill: var(--card); stroke: var(--line); }
+  .box-hero { stroke: var(--accent); stroke-width: 1.5; }
+  .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+  .box-ghost { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; }
+  .t { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .sub { font-size: 10.5px; fill: var(--muted); }
+  .t-ok { fill: var(--ok); }
+  .lbl { font-size: 10.5px; fill: var(--muted); }
+  .foot { font-size: 11px; font-weight: 600; fill: var(--off); }
+  .flowline { fill: none; stroke: var(--ink); stroke-width: 1.2; opacity: 0.55; }
+  .flowline-ok { fill: none; stroke: var(--ok); stroke-width: 1.4; }
+
+  .actors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .actor {
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .actor h2 {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .actor p { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .actor .fee {
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .rules {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 28px;
+  }
+  .rules h3 {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 4px;
+  }
+  .rule { font-size: 14px; margin: 0; }
+  .rule b { font-weight: 600; }
+  .rule span { color: var(--muted); }
+
+  @media (max-width: 640px) {
+    .actors { grid-template-columns: 1fr; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">TMG180 · Team reference</span>
+    <h1>How TMG180 Works</h1>
+    <p class="thesis"><strong>Trust and evidence live on the platform.</strong> The support relationship itself — contact, agreement, payment — happens directly between participant and worker, off it. By design.</p>
+  </header>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 1000" role="img"
+           aria-label="Flow: trust and discovery on TMG180, the support arrangement off the platform, then consent and evidence back on TMG180 ending in participant-owned exports for NDIS reassessment.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor" opacity="0.55"/>
+          </marker>
+          <marker id="arrok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--ok)"/>
+          </marker>
+        </defs>
+
+        <!-- ZONE 1 · on platform: trust & discovery -->
+        <rect class="zone" x="16" y="16" width="728" height="296" rx="14"/>
+        <text class="chip" x="36" y="44">ON TMG180 · TRUST &amp; DISCOVERY</text>
+
+        <rect class="box" x="36" y="64" width="210" height="44" rx="9"/>
+        <text class="t" x="141" y="90" text-anchor="middle">Participant joins (free)</text>
+
+        <rect class="box" x="514" y="64" width="210" height="44" rx="9"/>
+        <text class="t" x="619" y="90" text-anchor="middle">Worker subscribes</text>
+
+        <rect class="box" x="36" y="160" width="210" height="48" rx="9"/>
+        <text class="t" x="141" y="180" text-anchor="middle">My Personal Profile</text>
+        <text class="sub" x="141" y="196" text-anchor="middle">their story, needs, preferences</text>
+
+        <rect class="box" x="514" y="160" width="210" height="48" rx="9"/>
+        <text class="t" x="619" y="180" text-anchor="middle">Verified by governance</text>
+        <text class="sub" x="619" y="196" text-anchor="middle">insurance · screening · conduct</text>
+
+        <line class="flowline" x1="141" y1="110" x2="141" y2="156" marker-end="url(#arr)"/>
+        <line class="flowline" x1="619" y1="110" x2="619" y2="156" marker-end="url(#arr)"/>
+
+        <rect class="box box-hero" x="275" y="248" width="210" height="48" rx="9"/>
+        <text class="t" x="380" y="268" text-anchor="middle">Verified Worker Directory</text>
+        <text class="sub" x="380" y="284" text-anchor="middle">relational profiles first</text>
+
+        <polyline class="flowline" points="141,210 141,272 269,272" marker-end="url(#arr)"/>
+        <text class="lbl" x="150" y="240">browses &amp; filters</text>
+        <polyline class="flowline" points="619,210 619,272 491,272" marker-end="url(#arr)"/>
+        <text class="lbl" x="612" y="240" text-anchor="end">published once verified</text>
+
+        <!-- boundary crossing -->
+        <line class="flowline" x1="380" y1="298" x2="380" y2="350" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="322">picks someone &amp;</text>
+        <text class="lbl" x="392" y="338">contacts them directly</text>
+
+        <!-- ZONE 2 · off platform -->
+        <rect class="zone-off" x="16" y="356" width="728" height="176" rx="14"/>
+        <text class="chip chip-off" x="36" y="384">OFF THE PLATFORM · THE ARRANGEMENT</text>
+
+        <rect class="box" x="36" y="408" width="210" height="52" rx="9"/>
+        <text class="t" x="141" y="428" text-anchor="middle">Meet &amp; agree</text>
+        <text class="sub" x="141" y="444" text-anchor="middle">rates · times · service agreement</text>
+
+        <rect class="box" x="275" y="408" width="210" height="52" rx="9"/>
+        <text class="t" x="380" y="428" text-anchor="middle">Support happens</text>
+        <text class="sub" x="380" y="444" text-anchor="middle">in real life, ongoing</text>
+
+        <rect class="box" x="514" y="408" width="210" height="52" rx="9"/>
+        <text class="t" x="619" y="428" text-anchor="middle">Worker invoices</text>
+        <text class="sub" x="619" y="444" text-anchor="middle">paid from NDIS funds</text>
+
+        <line class="flowline" x1="248" y1="434" x2="271" y2="434" marker-end="url(#arr)"/>
+        <line class="flowline" x1="487" y1="434" x2="510" y2="434" marker-end="url(#arr)"/>
+
+        <text class="foot" x="380" y="506" text-anchor="middle">TMG180 never books, schedules, pays, or coordinates — by design.</text>
+
+        <!-- boundary crossing back -->
+        <line class="flowline" x1="380" y1="534" x2="380" y2="630" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="572">back on TMG180</text>
+        <text class="lbl" x="392" y="588">to document the support</text>
+
+        <!-- ZONE 3 · on platform: consent & evidence -->
+        <rect class="zone" x="16" y="588" width="728" height="392" rx="14"/>
+        <text class="chip" x="36" y="616">ON TMG180 · CONSENT &amp; EVIDENCE</text>
+
+        <rect class="box box-hero" x="275" y="636" width="210" height="48" rx="9"/>
+        <text class="t" x="380" y="656" text-anchor="middle">Consent granted</text>
+        <text class="sub" x="380" y="672" text-anchor="middle">participant chooses what's shared</text>
+
+        <polyline class="flowline" points="275,660 141,660 141,724" marker-end="url(#arr)"/>
+        <text class="lbl" x="150" y="700">consent-gated</text>
+        <polyline class="flowline" points="485,660 619,660 619,724" marker-end="url(#arr)"/>
+
+        <rect class="box" x="36" y="728" width="210" height="52" rx="9"/>
+        <text class="t" x="141" y="748" text-anchor="middle">Daily Support Evidence Logs</text>
+        <text class="sub" x="141" y="764" text-anchor="middle">worker records each session</text>
+
+        <rect class="box" x="514" y="728" width="210" height="52" rx="9"/>
+        <text class="t" x="619" y="748" text-anchor="middle">Daily check-ins</text>
+        <text class="sub" x="619" y="764" text-anchor="middle">participant's own reflections</text>
+
+        <polyline class="flowline" points="141,782 141,836 271,836" marker-end="url(#arr)"/>
+        <text class="lbl" x="150" y="812">rolls up monthly</text>
+        <polyline class="flowline" points="619,782 619,836 489,836" marker-end="url(#arr)"/>
+
+        <rect class="box" x="275" y="812" width="210" height="48" rx="9"/>
+        <text class="t" x="380" y="832" text-anchor="middle">Monthly Snapshot</text>
+        <text class="sub" x="380" y="848" text-anchor="middle">patterns · goals · fluctuations</text>
+
+        <line class="flowline" x1="380" y1="862" x2="380" y2="892" marker-end="url(#arr)"/>
+
+        <rect class="box box-ok" x="275" y="896" width="210" height="52" rx="9"/>
+        <text class="t t-ok" x="380" y="916" text-anchor="middle">Approve → lock → export</text>
+        <text class="sub" x="380" y="932" text-anchor="middle">participant-owned evidence</text>
+
+        <line class="flowline-ok" x1="487" y1="922" x2="556" y2="922" marker-end="url(#arrok)"/>
+        <rect class="box-ghost" x="562" y="902" width="158" height="40" rx="20" style="stroke: var(--ok)"/>
+        <text class="t t-ok" x="641" y="926" text-anchor="middle">NDIS reassessment</text>
+
+        <rect class="box-ghost" x="36" y="900" width="200" height="52" rx="9"/>
+        <text class="t" x="136" y="920" text-anchor="middle">Platform Governance</text>
+        <text class="sub" x="136" y="936" text-anchor="middle">metadata only — never content</text>
+      </svg>
+    </div>
+    <figcaption>The dashed band is the point: discovery and evidence live on the platform — the arrangement itself never touches it.</figcaption>
+  </figure>
+
+  <section class="actors" aria-label="The three roles">
+    <div class="actor">
+      <h2>Participant</h2>
+      <p>Needs support. Owns every record, and gives or revokes consent at any time.</p>
+      <span class="fee">Free</span>
+    </div>
+    <div class="actor">
+      <h2>Independent Worker</h2>
+      <p>Provides support as their own business. Sees only what's shared; writes session evidence.</p>
+      <span class="fee">Pays subscription</span>
+    </div>
+    <div class="actor">
+      <h2>Platform Governance</h2>
+      <p>Verifies workers, handles incidents and standards. Sees metadata, never record content.</p>
+      <span class="fee">Oversight only</span>
+    </div>
+  </section>
+
+  <section class="rules">
+    <h3>By design</h3>
+    <p class="rule"><b>No matching.</b> <span>Participants browse and choose for themselves.</span></p>
+    <p class="rule"><b>No bookings or payments.</b> <span>The arrangement is private, funded by the participant's NDIS plan.</span></p>
+    <p class="rule"><b>Nothing shared without consent.</b> <span>Access is granted per worker — and revocable.</span></p>
+    <p class="rule"><b>The product is the evidence.</b> <span>Profile → daily logs → snapshots → export, ready for reassessment.</span></p>
+  </section>
+</div>

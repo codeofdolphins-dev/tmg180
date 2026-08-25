@@ -1,22 +1,21 @@
 import {
-  Search,
-  Bell,
-  HelpCircle,
-  Grid3x3,
   Eye,
   Upload,
   ClipboardList,
   CheckCircle2,
   Clock,
   RefreshCw,
-  Settings,
-  UserCircle,
 } from 'lucide-react';
-import GovernanceSidebar, { GOV_NAV_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
 import Button from '../../components/ui/Button';
 
-const NAV_ITEMS = [...GOV_NAV_ITEMS, { label: 'Settings', icon: Settings }];
-const BOTTOM_ITEMS = [{ label: 'Admin Profile', icon: UserCircle }];
+/**
+ * Governance Standing — governance portal. Renders inside GovernanceLayout
+ * (shared fixed sidebar + top bar); this file is content only, on the portal
+ * card idiom shared with the participant / worker workspaces. The frame's own
+ * search / bell / avatar header was dropped with the per-page chrome.
+ */
+
+const CARD = 'bg-white/80 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
 const STATS = [
   { label: 'Policies Active', value: '12', icon: ClipboardList, tone: 'blue' },
@@ -95,7 +94,7 @@ const STATUS_STYLES = {
 
 function StatCard({ label, value, icon: Icon, tone }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4">
+    <div className={`${CARD} p-4`}>
       <div className="flex items-start justify-between gap-2 mb-4">
         <p className="text-xs text-slate-400 leading-tight">{label}</p>
         <div
@@ -221,127 +220,85 @@ function VersionAdoptionChart() {
 
 export default function GovernanceStanding() {
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <GovernanceSidebar
-        activeItem="Governance Standing"
-        portalLabel="SaaS Admin Portal"
-        logo="ring"
-        navItems={NAV_ITEMS}
-        bottomItems={BOTTOM_ITEMS}
-      />
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Governance Standing</h1>
+          <p className="text-base text-slate-600 mt-2">
+            Platform-level governance metadata and acknowledgement status.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" icon={Eye} className="w-auto! px-4! py-2.5!">
+            View Policy
+          </Button>
+          <Button variant="primary" icon={Upload} className="w-auto! px-5! py-2.5!">
+            Export Metadata
+          </Button>
+        </div>
+      </div>
 
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-100 bg-white">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2 w-72 shrink-0">
-            <Search size={16} className="text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search governance metadata..."
-              className="bg-transparent outline-none text-sm text-slate-600 placeholder:text-slate-400 flex-1 min-w-0"
-            />
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {STATS.map((s) => (
+          <StatCard key={s.label} {...s} />
+        ))}
+      </div>
 
-          <div className="flex items-center gap-4 text-slate-500">
-            <button className="hover:text-slate-700 transition-colors">
-              <Bell size={18} />
-            </button>
-            <button className="hover:text-slate-700 transition-colors">
-              <HelpCircle size={18} />
-            </button>
-            <button className="hover:text-slate-700 transition-colors">
-              <Grid3x3 size={18} />
-            </button>
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                alt="Admin avatar"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </header>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+        <div className={`${CARD} p-5`}>
+          <h3 className="text-sm font-bold text-slate-900 mb-4">
+            Acknowledgement by Policy
+          </h3>
+          <AcknowledgementChart />
+        </div>
 
-        <main className="flex-1 p-6 flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Governance Standing</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Platform-level governance metadata and acknowledgement status.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button variant="outline" icon={Eye} className="w-auto! px-4! py-2.5!">
-                View Policy
-              </Button>
-              <Button variant="primary" icon={Upload} className="w-auto! px-5! py-2.5!">
-                Export Metadata
-              </Button>
-            </div>
-          </div>
+        <div className={`${CARD} p-5`}>
+          <h3 className="text-sm font-bold text-slate-900 mb-4">
+            Version Adoption Trend
+          </h3>
+          <VersionAdoptionChart />
+        </div>
+      </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {STATS.map((s) => (
-              <StatCard key={s.label} {...s} />
+      <div className={`${CARD} p-5`}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold text-slate-900">Policy Status Repository</h3>
+          <button className="text-sm font-medium text-brand-600 hover:text-brand-800 transition-colors">
+            Filter ▾
+          </button>
+        </div>
+
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs text-slate-400">
+              <th className="font-medium pb-2">Policy / Item Name</th>
+              <th className="font-medium pb-2">Version</th>
+              <th className="font-medium pb-2">Audience</th>
+              <th className="font-medium pb-2">Acknowledgement Status</th>
+              <th className="font-medium pb-2">Last Updated</th>
+              <th className="font-medium pb-2">Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {POLICIES.map((p) => (
+              <tr key={p.name} className="border-t border-slate-100">
+                <td className="py-3 text-slate-700 font-medium">{p.name}</td>
+                <td className="py-3 text-slate-500">{p.version}</td>
+                <td className="py-3 text-slate-500">{p.audience}</td>
+                <td className="py-3">
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_STYLES[p.status]}`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    {p.status}
+                  </span>
+                </td>
+                <td className="py-3 text-slate-500">{p.lastUpdated}</td>
+                <td className="py-3 text-slate-500">{p.dueDate}</td>
+              </tr>
             ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-slate-900 mb-4">
-                Acknowledgement by Policy
-              </h3>
-              <AcknowledgementChart />
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-slate-900 mb-4">
-                Version Adoption Trend
-              </h3>
-              <VersionAdoptionChart />
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-900">Policy Status Repository</h3>
-              <button className="text-sm font-medium text-brand-600 hover:text-brand-800 transition-colors">
-                Filter ▾
-              </button>
-            </div>
-
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-slate-400">
-                  <th className="font-medium pb-2">Policy / Item Name</th>
-                  <th className="font-medium pb-2">Version</th>
-                  <th className="font-medium pb-2">Audience</th>
-                  <th className="font-medium pb-2">Acknowledgement Status</th>
-                  <th className="font-medium pb-2">Last Updated</th>
-                  <th className="font-medium pb-2">Due Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {POLICIES.map((p) => (
-                  <tr key={p.name} className="border-t border-slate-100">
-                    <td className="py-3 text-slate-700 font-medium">{p.name}</td>
-                    <td className="py-3 text-slate-500">{p.version}</td>
-                    <td className="py-3 text-slate-500">{p.audience}</td>
-                    <td className="py-3">
-                      <span
-                        className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_STYLES[p.status]}`}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className="py-3 text-slate-500">{p.lastUpdated}</td>
-                    <td className="py-3 text-slate-500">{p.dueDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </main>
+          </tbody>
+        </table>
       </div>
     </div>
   );

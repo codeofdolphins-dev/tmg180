@@ -14,7 +14,7 @@ const TABS = ['Core Library', 'Optional Reading'];
 const SECTIONS = [
   {
     title: 'Personal Profile',
-    tag: '(FCA baseline)',
+    tag: null, // participant-facing UI never says FCA/baseline (Final Override P1)
     icon: User,
     iconTone: 'bg-slate-200 text-slate-600',
     accent: 'text-brand-600',

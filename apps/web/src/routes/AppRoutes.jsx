@@ -7,7 +7,8 @@ import { participantRoutes, participantStandaloneRoutes } from './participant/pa
 import ParticipantLayout from '../components/layout/participant/ParticipantLayout';
 import { workerRoutes, workerStandaloneRoutes } from './worker/workerRoutes';
 import WorkerLayout from '../components/layout/worker/WorkerLayout';
-import { adminRoutes } from './admin/adminRoutes';
+import { adminRoutes, adminStandaloneRoutes } from './admin/adminRoutes';
+import GovernanceLayout from '../components/layout/admin/GovernanceLayout';
 
 export default function AppRoutes() {
   return (
@@ -49,7 +50,13 @@ export default function AppRoutes() {
       </Route>
 
       <Route path="/admin" element={<RequireRole role={ROLES.ADMIN} />}>
-        {adminRoutes.map(({ path, element }) => (
+        {/* Shared portal chrome; pages render into its <Outlet />. */}
+        <Route element={<GovernanceLayout />}>
+          {adminRoutes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
+        </Route>
+        {adminStandaloneRoutes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
         ))}
       </Route>

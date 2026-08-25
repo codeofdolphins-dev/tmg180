@@ -320,6 +320,19 @@ function ProfileCard() {
           </div>
 
           <p className="text-xs text-slate-500 mt-4">{profile.contactNotice}</p>
+
+          {/* Credentials live on Governance Standing — Settings is where people
+              go looking for them, so point the way instead of staying silent. */}
+          <p className="text-sm text-slate-600 border-t border-slate-100 mt-4 pt-4">
+            Your credentials — insurance, screening checks, first aid — are recorded on{' '}
+            <button
+              onClick={() => navigate(WORKER_PATHS.governance)}
+              className="font-medium text-brand-700 hover:underline"
+            >
+              Governance Standing
+            </button>
+            . Once verified by TMG180 they show on your published profile.
+          </p>
         </>
       )}
     </section>

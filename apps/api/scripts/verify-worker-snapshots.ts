@@ -102,7 +102,7 @@ async function main() {
     data: { participant_id: participantId },
   });
   const section = await prisma.participantProfileSection.create({
-    data: { profile_id: profile.id, section_key: 'my-goals', status: 'in_progress' },
+    data: { profile_id: profile.id, section_key: 'goals', status: 'in_progress' },
   });
   await prisma.participantProfileAnswer.createMany({
     data: [
@@ -186,7 +186,7 @@ async function main() {
     data: { participant_id: secondId },
   });
   const secondSection = await prisma.participantProfileSection.create({
-    data: { profile_id: secondProfile.id, section_key: 'my-goals', status: 'in_progress' },
+    data: { profile_id: secondProfile.id, section_key: 'goals', status: 'in_progress' },
   });
   await prisma.participantProfileAnswer.create({
     data: { section_id: secondSection.id, question_key: 'primary_aspiration', value: 'Swim on Fridays' },

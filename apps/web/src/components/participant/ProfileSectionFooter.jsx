@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight, Mail, LoaderCircle } from 'lucide-react';
  * bar with all four actions: Previous | Save Draft · Save & Exit · Save & Continue.
  *
  * Wire it straight from useSectionForm:
- *   <ProfileSectionFooter {...useSectionForm('about-me')} />
+ *   <ProfileSectionFooter {...useSectionForm('about_me')} />
  * (extra hook fields are ignored). Every save action posts the section before
  * navigating; Previous never saves.
  */

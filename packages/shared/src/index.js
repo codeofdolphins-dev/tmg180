@@ -82,6 +82,8 @@ export {
   PROFILE_SECTIONS,
   PROFILE_TOTAL_SECTIONS,
   profileSection,
+  profileSectionSlug,
+  profileSectionBySlug,
   nextProfileSection,
   isEmptyAnswer,
   validateAnswerValue,

@@ -1,85 +1,49 @@
+import { useState } from 'react';
 import {
-  Search,
-  Bell,
-  HelpCircle,
-  Upload,
   Users,
   BadgeCheck,
-  CheckCircle2,
+  ShieldCheck,
   AlertTriangle,
-  RefreshCw,
-  Eye,
-  ArrowRight,
+  Upload,
+  ChevronDown,
+  ChevronRight,
+  CircleCheck,
+  Undo2,
+  LoaderCircle,
+  Info,
 } from 'lucide-react';
-import GovernanceSidebar from '../../components/layout/admin/GovernanceSidebar';
-import Button from '../../components/ui/Button';
+import { CREDENTIAL_STATUS, credentialStatusLabel } from '@tmg180/shared';
+import { formatShortDate, formatRelativeTime } from '../../lib/dates';
+import { useAdminWorkers, useVerifyCredential } from '../../hooks/admin/platform';
 
-const STATS = [
-  { label: 'Active workers', value: '1,248', icon: Users, tone: 'purple' },
-  { label: 'Profiles published', value: '1,102', icon: BadgeCheck, tone: 'blue' },
-  { label: 'Gov items completed', value: '98%', icon: CheckCircle2, tone: 'green' },
-  { label: 'Policies needing review', value: '43', icon: AlertTriangle, tone: 'red' },
-  { label: 'Verification updates', value: '156', icon: RefreshCw, tone: 'violet' },
-];
+/**
+ * Workers Report — the worker registry and the home of admin credential
+ * verification (Technical Brief §4: the platform "verifies worker eligibility
+ * documents and access conditions"). Renders inside GovernanceLayout; content
+ * only, on the shared portal card idiom.
+ *
+ * Everything on screen is live registry data — no sample rows. A worker's
+ * expanded row lists their four credentials; "Verify" stamps one, "Remove"
+ * takes the stamp off, and a worker editing a credential clears its stamp
+ * automatically (verification refers to what was on file). The stamp is what
+ * participants see as "Verified by TMG180" on directory profiles.
+ */
 
-const TONE_BG = {
-  purple: 'bg-purple-100 text-brand-600',
-  blue: 'bg-sky-100 text-sky-600',
-  green: 'bg-emerald-100 text-emerald-600',
-  red: 'bg-rose-100 text-rose-600',
-  violet: 'bg-violet-100 text-violet-600',
+const CARD = 'bg-white/80 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
+
+const STATUS_CHIP = {
+  [CREDENTIAL_STATUS.UP_TO_DATE]: 'bg-emerald-50 text-emerald-700',
+  [CREDENTIAL_STATUS.DUE_SOON]: 'bg-amber-50 text-amber-700',
+  [CREDENTIAL_STATUS.EXPIRED]: 'bg-rose-50 text-rose-600',
+  [CREDENTIAL_STATUS.NEEDS_REVIEW]: 'bg-slate-100 text-slate-500',
 };
-
-const TREND_POINTS = [
-  { month: 'May', value: 850 },
-  { month: 'Jun', value: 955 },
-  { month: 'Jul', value: 1000 },
-  { month: 'Aug', value: 1055 },
-  { month: 'Sep', value: 1090 },
-  { month: 'Oct', value: 1150 },
-];
-
-const Y_TICKS = [1150, 1100, 1050, 1000, 950, 900, 850, 800];
-
-const WORKERS = [
-  {
-    id: 'W-8472',
-    name: 'Alex M.',
-    status: 'Published',
-    standing: 'Completed',
-    lastAck: 'Oct 12, 2023',
-  },
-  {
-    id: 'W-9912',
-    name: 'Sam K.',
-    status: 'Draft',
-    standing: 'Needs Review',
-    lastAck: 'Sep 05, 2023',
-  },
-  {
-    id: 'W-2341',
-    name: 'Jordan T.',
-    status: 'Published',
-    standing: 'Completed',
-    lastAck: 'Oct 20, 2023',
-  },
-  {
-    id: 'W-7754',
-    name: 'Taylor R.',
-    status: 'Published',
-    standing: 'Needs Review',
-    lastAck: 'Aug 14, 2023',
-  },
-];
 
 function StatCard({ label, value, icon: Icon, tone }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4">
+    <div className={`${CARD} p-4`}>
       <div className="flex items-start justify-between gap-2 mb-4">
         <p className="text-xs text-slate-400 leading-tight">{label}</p>
-        <div
-          className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${TONE_BG[tone]}`}
-        >
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${tone}`}>
           <Icon size={13} />
         </div>
       </div>
@@ -88,253 +52,259 @@ function StatCard({ label, value, icon: Icon, tone }) {
   );
 }
 
-function ProfileCompletionChart() {
-  const width = 460;
-  const height = 170;
-  const padLeft = 34;
-  const padBottom = 20;
-  const min = 800;
-  const max = 1150;
-
-  const x = (i) =>
-    padLeft + (i * (width - padLeft)) / (TREND_POINTS.length - 1);
-  const y = (v) =>
-    ((max - v) / (max - min)) * (height - padBottom);
-
-  const linePath = TREND_POINTS.map(
-    (p, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(p.value)}`
-  ).join(' ');
-  const areaPath = `${linePath} L ${x(TREND_POINTS.length - 1)} ${
-    height - padBottom
-  } L ${x(0)} ${height - padBottom} Z`;
+/** One credential inside an expanded worker row, with its verification act. */
+function CredentialRow({ worker, credential }) {
+  const verify = useVerifyCredential();
+  const act = (verified) =>
+    verify.mutate({ workerId: worker.id, type: credential.type, verified });
 
   return (
-    <svg viewBox={`0 0 ${width} ${height + 16}`} className="w-full h-48">
-      <defs>
-        <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3 border-t border-slate-100 first:border-t-0">
+      <div className="w-56 min-w-0">
+        <p className="text-sm font-medium text-slate-800">{credential.label}</p>
+        {credential.reference && (
+          <p className="text-xs text-slate-400 truncate">Ref: {credential.reference}</p>
+        )}
+      </div>
 
-      {Y_TICKS.map((tick) => (
-        <g key={tick}>
-          <line
-            x1={padLeft}
-            x2={width}
-            y1={y(tick)}
-            y2={y(tick)}
-            stroke="#eef2f6"
-            strokeWidth="1"
-          />
-          <text x={0} y={y(tick) + 3} fontSize="9" fill="#94a3b8">
-            {tick}
-          </text>
-        </g>
-      ))}
+      <div className="w-44 text-xs text-slate-500">
+        {credential.expiresAt ? (
+          <>
+            {credential.issuedAt && <>Issued {formatShortDate(credential.issuedAt)} · </>}
+            Expires {formatShortDate(credential.expiresAt)}
+          </>
+        ) : credential.recorded ? (
+          'No expiry recorded'
+        ) : (
+          'Nothing recorded yet'
+        )}
+      </div>
 
-      <path d={areaPath} fill="url(#trendFill)" />
-      <path d={linePath} fill="none" stroke="#7c3aed" strokeWidth="2.5" />
-
-      {TREND_POINTS.map((p, i) => (
-        <circle
-          key={p.month}
-          cx={x(i)}
-          cy={y(p.value)}
-          r="3.5"
-          fill="#fff"
-          stroke="#7c3aed"
-          strokeWidth="2"
-        />
-      ))}
-
-      {TREND_POINTS.map((p, i) => (
-        <text
-          key={p.month}
-          x={x(i)}
-          y={height + 12}
-          fontSize="9"
-          fill="#94a3b8"
-          textAnchor="middle"
-        >
-          {p.month}
-        </text>
-      ))}
-    </svg>
-  );
-}
-
-const STANDING_SEGMENTS = [
-  { label: 'Completed', value: 68, color: '#10b981' },
-  { label: 'Pending', value: 20, color: '#60a5fa' },
-  { label: 'Needs Review', value: 12, color: '#fca5a5' },
-];
-
-function GovernanceStandingChart() {
-  let acc = 0;
-  const stops = STANDING_SEGMENTS.map((s) => {
-    const start = acc;
-    acc += s.value;
-    return `${s.color} ${start}% ${acc}%`;
-  }).join(', ');
-
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className="w-36 h-36 rounded-full flex items-center justify-center"
-        style={{ background: `conic-gradient(${stops})` }}
+      <span
+        className={`inline-flex text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_CHIP[credential.status]}`}
       >
-        <div className="w-20 h-20 rounded-full bg-white" />
+        {credentialStatusLabel(credential.status)}
+      </span>
+
+      <div className="ml-auto flex items-center gap-2">
+        {credential.verifiedAt ? (
+          <>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+              <BadgeCheck size={14} />
+              Verified {formatRelativeTime(credential.verifiedAt)}
+            </span>
+            <button
+              onClick={() => act(false)}
+              disabled={verify.isPending}
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 border border-slate-200 rounded-full px-3 py-1.5 transition-colors disabled:opacity-50"
+            >
+              {verify.isPending ? <LoaderCircle size={12} className="animate-spin" /> : <Undo2 size={12} />}
+              Remove
+            </button>
+          </>
+        ) : credential.recorded ? (
+          <button
+            onClick={() => act(true)}
+            disabled={verify.isPending}
+            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-full px-4 py-1.5 transition-colors disabled:opacity-50"
+          >
+            {verify.isPending ? (
+              <LoaderCircle size={13} className="animate-spin" />
+            ) : (
+              <CircleCheck size={13} />
+            )}
+            Verify
+          </button>
+        ) : (
+          <span className="text-xs text-slate-400">Awaiting the worker&rsquo;s details</span>
+        )}
       </div>
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4">
-        {STANDING_SEGMENTS.map((s) => (
-          <div key={s.label} className="flex items-center gap-1.5 text-xs text-slate-500">
-            <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ background: s.color }}
-            />
-            {s.label}
-          </div>
-        ))}
-      </div>
+
+      {verify.error && (
+        <p className="w-full text-xs text-rose-600">{verify.error.message}</p>
+      )}
     </div>
   );
 }
 
-function StatusDot({ color }) {
-  return <span className={`inline-block w-1.5 h-1.5 rounded-full ${color}`} />;
+function WorkerRow({ worker, open, onToggle }) {
+  const { publication, governance, credentialSummary } = worker;
+  return (
+    <>
+      <tr
+        className="border-t border-slate-100 cursor-pointer hover:bg-slate-50/60 transition-colors"
+        onClick={onToggle}
+      >
+        <td className="py-3 pr-3">
+          <div className="flex items-center gap-2">
+            {open ? (
+              <ChevronDown size={14} className="text-slate-400 shrink-0" />
+            ) : (
+              <ChevronRight size={14} className="text-slate-400 shrink-0" />
+            )}
+            <div className="min-w-0">
+              <p className="text-slate-700 font-medium truncate">{worker.name}</p>
+              <p className="text-xs text-slate-400 truncate">{worker.email}</p>
+            </div>
+          </div>
+        </td>
+        <td className="py-3 pr-3">
+          <div className="flex items-center gap-1.5 text-slate-600">
+            <span
+              className={`inline-block w-1.5 h-1.5 rounded-full ${
+                worker.accountStatus !== 'active'
+                  ? 'bg-rose-500'
+                  : publication.isPublished
+                    ? 'bg-emerald-500'
+                    : 'bg-slate-400'
+              }`}
+            />
+            {worker.accountStatus !== 'active'
+              ? 'Suspended'
+              : publication.isPublished
+                ? 'Published'
+                : 'Draft'}
+          </div>
+        </td>
+        <td className="py-3 pr-3 text-slate-600">
+          {governance.confirmed} of {governance.total}
+        </td>
+        <td className="py-3 pr-3">
+          {credentialSummary.recorded === 0 ? (
+            <span className="text-slate-400">None recorded</span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-slate-600">
+              <BadgeCheck
+                size={14}
+                className={credentialSummary.awaiting > 0 ? 'text-amber-500' : 'text-emerald-500'}
+              />
+              {credentialSummary.verified} of {credentialSummary.recorded} verified
+            </span>
+          )}
+        </td>
+        <td className="py-3 text-slate-500">
+          {governance.lastAcknowledgedAt
+            ? formatShortDate(governance.lastAcknowledgedAt.slice(0, 10))
+            : '—'}
+        </td>
+      </tr>
+      {open && (
+        <tr className="border-t border-slate-100 bg-slate-50/40">
+          <td colSpan={5} className="px-5 py-2">
+            {credentialSummary.recorded === 0 && (
+              <p className="flex items-center gap-2 text-xs text-slate-500 bg-sky-50 border border-sky-100 rounded-lg px-3 py-2 mt-2 mb-1">
+                <Info size={13} className="shrink-0 text-sky-600" />
+                Verification opens once this worker records their credential details in
+                their own workspace (Governance Standing) — TMG180 verifies what workers
+                put on file, it never records it for them.
+              </p>
+            )}
+            {worker.credentials.map((credential) => (
+              <CredentialRow key={credential.type} worker={worker} credential={credential} />
+            ))}
+          </td>
+        </tr>
+      )}
+    </>
+  );
 }
 
 export default function WorkersReport() {
+  const { data, isLoading, error } = useAdminWorkers();
+  const [openId, setOpenId] = useState(null);
+
+  const workers = data?.workers ?? [];
+  const stats = {
+    active: workers.filter((w) => w.accountStatus === 'active').length,
+    published: workers.filter((w) => w.publication.isPublished).length,
+    awaiting: workers.reduce((sum, w) => sum + w.credentialSummary.awaiting, 0),
+    verified: workers.reduce((sum, w) => sum + w.credentialSummary.verified, 0),
+    acknowledged: workers.filter(
+      (w) => w.governance.total > 0 && w.governance.confirmed === w.governance.total
+    ).length,
+  };
+  const v = (value) => (isLoading ? '…' : value);
+
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <GovernanceSidebar activeItem="Workers Report" />
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Workers Report</h1>
+          <p className="text-base text-slate-600 mt-2">
+            Platform-level worker verification and governance metadata.
+          </p>
+        </div>
+        {/* Export has nothing behind it yet — switched off, never a dead control. */}
+        <button
+          disabled
+          title="Export is not built yet"
+          className="flex items-center gap-2 text-sm font-medium text-slate-400 bg-slate-100 rounded-full px-5 py-2.5 cursor-not-allowed shrink-0"
+        >
+          <Upload size={15} />
+          Export metadata report
+          <span className="text-xs font-normal">(not yet available)</span>
+        </button>
+      </div>
 
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-100 bg-white">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2 w-64 shrink-0">
-            <Search size={16} className="text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search metadata..."
-              className="bg-transparent outline-none text-sm text-slate-600 placeholder:text-slate-400 flex-1 min-w-0"
-            />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <StatCard label="Active workers" value={v(stats.active)} icon={Users} tone="bg-purple-100 text-brand-600" />
+        <StatCard label="Profiles published" value={v(stats.published)} icon={BadgeCheck} tone="bg-sky-100 text-sky-600" />
+        <StatCard label="Fully acknowledged" value={v(stats.acknowledged)} icon={ShieldCheck} tone="bg-emerald-100 text-emerald-600" />
+        <StatCard label="Credentials awaiting verification" value={v(stats.awaiting)} icon={AlertTriangle} tone="bg-rose-100 text-rose-600" />
+        <StatCard label="Credentials verified" value={v(stats.verified)} icon={CircleCheck} tone="bg-violet-100 text-violet-600" />
+      </div>
+
+      <div className={`${CARD} p-5`}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold text-slate-900">Worker Registry</h3>
+          <p className="text-xs text-slate-400">
+            Open a worker to review and verify their credentials
+          </p>
+        </div>
+
+        {isLoading && (
+          <div className="flex items-center gap-2 py-8 justify-center text-slate-400 text-sm">
+            <LoaderCircle size={16} className="animate-spin" />
+            Loading the registry…
           </div>
+        )}
 
-          <div className="flex items-center gap-6">
-            <h2 className="text-base font-bold text-slate-900 whitespace-nowrap">
-              TMG180 Governance
-            </h2>
-            <div className="flex items-center gap-4 text-slate-500">
-              <button className="hover:text-slate-700 transition-colors">
-                <Bell size={18} />
-              </button>
-              <button className="hover:text-slate-700 transition-colors">
-                <HelpCircle size={18} />
-              </button>
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                  alt="Admin avatar"
-                  className="w-full h-full object-cover"
+        {error && (
+          <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4 text-sm text-rose-700">
+            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+            <span>The registry could not be loaded. {error.message}</span>
+          </div>
+        )}
+
+        {!isLoading && !error && workers.length === 0 && (
+          <p className="py-8 text-center text-sm text-slate-400">
+            No worker accounts yet — the registry fills in as workers sign up.
+          </p>
+        )}
+
+        {!isLoading && !error && workers.length > 0 && (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-slate-400">
+                <th className="font-medium pb-2">Worker</th>
+                <th className="font-medium pb-2">Profile Status</th>
+                <th className="font-medium pb-2">Governance Items</th>
+                <th className="font-medium pb-2">Credentials</th>
+                <th className="font-medium pb-2">Last Ack.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {workers.map((worker) => (
+                <WorkerRow
+                  key={worker.id}
+                  worker={worker}
+                  open={openId === worker.id}
+                  onToggle={() => setOpenId(openId === worker.id ? null : worker.id)}
                 />
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 p-6 flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Workers Report</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Platform-level worker verification and governance metadata.
-              </p>
-            </div>
-            <Button variant="primary" icon={Upload} className="w-auto! px-5! py-2.5!">
-              Export metadata report
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {STATS.map((s) => (
-              <StatCard key={s.label} {...s} />
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
-            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-slate-900 mb-2">
-                Profile Completion Trend
-              </h3>
-              <ProfileCompletionChart />
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-slate-900 mb-2">
-                Governance Standing
-              </h3>
-              <GovernanceStandingChart />
-            </div>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-900">Worker Registry</h3>
-              <button className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-800 transition-colors">
-                View all records
-                <ArrowRight size={14} />
-              </button>
-            </div>
-
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-slate-400">
-                  <th className="font-medium pb-2">Worker ID</th>
-                  <th className="font-medium pb-2">Display Name</th>
-                  <th className="font-medium pb-2">Profile Status</th>
-                  <th className="font-medium pb-2">Governance Standing</th>
-                  <th className="font-medium pb-2">Last Ack.</th>
-                  <th className="font-medium pb-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {WORKERS.map((w) => (
-                  <tr key={w.id} className="border-t border-slate-100">
-                    <td className="py-3 text-slate-500">{w.id}</td>
-                    <td className="py-3 text-slate-700 font-medium">{w.name}</td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <StatusDot
-                          color={
-                            w.status === 'Published' ? 'bg-emerald-500' : 'bg-slate-400'
-                          }
-                        />
-                        {w.status}
-                      </div>
-                    </td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-1.5">
-                        {w.standing === 'Completed' ? (
-                          <CheckCircle2 size={14} className="text-emerald-500" />
-                        ) : (
-                          <AlertTriangle size={14} className="text-amber-500" />
-                        )}
-                        <span className="text-slate-600">{w.standing}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 text-slate-500">{w.lastAck}</td>
-                    <td className="py-3">
-                      <button className="w-7 h-7 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-100 transition-colors">
-                        <Eye size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </main>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -175,9 +175,13 @@ function CredentialForm({ credential, onDone }) {
   };
 
   return (
-    <form onSubmit={submit} className="bg-white border border-slate-200 rounded-xl p-4 mt-3">
+    /* Sits inside the credential's own card, which already names it — so this
+       is an inset panel with a job title, not a second copy of the heading. */
+    <form onSubmit={submit} className="bg-slate-50 rounded-lg p-3 mt-3">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-slate-900">{credential.label}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          {credential.expiresAt ? 'Update details' : 'Record dates'}
+        </p>
         <button type="button" onClick={onDone} aria-label="Close" className="text-slate-400 hover:text-slate-600">
           <X size={15} />
         </button>
@@ -232,6 +236,8 @@ function CredentialForm({ credential, onDone }) {
       </button>
       <p className="text-xs text-slate-500 mt-3 leading-relaxed">
         Standing is worked out from the expiry date each time this screen loads — it is never stored.
+        {credential.verifiedAt &&
+          ' Saving changes takes off TMG180’s verification until an administrator reviews the new details.'}
       </p>
     </form>
   );
@@ -258,52 +264,75 @@ function Renewals({ credentials }) {
   const settled = credentials.filter((c) => c.status === CREDENTIAL_STATUS.UP_TO_DATE).length;
 
   return (
-    <section className="bg-[#eff4ff]/70 rounded-xl p-6">
-      <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-        <Clock size={18} className="text-brand-600" />
-        Upcoming Renewals
-      </h2>
+    <section className="bg-[#eff4ff]/70 rounded-xl p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <Clock size={18} className="text-brand-600 shrink-0" />
+          My Credentials
+        </h2>
+        <span className="text-xs font-medium text-slate-500 shrink-0">
+          {settled} of {credentials.length} current
+        </span>
+      </div>
+      <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+        Record what you hold — TMG180 reviews and verifies it.
+      </p>
 
-      <div className="ml-2 border-l border-slate-200 pl-6 flex flex-col gap-6 mt-6">
+      <div className="flex flex-col gap-3 mt-4">
         {ordered.map((credential) => (
-          <div key={credential.type} className="relative">
-            <span
-              className={`absolute -left-8 top-1 w-4 h-4 rounded-full border-2 border-white ${
-                CREDENTIAL_DOT[credential.status]
-              }`}
-            />
-            <span
-              className={`inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                CREDENTIAL_CHIP[credential.status]
-              }`}
-            >
-              {credentialStatusLabel(credential.status)}
-            </span>
-            <p className="text-sm font-medium text-slate-900 mt-1.5 leading-snug">{credential.label}</p>
-            <p className="text-xs text-slate-500 mt-1">{credentialNote(credential)}</p>
+          <div key={credential.type} className="bg-white/80 rounded-lg p-4">
+            <div className="flex items-start gap-2.5">
+              <span
+                className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1.5 ${
+                  CREDENTIAL_DOT[credential.status]
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-900 leading-snug">
+                  {credential.label}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">{credentialNote(credential)}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+              <span
+                className={`inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                  CREDENTIAL_CHIP[credential.status]
+                }`}
+              >
+                {credentialStatusLabel(credential.status)}
+              </span>
+              {credential.verifiedAt && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                  <BadgeCheck size={12} className="shrink-0" />
+                  Verified
+                </span>
+              )}
+            </div>
+
             {editing === credential.type ? (
               <CredentialForm credential={credential} onDone={() => setEditing(null)} />
             ) : (
               <button
                 onClick={() => setEditing(credential.type)}
-                className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700 mt-1.5"
+                className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700 mt-2.5"
               >
                 {credential.expiresAt ? 'Update details' : 'Record dates'}
-                <ArrowRight size={12} />
+                <ArrowRight size={12} className="shrink-0" />
               </button>
             )}
           </div>
         ))}
       </div>
 
-      <div className="border-t border-slate-200 mt-6 pt-4 flex items-start gap-3">
-        <BadgeCheck size={15} className="text-slate-400 mt-0.5 shrink-0" />
-        <p className="text-xs text-slate-500 leading-relaxed">
-          {settled === credentials.length
-            ? 'All of your credentials are up to date.'
-            : `${settled} of ${credentials.length} credentials are up to date. Nothing here is shared with participants.`}
-        </p>
-      </div>
+      <p className="flex items-start gap-2 text-xs text-slate-500 leading-relaxed border-t border-slate-200 mt-4 pt-4">
+        <BadgeCheck size={14} className="text-slate-400 mt-0.5 shrink-0" />
+        <span>
+          On a published profile, participants see the dates and whether TMG180 has
+          verified them — never your reference numbers or notes.
+        </span>
+      </p>
     </section>
   );
 }
@@ -322,8 +351,9 @@ export default function WorkerGovernanceStanding() {
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Governance Standing</h1>
         <p className="text-base text-slate-600 mt-2 max-w-2xl">
-          Your own documents, acknowledgements, and readiness items. Held in your account, and never
-          shown to participants.
+          Everything about your own standing in one place. Documents open on their own page —
+          you read one there, then confirm it. Credentials are recorded right here, under
+          &ldquo;My Credentials&rdquo;. Confirmations and notes are never shown to participants.
         </p>
       </div>
 
@@ -381,7 +411,9 @@ export default function WorkerGovernanceStanding() {
             />
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6 items-start">
+          {/* The rail carries editable date fields, not just labels — 300px
+              squeezed the calendar and wrapped every chip onto its own line. */}
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
             <div className="flex flex-col gap-6">
               {data.groups.map((group) => {
                 const items = data.items.filter((item) => item.group === group.key);

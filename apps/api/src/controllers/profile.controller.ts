@@ -1,5 +1,6 @@
 import {
   PROFILE_SECTION_STATUS,
+  PROFILE_SECTIONS,
   PROFILE_TOTAL_SECTIONS,
   isEmptyAnswer,
   isSectionComplete,
@@ -151,8 +152,14 @@ export const saveSection = asyncHandler(async (req, res) => {
       },
     });
 
+    // Only count sections that still exist in the contract — rows saved under
+    // a since-retired section key (pre-Final-Override) must not inflate progress.
     const completedCount = await tx.participantProfileSection.count({
-      where: { profile_id: profile.id, status: PROFILE_SECTION_STATUS.COMPLETE },
+      where: {
+        profile_id: profile.id,
+        status: PROFILE_SECTION_STATUS.COMPLETE,
+        section_key: { in: PROFILE_SECTIONS.map((s) => s.key) },
+      },
     });
 
     await tx.participantProfile.update({

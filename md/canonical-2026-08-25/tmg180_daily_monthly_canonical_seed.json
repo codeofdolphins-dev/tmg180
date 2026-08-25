@@ -1,0 +1,609 @@
+{
+  "bundle_id": "tmg180.case_notes.canonical",
+  "version": "2026-08-25.1",
+  "status": "FINAL_CANONICAL_OVERRIDE",
+  "source_filename": "DAILY and MONTHLY CASE NOTES copy.docx",
+  "source_sha256": "32fc3ab3d223f34a6340e99f98cf8c45b956ded3c15ef096efde2b9e885cb503",
+  "blocks": [
+    {
+      "block_id": "cn_p001",
+      "kind": "text",
+      "text": "Universal Daily Case Note"
+    },
+    {
+      "block_id": "cn_p002",
+      "kind": "text",
+      "text": "A quick record of support today"
+    },
+    {
+      "block_id": "cn_p003",
+      "kind": "text",
+      "text": "Participant: ______________________________\nDate: ______________\nWorker: ______________________________\nSupport time: __________ to __________"
+    },
+    {
+      "block_id": "cn_p004",
+      "kind": "text",
+      "text": "What was part of today?"
+    },
+    {
+      "block_id": "cn_p005",
+      "kind": "text",
+      "text": "Tick anything that applies."
+    },
+    {
+      "block_id": "cn_p006",
+      "kind": "checkbox_line",
+      "text": "☐ Personal care / looking after myself\n☐ Meals / food / nutrition\n☐ Home / everyday tasks\n☐ Planning / organising / getting started\n☐ Leaving home / transport / community\n☐ Physical health / movement / exercise\n☐ Health / appointments / medication\n☐ Emotional / nervous-system support\n☐ Communication / connection\n☐ Work / learning / purposeful activity\n☐ Equipment / technology / environment\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p007",
+      "kind": "text",
+      "text": "What support helped today?"
+    },
+    {
+      "block_id": "cn_p008",
+      "kind": "checkbox_line",
+      "text": "☐ I did this independently — worker was available if needed\n☐ Reminder / prompt\n☐ Help getting started\n☐ Planning / organising together\n☐ We did it together\n☐ Practical assistance\n☐ Physical assistance\n☐ Communication support\n☐ Emotional support / reassurance\n☐ Rest / pacing / reduced demands\n☐ Environmental or sensory adjustment\n☐ Transport / getting somewhere\n☐ Worker completed the task at my request / as agreed\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p009",
+      "kind": "text",
+      "text": "If physical health / movement was part of today"
+    },
+    {
+      "block_id": "cn_p010",
+      "kind": "text",
+      "text": "Only complete if relevant."
+    },
+    {
+      "block_id": "cn_p011",
+      "kind": "checkbox_line",
+      "text": "☐ Physiotherapy / prescribed exercises\n☐ Exercise physiology program\n☐ Personal training / exercise\n☐ Walking / mobility\n☐ Strength / movement\n☐ Stretching / range of movement\n☐ Maintaining physical ability\n☐ Support getting started / attending\n☐ Pacing / rest / adapting activity\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p012",
+      "kind": "text",
+      "text": "Today this was:"
+    },
+    {
+      "block_id": "cn_p013",
+      "kind": "checkbox_line",
+      "text": "☐ As usual / expected\n☐ Adapted to what I could manage today\n☐ More support was needed\n☐ Less support was needed\n☐ Activity was reduced or changed\n☐ Participant chose not to continue today\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p014",
+      "kind": "text",
+      "text": "How was today compared with usual?"
+    },
+    {
+      "block_id": "cn_p015",
+      "kind": "checkbox_line",
+      "text": "☐ About usual for me\n☐ Easier than usual\n☐ Harder than usual\n☐ My capacity changed during the support\n☐ Nothing particular to record\n☐ Not sure"
+    },
+    {
+      "block_id": "cn_p016",
+      "kind": "text",
+      "text": "If relevant, what affected today?"
+    },
+    {
+      "block_id": "cn_p017",
+      "kind": "checkbox_line",
+      "text": "☐ Energy / fatigue\n☐ Pain / physical ability\n☐ Getting started / organising\n☐ Stress / anxiety / overwhelm\n☐ Sensory environment\n☐ Communication\n☐ Health\n☐ Change / unexpected event\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p018",
+      "kind": "text",
+      "text": "What did today’s support help make possible?"
+    },
+    {
+      "block_id": "cn_p019",
+      "kind": "checkbox_line",
+      "text": "☐ Getting something done that mattered today\n☐ Maintaining my usual routine\n☐ Looking after my health / wellbeing\n☐ Maintaining my physical health / movement\n☐ Maintaining my home / everyday life\n☐ Getting out / attending something\n☐ Reducing overwhelm / making things more manageable\n☐ Maintaining connection / something meaningful to me\n☐ Maintaining independence / choice\n☐ Ordinary support day — nothing particular to add\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p020",
+      "kind": "text",
+      "text": "Participant voice & collaboration"
+    },
+    {
+      "block_id": "cn_p021",
+      "kind": "checkbox_line",
+      "text": "☐ We completed this together\n☐ Participant told the worker what they wanted recorded\n☐ Participant contributed but didn’t want to review the whole note\n☐ Participant asked/preferred the worker to complete it\n☐ Participant chose not to contribute today\n☐ Observation only / participant wasn’t available to contribute"
+    },
+    {
+      "block_id": "cn_p022",
+      "kind": "text",
+      "text": "Anything the participant wants recorded in their own words:"
+    },
+    {
+      "block_id": "cn_p023",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p024",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p025",
+      "kind": "text",
+      "text": "Anything important to follow up?"
+    },
+    {
+      "block_id": "cn_p026",
+      "kind": "checkbox_line",
+      "text": "☐ No"
+    },
+    {
+      "block_id": "cn_p027",
+      "kind": "checkbox_line",
+      "text": "☐ Yes: __________________________________________________"
+    },
+    {
+      "block_id": "cn_p028",
+      "kind": "text",
+      "text": "TMG180 recording approach"
+    },
+    {
+      "block_id": "cn_p029",
+      "kind": "text",
+      "text": "Keep it short, factual and human."
+    },
+    {
+      "block_id": "cn_p030",
+      "kind": "text",
+      "text": "Record what happened, what the participant chose, what support helped and anything meaningfully different from usual."
+    },
+    {
+      "block_id": "cn_p031",
+      "kind": "text",
+      "text": "Use the participant’s own words where possible. Don’t diagnose, judge, assume motivation or make the person sound like the problem."
+    },
+    {
+      "block_id": "cn_p032",
+      "kind": "text",
+      "text": "If the tick boxes accurately describe the day, you don’t need to create extra narrative."
+    },
+    {
+      "block_id": "cn_p033",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p034",
+      "kind": "text",
+      "text": "Monthly Case Note"
+    },
+    {
+      "block_id": "cn_p035",
+      "kind": "text",
+      "text": "My Month — Everyday Life & Support Summary"
+    },
+    {
+      "block_id": "cn_p036",
+      "kind": "text",
+      "text": "Participant: ______________________________\nMonth: __________________\nCompleted with/by: ______________________________"
+    },
+    {
+      "block_id": "cn_p037",
+      "kind": "text",
+      "text": "How was the participant involved?"
+    },
+    {
+      "block_id": "cn_p038",
+      "kind": "checkbox_line",
+      "text": "☐ We completed/reviewed this together\n☐ Participant added their own comments\n☐ Participant discussed the month and asked worker to record it\n☐ Participant preferred the worker to complete the summary\n☐ Participant chose not to review/comment this month"
+    },
+    {
+      "block_id": "cn_p039",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p040",
+      "kind": "text",
+      "text": "1. Looking back over this month"
+    },
+    {
+      "block_id": "cn_p041",
+      "kind": "text",
+      "text": "Overall, this month was:"
+    },
+    {
+      "block_id": "cn_p042",
+      "kind": "checkbox_line",
+      "text": "☐ Mostly steady / usual\n☐ More manageable\n☐ More difficult\n☐ Mixed / fluctuating\n☐ There was a meaningful change\n☐ No clear pattern"
+    },
+    {
+      "block_id": "cn_p043",
+      "kind": "text",
+      "text": "Anything worth adding?"
+    },
+    {
+      "block_id": "cn_p044",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p045",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p046",
+      "kind": "text",
+      "text": "2. What areas were part of support this month?"
+    },
+    {
+      "block_id": "cn_p047",
+      "kind": "checkbox_line",
+      "text": "☐ Personal care / looking after myself\n☐ Meals / food / nutrition\n☐ Home / everyday tasks\n☐ Executive functioning / planning / organising\n☐ Leaving home / transport / community\n☐ Physical health / movement / exercise\n☐ Health / appointments / medication\n☐ Emotional / nervous-system support\n☐ Communication\n☐ Relationships / connection\n☐ Work / education / learning / purpose\n☐ Equipment / technology / environment\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p048",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p049",
+      "kind": "text",
+      "text": "3. What was working or being maintained?"
+    },
+    {
+      "block_id": "cn_p050",
+      "kind": "checkbox_line",
+      "text": "☐ Everyday routines were maintained\n☐ Personal care was maintained\n☐ Meals / nutrition were maintained\n☐ Home remained manageable\n☐ Physical health / movement was maintained\n☐ Health routines were maintained\n☐ Appointments were managed/attended\n☐ Community access was maintained\n☐ Relationships / connection were maintained\n☐ Work / learning / purposeful activity continued\n☐ Participant used strategies that work for them\n☐ Existing support continued to work well\n☐ Something became easier\n☐ Something improved\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p051",
+      "kind": "text",
+      "text": "What seemed particularly helpful?"
+    },
+    {
+      "block_id": "cn_p052",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p053",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p054",
+      "kind": "text",
+      "text": "4. What remained difficult or took extra effort?"
+    },
+    {
+      "block_id": "cn_p055",
+      "kind": "checkbox_line",
+      "text": "☐ Pain / physical limitations\n☐ Fatigue / energy / recovery\n☐ Getting started\n☐ Planning / organising / remembering\n☐ Sensory environment\n☐ Anxiety / panic / stress\n☐ Low mood\n☐ Emotional overwhelm / nervous-system response\n☐ Communication\n☐ Mobility / accessibility\n☐ Health changes\n☐ Maintaining routines\n☐ Leaving home / community access\n☐ Balancing necessary tasks with enjoyable/meaningful life\n☐ Other: ______________________________\n☐ Nothing particular this month"
+    },
+    {
+      "block_id": "cn_p056",
+      "kind": "text",
+      "text": "Anything important to understand?"
+    },
+    {
+      "block_id": "cn_p057",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p058",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p059",
+      "kind": "text",
+      "text": "5. What support helped?"
+    },
+    {
+      "block_id": "cn_p060",
+      "kind": "checkbox_line",
+      "text": "☐ Reminders / prompting\n☐ Help getting started\n☐ Planning / organising together\n☐ Working alongside the participant\n☐ Practical assistance\n☐ Physical assistance\n☐ Communication support\n☐ Emotional / nervous-system support\n☐ Pacing / rest / reduced demands\n☐ Transport / community access\n☐ Environmental / sensory adjustment\n☐ Physical-health / exercise support\n☐ Equipment / technology\n☐ Professional / health support\n☐ Worker completing agreed tasks\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p061",
+      "kind": "text",
+      "text": "What did that support help the participant do, maintain or have more capacity for?"
+    },
+    {
+      "block_id": "cn_p062",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p063",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p064",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p065",
+      "kind": "text",
+      "text": "6. Physical health, movement & maintaining ability"
+    },
+    {
+      "block_id": "cn_p066",
+      "kind": "text",
+      "text": "Complete if relevant."
+    },
+    {
+      "block_id": "cn_p067",
+      "kind": "text",
+      "text": "This month:"
+    },
+    {
+      "block_id": "cn_p068",
+      "kind": "checkbox_line",
+      "text": "☐ Physical ability was fairly stable\n☐ Movement / exercise was maintained\n☐ Prescribed/recommended activity was maintained\n☐ Participant needed support to initiate or attend\n☐ Activity needed adapting at times\n☐ Pain affected activity\n☐ Fatigue / recovery affected activity\n☐ Health changes affected activity\n☐ More assistance was needed\n☐ Less assistance was needed\n☐ Participant couldn’t maintain usual activity at times\n☐ Not relevant this month"
+    },
+    {
+      "block_id": "cn_p069",
+      "kind": "text",
+      "text": "What worked or helped?"
+    },
+    {
+      "block_id": "cn_p070",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p071",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p072",
+      "kind": "text",
+      "text": "7. Did capacity fluctuate?"
+    },
+    {
+      "block_id": "cn_p073",
+      "kind": "checkbox_line",
+      "text": "☐ Fairly consistent\n☐ Some fluctuation\n☐ Considerable fluctuation\n☐ Different areas fluctuated differently\n☐ No clear pattern"
+    },
+    {
+      "block_id": "cn_p074",
+      "kind": "text",
+      "text": "Where relevant, changes appeared alongside:"
+    },
+    {
+      "block_id": "cn_p075",
+      "kind": "checkbox_line",
+      "text": "☐ Health\n☐ Pain\n☐ Fatigue / energy\n☐ Sleep\n☐ Stress / anxiety / panic\n☐ Low mood\n☐ Sensory load\n☐ Increased demands\n☐ Changes in routine\n☐ Environment\n☐ Life events\n☐ Availability of support\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p076",
+      "kind": "text",
+      "text": "Anything important about the pattern?"
+    },
+    {
+      "block_id": "cn_p077",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p078",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p079",
+      "kind": "text",
+      "text": "8. Effort, recovery & the rest of life"
+    },
+    {
+      "block_id": "cn_p080",
+      "kind": "checkbox_line",
+      "text": "☐ Everyday activities were generally manageable\n☐ Regular pacing / rest helped\n☐ Necessary tasks took considerable energy\n☐ Some activities required significant recovery\n☐ Participant sometimes had to choose which activities they had capacity for\n☐ Necessary activities sometimes left less capacity for enjoyable or meaningful things\n☐ Support reduced the effort required\n☐ Support helped leave capacity for other parts of life\n☐ Nothing particular to record"
+    },
+    {
+      "block_id": "cn_p081",
+      "kind": "text",
+      "text": "Optional comment:"
+    },
+    {
+      "block_id": "cn_p082",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p083",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p084",
+      "kind": "text",
+      "text": "9. Compared with the Personal Profile"
+    },
+    {
+      "block_id": "cn_p085",
+      "kind": "checkbox_line",
+      "text": "☐ No meaningful change\n☐ Something became easier\n☐ Something became harder\n☐ More support was needed\n☐ Less support was needed\n☐ A different approach worked better\n☐ Something new emerged\n☐ Something previously difficult is no longer an issue\n☐ A Personal Profile module may need updating"
+    },
+    {
+      "block_id": "cn_p086",
+      "kind": "text",
+      "text": "Which area / what changed?"
+    },
+    {
+      "block_id": "cn_p087",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p088",
+      "kind": "text",
+      "text": "This is deliberately not asking the worker to rewrite the Personal Profile."
+    },
+    {
+      "block_id": "cn_p089",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p090",
+      "kind": "text",
+      "text": "10. Did we try or change anything?"
+    },
+    {
+      "block_id": "cn_p091",
+      "kind": "checkbox_line",
+      "text": "☐ Nothing new this month\n☐ Different support approach\n☐ New strategy\n☐ New equipment / technology\n☐ New physical-health approach\n☐ New health / professional support\n☐ New community / mainstream option\n☐ Different routine\n☐ Something was stopped because it wasn’t helping\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p092",
+      "kind": "text",
+      "text": "How did it go?"
+    },
+    {
+      "block_id": "cn_p093",
+      "kind": "checkbox_line",
+      "text": "☐ Worked well\n☐ Helped somewhat\n☐ Still trying it\n☐ Too early to know\n☐ Didn’t help\n☐ Wasn’t accessible / suitable\n☐ Participant chose not to continue\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p094",
+      "kind": "text",
+      "text": "Anything worth recording?"
+    },
+    {
+      "block_id": "cn_p095",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p096",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p097",
+      "kind": "text",
+      "text": "11. What did support contribute to this month?"
+    },
+    {
+      "block_id": "cn_p098",
+      "kind": "checkbox_line",
+      "text": "☐ Maintaining everyday life\n☐ Maintaining independence\n☐ Maintaining choice and control\n☐ Maintaining health / physical abilities\n☐ Maintaining the participant’s home\n☐ Maintaining relationships / connection\n☐ Getting into the community\n☐ Work / education / learning\n☐ Maintaining a meaningful role or responsibility\n☐ Doing something enjoyable\n☐ Working toward something the participant wants\n☐ Maintaining something already important\n☐ Having more capacity for other parts of life\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p099",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p100",
+      "kind": "text",
+      "text": "12. Participant’s view of the month"
+    },
+    {
+      "block_id": "cn_p101",
+      "kind": "text",
+      "text": "What went well or helped?"
+    },
+    {
+      "block_id": "cn_p102",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p103",
+      "kind": "text",
+      "text": "Was anything particularly difficult or important?"
+    },
+    {
+      "block_id": "cn_p104",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p105",
+      "kind": "text",
+      "text": "Is there anything you would like continued, changed or understood next month?"
+    },
+    {
+      "block_id": "cn_p106",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p107",
+      "kind": "text",
+      "text": "Or:"
+    },
+    {
+      "block_id": "cn_p108",
+      "kind": "checkbox_line",
+      "text": "☐ Nothing to add\n☐ I’m happy with this summary\n☐ I’d like something changed in the summary\n☐ I prefer not to comment this month"
+    },
+    {
+      "block_id": "cn_p109",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p110",
+      "kind": "text",
+      "text": "13. Anything to follow up?"
+    },
+    {
+      "block_id": "cn_p111",
+      "kind": "checkbox_line",
+      "text": "☐ Nothing at present\n☐ Update part of the Personal Profile\n☐ Change/review support approach\n☐ Follow up health/professional support\n☐ Review equipment / environment\n☐ Participant wants to explore another option\n☐ Participant wants something discussed with another person/service\n☐ Safety / consent / boundary matter requires appropriate follow-up\n☐ Other: ______________________________"
+    },
+    {
+      "block_id": "cn_p112",
+      "kind": "text",
+      "text": "What needs to happen?"
+    },
+    {
+      "block_id": "cn_p113",
+      "kind": "blank",
+      "text": ""
+    },
+    {
+      "block_id": "cn_p114",
+      "kind": "text",
+      "text": "TMG180 monthly recording approach"
+    },
+    {
+      "block_id": "cn_p115",
+      "kind": "text",
+      "text": "The Monthly Note is a shared reflection, not a judgement of the participant."
+    },
+    {
+      "block_id": "cn_p116",
+      "kind": "text",
+      "text": "Record what actually happened across the month: what worked, what remained difficult, what changed, what support made possible and what the participant wants understood."
+    },
+    {
+      "block_id": "cn_p117",
+      "kind": "text",
+      "text": "Improvement is not the only meaningful outcome. Maintaining health, abilities, independence, relationships, routines, stability and an ordinary life can also matter."
+    },
+    {
+      "block_id": "cn_p118",
+      "kind": "text",
+      "text": "Use respectful everyday language. Don’t diagnose, speculate about motivation or turn ordinary human responses into clinical labels."
+    },
+    {
+      "block_id": "cn_p119",
+      "kind": "text",
+      "text": "Where the participant’s experience differs from the worker’s observation, record both rather than deciding which version is “correct.”"
+    },
+    {
+      "block_id": "cn_p120",
+      "kind": "blank",
+      "text": ""
+    }
+  ]
+}

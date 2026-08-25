@@ -13,6 +13,9 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
+    // Runs on `prisma migrate reset` too, so a reset database still has a
+    // governance account to sign in with.
+    seed: 'tsx prisma/seed.ts',
   },
   datasource: {
     url: process.env.DATABASE_URL,

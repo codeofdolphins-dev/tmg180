@@ -23,17 +23,7 @@ export const PARTICIPANT_PATHS = {
   root: '/participant',
   dashboard: '/participant/dashboard',
   profile: '/participant/profile',
-  profileAboutMe: '/participant/profile/about-me',
-  profileHowICommunicate: '/participant/profile/how-i-communicate',
-  profileMyGoals: '/participant/profile/my-goals',
-  profileDailyLiving: '/participant/profile/daily-living',
-  profileMobilityAccess: '/participant/profile/mobility-access',
-  profileHealthWellbeing: '/participant/profile/health-wellbeing',
-  profileSocialCommunity: '/participant/profile/social-community',
-  profileDecisionMaking: '/participant/profile/decision-making',
-  profileSafetySupport: '/participant/profile/safety-support',
-  profileLearningEmployment: '/participant/profile/learning-employment',
-  profileSelfCare: '/participant/profile/self-care',
+  profileSection: '/participant/profile/:sectionSlug',
   dailyLog: '/participant/daily-log',
   dailyLogNew: '/participant/daily-log/new',
   dailyLogDetail: '/participant/daily-log/:id',
@@ -95,6 +85,11 @@ export const ADMIN_PATHS = {
   permissionDenied: '/admin/permission-denied',
 };
 
+/** Personal Profile → one section's page; key is a canonical section key. */
+export const participantProfilePath = {
+  section: (key) => `/participant/profile/${key.replace(/_/g, '-')}`,
+};
+
 /** One log has three URLs: read it, edit its draft, or start a new one. */
 export const participantDailyLogPath = {
   detail: (id) => `/participant/daily-log/${id}`,
@@ -115,9 +110,20 @@ export const workerGovernancePath = {
   item: (key) => `/worker/governance/item/${key}`,
 };
 
-/** Learning Hub → one reading; the slug is a LEARNING_RESOURCE_SLUGS value. */
+/**
+ * Learning Hub → one reading; the slug is a LEARNING_RESOURCE_SLUGS value.
+ *
+ * A reading is one library shared by the Learning Hub and the governance
+ * items that point at it. `fromItem` records which governance item sent the
+ * worker here so the reading can offer the way back — a worker who opened a
+ * reading in order to confirm an item should land back on that item, not in
+ * the Hub they never chose to visit.
+ */
 export const workerLearningPath = {
-  resource: (slug) => `/worker/learning-hub/resource/${slug}`,
+  resource: (slug, fromItem) =>
+    fromItem
+      ? `/worker/learning-hub/resource/${slug}?from=${encodeURIComponent(fromItem)}`
+      : `/worker/learning-hub/resource/${slug}`,
 };
 
 /** Browse Directory → one published worker profile. */

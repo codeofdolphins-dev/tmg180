@@ -21,7 +21,7 @@ import DateField from '../../components/ui/DateField';
 import Select from '../../components/ui/Select';
 import TimeField from '../../components/ui/TimeField';
 import { useDailyLogForm, useGoals, toggleInList } from '../../hooks/participant/dailyLog';
-import { participantDailyLogPath, PARTICIPANT_PATHS } from '../../routes/paths';
+import { participantDailyLogPath, participantProfilePath } from '../../routes/paths';
 import { useAuthStore } from '../../store';
 
 /**
@@ -234,7 +234,7 @@ export default function ParticipantDailyLog() {
                     <p className="mt-3 text-sm text-[#4d4354] bg-white rounded-3xl px-4 py-3">
                       Your goals come from{' '}
                       <a
-                        href={PARTICIPANT_PATHS.profileMyGoals}
+                        href={participantProfilePath.section('goals')}
                         className="text-brand-600 underline"
                       >
                         My Goals

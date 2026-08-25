@@ -50,8 +50,8 @@ async function main() {
     update: {},
   });
   const section = await prisma.participantProfileSection.upsert({
-    where: { profile_id_section_key: { profile_id: profile.id, section_key: 'my-goals' } },
-    create: { profile_id: profile.id, section_key: 'my-goals', status: 'in_progress' },
+    where: { profile_id_section_key: { profile_id: profile.id, section_key: 'goals' } },
+    create: { profile_id: profile.id, section_key: 'goals', status: 'in_progress' },
     update: {},
   });
   const answers = await prisma.participantProfileAnswer.count({ where: { section_id: section.id } });

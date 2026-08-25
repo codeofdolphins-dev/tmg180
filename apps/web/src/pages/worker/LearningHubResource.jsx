@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,12 +12,13 @@ import {
   FileText,
   Info,
   LoaderCircle,
+  ShieldCheck,
   TriangleAlert,
 } from 'lucide-react';
-import { learningKindLabel } from '@tmg180/shared';
+import { governanceItem, learningKindLabel } from '@tmg180/shared';
 import { formatShortDate } from '../../lib/dates';
 import { useLearningResource, useUpdateLearningProgress } from '../../hooks/worker/learning';
-import { WORKER_PATHS, workerLearningPath } from '../../routes/paths';
+import { WORKER_PATHS, workerGovernancePath, workerLearningPath } from '../../routes/paths';
 
 /**
  * One reading — Figma 1170:8551, on the UI scale.
@@ -46,8 +47,14 @@ const ACTION_PATH = {
 export default function LearningHubResource() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const reading = useLearningResource(slug);
   const progress = useUpdateLearningProgress(slug);
+
+  // A governance item can send the worker here to read before confirming
+  // (`?from=<item key>`). They came to finish that item, so the way back is
+  // the item — not the Hub, which they never chose to open.
+  const fromItem = governanceItem(params.get('from') ?? '');
 
   const resource = reading.data?.resource;
   const body = resource?.body;
@@ -58,11 +65,15 @@ export default function LearningHubResource() {
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-6">
       <button
-        onClick={() => navigate(WORKER_PATHS.learningHub)}
+        onClick={() =>
+          navigate(
+            fromItem ? workerGovernancePath.item(fromItem.key) : WORKER_PATHS.learningHub
+          )
+        }
         className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors w-fit"
       >
         <ArrowLeft size={14} />
-        Back to Learning Hub
+        {fromItem ? `Back to ${fromItem.title}` : 'Back to Learning Hub'}
       </button>
 
       {reading.isLoading && (
@@ -203,6 +214,29 @@ export default function LearningHubResource() {
             </div>
 
             <div className="flex flex-col gap-6">
+              {/* Read in order to confirm a governance item — close that loop
+                  here rather than leaving the worker to find their way back. */}
+              {fromItem && (
+                <section className={`${CARD} text-center`}>
+                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                    <ShieldCheck size={19} />
+                  </div>
+                  <h2 className="text-lg font-semibold text-slate-900 mt-3">
+                    Finish confirming
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                    You opened this from {fromItem.title}. Confirming happens there,
+                    once you have read this.
+                  </p>
+                  <button
+                    onClick={() => navigate(workerGovernancePath.item(fromItem.key))}
+                    className="w-full bg-brand-600 text-white text-sm rounded-full py-2.5 mt-4 shadow-md hover:bg-brand-700 transition-colors"
+                  >
+                    Back to {fromItem.title}
+                  </button>
+                </section>
+              )}
+
               {actionPath && (
                 <section className={`${CARD} text-center`}>
                   <div className="w-11 h-11 rounded-xl bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">

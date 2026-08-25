@@ -43,15 +43,16 @@
 }
 
 /*
- * Participant portal + worker workspace type scale. The app root is 18px; the
- * participant and worker frames are drawn at a 16px scale, so inside either
- * workspace Tailwind's text-* sizes resolve to their standard px values
- * (text-sm 14, text-base 16, text-3xl 30…) without touching auth / admin.
- * Line-heights are ratios and follow. Both roots share the rule so the shared
+ * Portal type scale (participant, worker, governance). The app root is 18px;
+ * the portal frames are drawn at a 16px scale, so inside any workspace
+ * Tailwind's text-* sizes resolve to their standard px values (text-sm 14,
+ * text-base 16, text-3xl 30…) without touching the auth screens.
+ * Line-heights are ratios and follow. The roots share the rule so the shared
  * chrome (sidebar, top bar) renders identically in each.
  */
 .participant-portal,
-.worker-workspace {
+.worker-workspace,
+.governance-portal {
   --text-xs: 0.6667rem;
   --text-sm: 0.7778rem;
   --text-base: 0.8889rem;
@@ -131,6 +132,55 @@ code {
 .tmg-calendar .react-datepicker__day-name {
   color: #0b1c30;
   font-weight: 600;
+}
+
+/*
+ * Month + year dropdowns in the header. They are native <select>s (react-
+ * datepicker's "select" dropdown mode), which is deliberate: a native select
+ * opens as the platform's own list, so typing a year jumps straight to it —
+ * the whole point of having them instead of paging the month arrows.
+ */
+.tmg-calendar .react-datepicker__header__dropdown {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 0 2px;
+}
+
+.tmg-calendar .react-datepicker__month-dropdown-container,
+.tmg-calendar .react-datepicker__year-dropdown-container {
+  margin: 0;
+}
+
+.tmg-calendar .react-datepicker__month-select,
+.tmg-calendar .react-datepicker__year-select {
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0b1c30;
+  background: #f5f0fa;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+}
+
+.tmg-calendar .react-datepicker__month-select:hover,
+.tmg-calendar .react-datepicker__year-select:hover {
+  background: #ece2f7;
+}
+
+.tmg-calendar .react-datepicker__month-select:focus-visible,
+.tmg-calendar .react-datepicker__year-select:focus-visible {
+  outline: none;
+  border-color: #6b21a8;
+}
+
+/* The dropdowns carry the month and year, so the header's static line is noise. */
+.tmg-calendar .react-datepicker__current-month {
+  display: none;
 }
 
 .tmg-calendar .react-datepicker__day {

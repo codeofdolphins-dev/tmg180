@@ -1,0 +1,528 @@
+<title>Worker Context — Evidence & Standing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #faf9fc;
+    --card: #ffffff;
+    --ink: #221e33;
+    --muted: #6f6a84;
+    --line: #d9d5e6;
+    --line-soft: #e7e4f0;
+    --accent: #7c3aed;
+    --accent-soft: rgba(124, 58, 237, 0.06);
+    --off: #b45309;
+    --off-soft: rgba(180, 83, 9, 0.055);
+    --ok: #0f7a55;
+    --ok-soft: rgba(15, 122, 85, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #161320;
+      --card: #1f1b2c;
+      --ink: #eceaf4;
+      --muted: #9a94ad;
+      --line: #3a3450;
+      --line-soft: #2b2740;
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.09);
+      --off: #f0a848;
+      --off-soft: rgba(240, 168, 72, 0.07);
+      --ok: #3ecf95;
+      --ok-soft: rgba(62, 207, 149, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #161320;
+    --card: #1f1b2c;
+    --ink: #eceaf4;
+    --muted: #9a94ad;
+    --line: #3a3450;
+    --line-soft: #2b2740;
+    --accent: #a78bfa;
+    --accent-soft: rgba(167, 139, 250, 0.09);
+    --off: #f0a848;
+    --off-soft: rgba(240, 168, 72, 0.07);
+    --ok: #3ecf95;
+    --ok-soft: rgba(62, 207, 149, 0.09);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  header.top { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  h1 {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700; letter-spacing: -0.02em; line-height: 1.12;
+    margin: 0; text-wrap: balance;
+  }
+  .thesis { font-size: 16px; color: var(--muted); max-width: 64ch; margin: 0; }
+  .thesis strong { color: var(--ink); font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .meta span {
+    font-size: 11.5px; font-weight: 600; color: var(--accent);
+    background: var(--accent-soft); border: 1px solid var(--line-soft);
+    border-radius: 999px; padding: 4px 11px;
+  }
+
+  h2.section {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em;
+  }
+  .section-sub { font-size: 14px; color: var(--muted); margin: 0 0 18px; max-width: 68ch; }
+  .section-sub b { color: var(--ink); font-weight: 600; }
+
+  figure.flow { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .fig-scroll { overflow-x: auto; }
+  .fig-scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  figcaption { font-size: 13px; color: var(--muted); text-align: center; }
+
+  .zone { fill: var(--accent-soft); stroke: var(--line-soft); }
+  .zone-off { fill: var(--off-soft); stroke: var(--off); stroke-dasharray: 6 5; }
+  .zone-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-dasharray: 6 5; }
+  .chip { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; fill: var(--accent); }
+  .chip-off { fill: var(--off); }
+  .chip-ok { fill: var(--ok); }
+  .box { fill: var(--card); stroke: var(--line); }
+  .box-hero { stroke: var(--accent); stroke-width: 1.5; }
+  .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+  .box-ghost { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; }
+  .box-dead { fill: none; stroke: var(--off); stroke-dasharray: 4 4; }
+  .t { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .sub { font-size: 10.5px; fill: var(--muted); }
+  .t-ok { fill: var(--ok); }
+  .t-off { fill: var(--off); }
+  .lbl { font-size: 10.5px; fill: var(--muted); }
+  .foot { font-size: 11px; font-weight: 600; fill: var(--off); }
+  .flowline { fill: none; stroke: var(--ink); stroke-width: 1.2; opacity: 0.55; }
+  .flowline-ok { fill: none; stroke: var(--ok); stroke-width: 1.4; }
+  .flowline-off { fill: none; stroke: var(--off); stroke-width: 1.2; stroke-dasharray: 5 4; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cards.three { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: var(--card); border: 1px solid var(--line-soft);
+    border-radius: 12px; padding: 15px 17px 13px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .card h3 { font-size: 14.5px; font-weight: 600; margin: 0; line-height: 1.3; }
+  .card p { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .card p b { color: var(--ink); font-weight: 600; }
+  .card .tag {
+    margin-top: auto; padding-top: 6px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .card .tag.built { color: var(--ok); }
+  .card .tag.pending { color: var(--off); }
+  .card.dashed { border-style: dashed; }
+
+  .rules {
+    border-top: 1px solid var(--line-soft); padding-top: 22px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px;
+  }
+  .rules h3 {
+    grid-column: 1 / -1; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px;
+  }
+  .rule { font-size: 14px; margin: 0; }
+  .rule b { font-weight: 600; }
+  .rule span { color: var(--muted); }
+
+  .slices { display: flex; flex-direction: column; gap: 0; }
+  .slice { display: grid; grid-template-columns: 64px 1fr; gap: 0 18px; position: relative; padding-bottom: 22px; }
+  .slice::before {
+    content: ""; position: absolute; left: 31px; top: 34px; bottom: 0;
+    width: 2px; background: var(--line-soft);
+  }
+  .slice:last-child::before { display: none; }
+  .slice .code {
+    font-family: "Sora", "Inter", sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft); border: 1px solid var(--line-soft);
+    border-radius: 999px; width: 46px; height: 30px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto;
+  }
+  .slice .body { padding-top: 3px; }
+  .slice h3 { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+  .slice p { font-size: 13.5px; color: var(--muted); margin: 0 0 7px; max-width: 66ch; }
+  .slice p b { color: var(--ink); font-weight: 600; }
+  .tests { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tests span {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em;
+    color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 2.5px 9px;
+  }
+
+  .flags {
+    background: var(--off-soft); border: 1px dashed var(--off);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .flags h3 {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--off); margin: 0 0 10px;
+  }
+  .flags ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+  .flags li { font-size: 13.5px; }
+  .flags li b { font-weight: 600; }
+  .flags li span { color: var(--muted); }
+
+  footer.src {
+    border-top: 1px solid var(--line-soft); padding-top: 16px;
+    font-size: 12px; color: var(--muted);
+  }
+  footer.src code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 11.5px; background: var(--accent-soft); border-radius: 5px; padding: 1px 5px;
+  }
+
+  @media (max-width: 720px) { .cards.three { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) {
+    .cards, .cards.three { grid-template-columns: 1fr; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">TMG180 · Worker phase reference</span>
+    <h1>The Worker Workspace</h1>
+    <p class="thesis"><strong>A self-employed worker's own space: their standing, their evidence, their directory listing.</strong> Everything about a participant is borrowed under consent and returned the moment it's revoked — the worker records what happened, never who the participant is.</p>
+    <div class="meta">
+      <span>Workspace built · 8 slices live</span>
+      <span>4 consent permissions</span>
+      <span>WCPS Layer A never shared</span>
+      <span>25 Aug canon reshapes the notes</span>
+    </div>
+  </header>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 880" role="img"
+           aria-label="Worker flow: the worker owns their profile, credentials and governance standing; a participant's consent grant opens four separately-toggled permissions; evidence logs carry a private layer that is never shared, and roll up into snapshots the participant approves.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor" opacity="0.55"/>
+          </marker>
+          <marker id="arrok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--ok)"/>
+          </marker>
+          <marker id="arroff" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--off)"/>
+          </marker>
+        </defs>
+
+        <!-- ZONE 1 · worker-owned -->
+        <rect class="zone" x="16" y="16" width="728" height="228" rx="14"/>
+        <text class="chip" x="36" y="44">WORKER-OWNED · NEEDS NOBODY'S PERMISSION</text>
+
+        <rect class="box" x="36" y="64" width="210" height="56" rx="9"/>
+        <text class="t" x="141" y="84" text-anchor="middle">Relational profile</text>
+        <text class="sub" x="141" y="100" text-anchor="middle">7 prompts about how they work</text>
+        <text class="sub" x="141" y="112" text-anchor="middle">draft until they opt in</text>
+
+        <rect class="box" x="275" y="64" width="210" height="56" rx="9"/>
+        <text class="t" x="380" y="84" text-anchor="middle">Credentials</text>
+        <text class="sub" x="380" y="100" text-anchor="middle">insurance · first aid · screening · WWCC</text>
+        <text class="sub" x="380" y="112" text-anchor="middle">standing derived from expiry, never stored</text>
+
+        <rect class="box" x="514" y="64" width="210" height="56" rx="9"/>
+        <text class="t" x="619" y="84" text-anchor="middle">Governance standing</text>
+        <text class="sub" x="619" y="100" text-anchor="middle">5 items · read then confirm</text>
+        <text class="sub" x="619" y="112" text-anchor="middle">append-only per version</text>
+
+        <line class="flowline" x1="141" y1="120" x2="141" y2="160" marker-end="url(#arr)"/>
+        <polyline class="flowline" points="380,120 380,140 200,140 200,160" marker-end="url(#arr)"/>
+
+        <rect class="box box-hero" x="36" y="164" width="290" height="52" rx="9"/>
+        <text class="t" x="181" y="184" text-anchor="middle">Published to the directory</text>
+        <text class="sub" x="181" y="200" text-anchor="middle">relational content + opt-in — never a rating</text>
+
+        <polyline class="flowline-off" points="619,120 619,190 336,190" marker-end="url(#arroff)"/>
+        <text class="lbl" x="480" y="182" text-anchor="middle">admin verification shows here</text>
+
+        <text class="foot" x="380" y="232" text-anchor="middle">Publishing is optional. Workspace access never depends on it.</text>
+
+        <!-- boundary -->
+        <line class="flowline" x1="380" y1="246" x2="380" y2="292" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="266">a participant chooses</text>
+        <text class="lbl" x="392" y="282">them, and grants access</text>
+
+        <!-- ZONE 2 · consent gate -->
+        <rect class="zone-ok" x="16" y="298" width="728" height="186" rx="14"/>
+        <text class="chip chip-ok" x="36" y="326">THE CONSENT GATE · THE PARTICIPANT'S SWITCHES</text>
+
+        <rect class="box box-ok" x="240" y="342" width="280" height="44" rx="9"/>
+        <text class="t t-ok" x="380" y="360" text-anchor="middle">One grant · four separate permissions</text>
+        <text class="sub" x="380" y="375" text-anchor="middle">each toggled on its own — enforced in middleware</text>
+
+        <rect class="box" x="30" y="404" width="166" height="56" rx="9"/>
+        <text class="t" x="113" y="422" text-anchor="middle">Write daily logs</text>
+        <text class="sub" x="113" y="437" text-anchor="middle">about this participant</text>
+        <text class="sub" x="113" y="450" text-anchor="middle">gate on every write</text>
+
+        <rect class="box" x="204" y="404" width="166" height="56" rx="9"/>
+        <text class="t" x="287" y="422" text-anchor="middle">Approved snapshots</text>
+        <text class="sub" x="287" y="437" text-anchor="middle">summary only, or</text>
+        <text class="sub" x="287" y="450" text-anchor="middle">full when paired with Profile</text>
+
+        <rect class="box" x="378" y="404" width="166" height="56" rx="9"/>
+        <text class="t" x="461" y="422" text-anchor="middle">My Personal Profile</text>
+        <text class="sub" x="461" y="437" text-anchor="middle">the participant's own words</text>
+        <text class="sub" x="461" y="450" text-anchor="middle">read-only, always</text>
+
+        <rect class="box" x="552" y="404" width="166" height="56" rx="9"/>
+        <text class="t" x="635" y="422" text-anchor="middle">Daily check-ins</text>
+        <text class="sub" x="635" y="437" text-anchor="middle">their short reflections</text>
+        <text class="sub" x="635" y="450" text-anchor="middle">not yet built</text>
+
+        <line class="flowline-ok" x1="380" y1="386" x2="380" y2="400" marker-end="url(#arrok)"/>
+
+        <line class="flowline" x1="113" y1="460" x2="113" y2="516" marker-end="url(#arr)"/>
+
+        <!-- ZONE 3 · evidence -->
+        <rect class="zone" x="16" y="522" width="728" height="248" rx="14"/>
+        <text class="chip" x="36" y="550">THE EVIDENCE · TWO LAYERS, ONE TRANSACTION</text>
+
+        <rect class="box box-hero" x="36" y="570" width="230" height="52" rx="9"/>
+        <text class="t" x="151" y="590" text-anchor="middle">Daily Support Evidence Log</text>
+        <text class="sub" x="151" y="606" text-anchor="middle">1–3 goals + domains to submit</text>
+
+        <polyline class="flowline-off" points="151,622 151,660 116,660" marker-end="url(#arroff)"/>
+        <rect class="box-dead" x="36" y="640" width="80" height="40" rx="9"/>
+        <text class="t t-off" x="76" y="657" text-anchor="middle">Layer A</text>
+        <text class="sub" x="76" y="671" text-anchor="middle">private notes</text>
+
+        <text class="foot" x="151" y="700" text-anchor="middle">Layer A is the worker's own. Never</text>
+        <text class="foot" x="151" y="714" text-anchor="middle">serialised to a participant or admin.</text>
+
+        <line class="flowline" x1="266" y1="596" x2="300" y2="596" marker-end="url(#arr)"/>
+        <text class="lbl" x="283" y="586" text-anchor="middle">submit</text>
+
+        <rect class="box" x="304" y="570" width="200" height="52" rx="9"/>
+        <text class="t" x="404" y="590" text-anchor="middle">Locked on submit</text>
+        <text class="sub" x="404" y="606" text-anchor="middle">corrections are addenda only</text>
+
+        <line class="flowline" x1="504" y1="596" x2="538" y2="596" marker-end="url(#arr)"/>
+
+        <rect class="box box-ok" x="542" y="570" width="182" height="52" rx="9"/>
+        <text class="t t-ok" x="633" y="590" text-anchor="middle">Monthly Snapshot</text>
+        <text class="sub" x="633" y="606" text-anchor="middle">participant approves &amp; locks</text>
+
+        <polyline class="flowline" points="633,622 633,676 520,676" marker-end="url(#arr)"/>
+        <rect class="box-ghost" x="330" y="656" width="190" height="40" rx="9"/>
+        <text class="t" x="425" y="673" text-anchor="middle">Worker reads it back</text>
+        <text class="sub" x="425" y="687" text-anchor="middle">at the level consent allows</text>
+
+        <text class="foot" x="450" y="740" text-anchor="middle">Revoke, and the participant disappears from the workspace — the worker's own past logs stay readable.</text>
+      </svg>
+    </div>
+    <figcaption>Two things the worker owns outright, four switches only the participant holds, and evidence that locks the moment it's submitted.</figcaption>
+  </figure>
+
+  <section class="rules">
+    <h3>Non-negotiables · worker-facing</h3>
+    <p class="rule"><b>Not an employer.</b> <span>No assigning, ranking, rostering or supervising. Workers stay self-employed with their own ABN and their own clients.</span></p>
+    <p class="rule"><b>Layer A never leaves.</b> <span>The worker's private narrative is serialised in their own detail view and nowhere else — not to participants, not to admin.</span></p>
+    <p class="rule"><b>Consent gates writes, not memory.</b> <span>Every write about a participant needs an active grant; reading a worker's own past logs never does.</span></p>
+    <p class="rule"><b>Voice and observation stay apart.</b> <span>What the participant said is stored separately from what the worker observed — never merged.</span></p>
+    <p class="rule"><b>Submitted is final.</b> <span>A locked log or approved snapshot is never edited — corrections are appended as addenda.</span></p>
+    <p class="rule"><b>Standing is a count, not a grade.</b> <span>"N of M in order." Never a rating, a score, or a ranking against other workers.</span></p>
+    <p class="rule"><b>Acknowledgement follows reading.</b> <span>Confirming happens on the item's own page, after the document has been opened. Append-only per version.</span></p>
+    <p class="rule"><b>Workers never write the Profile.</b> <span>They may read it under consent; the participant's source answers are theirs alone.</span></p>
+  </section>
+
+  <section>
+    <h2 class="section">The workspace as it stands</h2>
+    <p class="section-sub">Eight slices are live and backend-powered. <b>Green</b> = built and verified; <b>amber</b> = seam exists, screen doesn't.</p>
+    <div class="cards three">
+      <div class="card">
+        <h3>Dashboard</h3>
+        <p>Today's sessions with consent chips, recent logs, governance summary with expiry runway, quick resources.</p>
+        <span class="tag built">Live · 52 assertions</span>
+      </div>
+      <div class="card">
+        <h3>Participants I Support</h3>
+        <p>Only people who granted consent. Permission labels per person, last support, log counts. You never add someone yourself.</p>
+        <span class="tag built">Live · dynamic</span>
+      </div>
+      <div class="card">
+        <h3>Daily Logs</h3>
+        <p>List, form, detail. Two rows per log in one transaction — shared structured layer plus private Layer&nbsp;A. Locks on submit.</p>
+        <span class="tag built">Live · 71 assertions</span>
+      </div>
+      <div class="card">
+        <h3>Approved Snapshots</h3>
+        <p>Only what the participant locked, at summary-only or full-shared depending on the grant. Every view recorded.</p>
+        <span class="tag built">Live · 77 assertions</span>
+      </div>
+      <div class="card">
+        <h3>Governance Standing</h3>
+        <p>5 items to read and confirm, plus <b>My Credentials</b> — the one place credential dates are recorded.</p>
+        <span class="tag built">Live · 63 assertions</span>
+      </div>
+      <div class="card">
+        <h3>Learning Hub</h3>
+        <p>The reading library. Governance items link into it; a reading opened that way offers the way back to confirm.</p>
+        <span class="tag built">Live</span>
+      </div>
+      <div class="card">
+        <h3>Directory profile</h3>
+        <p>7 relational prompts, support areas, availability. Publish is opt-in and reversible; unlisted means unknown, not hidden.</p>
+        <span class="tag built">Live · 55 assertions</span>
+      </div>
+      <div class="card dashed">
+        <h3>Calendar</h3>
+        <p>Sessions have no backing table — no rostering by design, so what a calendar shows is an open question.</p>
+        <span class="tag pending">Frame only</span>
+      </div>
+      <div class="card dashed">
+        <h3>Exports</h3>
+        <p>The empty state exists; nothing generates a file yet.</p>
+        <span class="tag pending">Empty state</span>
+      </div>
+    </div>
+  </section>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 250" role="img"
+           aria-label="Credential verification loop: the worker records dates, the admin verifies them, participants see the verified badge, and any later edit by the worker clears the verification and returns it to the admin queue.">
+        <rect class="zone" x="16" y="16" width="728" height="218" rx="14"/>
+        <text class="chip" x="36" y="44">THE VERIFICATION LOOP</text>
+
+        <rect class="box" x="36" y="66" width="180" height="52" rx="9"/>
+        <text class="t" x="126" y="86" text-anchor="middle">Worker records</text>
+        <text class="sub" x="126" y="102" text-anchor="middle">dates + reference number</text>
+
+        <line class="flowline" x1="216" y1="92" x2="252" y2="92" marker-end="url(#arr)"/>
+
+        <rect class="box" x="256" y="66" width="180" height="52" rx="9"/>
+        <text class="t" x="346" y="86" text-anchor="middle">Admin verifies</text>
+        <text class="sub" x="346" y="102" text-anchor="middle">an empty row can't be verified</text>
+
+        <line class="flowline" x1="436" y1="92" x2="472" y2="92" marker-end="url(#arr)"/>
+
+        <rect class="box box-ok" x="476" y="66" width="248" height="52" rx="9"/>
+        <text class="t t-ok" x="600" y="86" text-anchor="middle">"Verified by TMG180"</text>
+        <text class="sub" x="600" y="102" text-anchor="middle">on the worker's published profile</text>
+
+        <polyline class="flowline-off" points="600,118 600,158 346,158" marker-end="url(#arroff)"/>
+        <text class="t t-off" x="470" y="182" text-anchor="middle">Worker edits the dates → verification clears automatically</text>
+        <text class="sub" x="470" y="198" text-anchor="middle">the stamp attests to what was on file when the admin looked</text>
+        <polyline class="flowline-off" points="346,158 346,124" marker-end="url(#arroff)"/>
+
+        <text class="foot" x="380" y="222" text-anchor="middle">Standing itself is always derived from the expiry date at read time — it can never go stale.</text>
+      </svg>
+    </div>
+    <figcaption>Verification is a loop, not a one-way stamp: changing what's on file returns the credential to the admin's queue.</figcaption>
+  </figure>
+
+  <section>
+    <h2 class="section">What the 25 Aug canon changes for workers</h2>
+    <p class="section-sub">The Longitudinal package rewrites the notes and the Profile relationship. <b>Nothing here is built yet</b> — it follows the participant phase, because the worker's read view needs the participant's grant model to exist first.</p>
+    <div class="cards">
+      <div class="card dashed">
+        <h3>New Daily Case Note</h3>
+        <p>A different, checkbox-led form: what was part of today · what support helped · how today compared with usual · what it made possible. Completable <b>without writing narrative</b> when the boxes describe the day.</p>
+        <span class="tag pending">Replaces the current field set · DN-01</span>
+      </div>
+      <div class="card dashed">
+        <h3>Participant voice, stored apart</h3>
+        <p>A collaboration state ("we completed this together" / "participant chose not to contribute") plus their own words — structurally separate from worker observation.</p>
+        <span class="tag pending">DN-02</span>
+      </div>
+      <div class="card dashed">
+        <h3>New Monthly Case Note</h3>
+        <p>"My Month" — 13 sections of shared reflection. Fluctuation, effort and recovery, what was <b>maintained</b>. Improvement is never required as an outcome.</p>
+        <span class="tag pending">MN-02</span>
+      </div>
+      <div class="card dashed">
+        <h3>Profile boundary, enforced</h3>
+        <p>Monthly can flag "a Personal Profile module may need updating" — that raises a review prompt for the participant. It must never edit the Profile.</p>
+        <span class="tag pending">MN-01</span>
+      </div>
+      <div class="card dashed">
+        <h3>Module-scoped read view</h3>
+        <p>Profile access stops being one boolean: the participant grants the full profile or <b>selected modules</b>, and ungranted modules must be unreachable.</p>
+        <span class="tag pending">PP-08 worker half</span>
+      </div>
+      <div class="card dashed">
+        <h3>Provenance per statement</h3>
+        <p>Every recorded line carries its origin — participant report, participant quote, worker observation, worker record, professional evidence.</p>
+        <span class="tag pending">AI-02 groundwork</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section">Worker build slices — after the participant phase</h2>
+    <p class="section-sub">Sequenced so nothing is built twice: the grant model and definition layer land on the participant side first, then the worker's half of each.</p>
+    <div class="slices">
+      <div class="slice">
+        <span class="code">W1</span>
+        <div class="body">
+          <h3>Module-scoped Profile read view</h3>
+          <p>Replace the single <b>can_view_intake</b> boolean with grant-scoped module reads: read-only rendering of the participant's source answers, ungranted modules genuinely unreachable, revocation immediate.</p>
+          <div class="tests"><span>PP-07</span><span>PP-08</span><span>PP-09</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">W2</span>
+        <div class="body">
+          <h3>Daily Case Note rebuild</h3>
+          <p>The canonical checkbox-led form off the seed, keeping the two-layer write (shared + Layer&nbsp;A), the 1–3 goal rule, submit-locks-both-rows and addenda. Participant voice and collaboration state stored separately.</p>
+          <div class="tests"><span>DN-01</span><span>DN-02</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">W3</span>
+        <div class="body">
+          <h3>Monthly Case Note rebuild</h3>
+          <p>"My Month" as a shared reflection: worker drafts from the month's logs, participant's view retained where it differs, maintenance valid as an outcome, and the Profile review prompt wired as a prompt only.</p>
+          <div class="tests"><span>MN-01</span><span>MN-02</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">W4</span>
+        <div class="body">
+          <h3>Provenance + longitudinal retrieval</h3>
+          <p>Tag every stored response with its provenance type, and link evidence across Profile → daily → monthly so a report can show where each statement came from without rewriting any of it.</p>
+          <div class="tests"><span>AI-02</span><span>AUD-01</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flags">
+    <h3>Open flags · worker</h3>
+    <ol>
+      <li><b>Calendar has nothing behind it</b> <span>— sessions aren't a table, and rostering is banned by design. Decide what it shows, or drop it.</span></li>
+      <li><b>Credential list needs a ruling</b> <span>— the four types are the union of the Figma frames, not canon. Same standing as the functional-domain list.</span></li>
+      <li><b>"Relational Worker" is a fixed label</b> <span>on every directory card — no role vocabulary exists yet.</span></li>
+      <li><b>Check-ins are a granted permission with no screen</b> <span>— M-04 is unbuilt, and the 25 Aug canon may fold it into the Daily Case Note.</span></li>
+      <li><b>Worker-facing participant profile view</b> <span>is still "not yet available" in Participants I Support — W1 is where it lands.</span></li>
+      <li><b>No Figma frames</b> <span>for the new case-note forms or the module-scoped read view.</span></li>
+    </ol>
+  </section>
+
+  <footer class="src">
+    Sources: <code>md/TMG180_Worker_Workspace_Brief.md</code> · <code>md/TMG180_Longitudinal_Spec_2026-08-25.md</code> · <code>md/TMG180_Daily_Monthly_Case_Notes_2026-08-25.md</code> · <code>md/TMG180_Project_Memory.md</code> · verified against the live <code>/api/v1/worker/*</code> surface and <code>packages/shared/</code> on 2026-08-25.
+  </footer>
+</div>

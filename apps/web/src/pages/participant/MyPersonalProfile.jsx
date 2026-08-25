@@ -1,111 +1,57 @@
 import {
   ArrowRight,
-  LayoutGrid,
-  Flag,
-  Home,
   Accessibility,
-  Speech,
-  Users,
-  SquareActivity,
+  BookOpenText,
+  Check,
+  Flag,
   Heart,
   HeartPulse,
+  Home,
+  LayoutGrid,
+  Scale,
   Shield,
-  Check,
+  Speech,
+  Users,
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { PROFILE_SECTION_STATUS } from '@tmg180/shared';
-import { SECTION_PATHS, useProfile } from '../../hooks/participant/profile';
+import { PROFILE_SECTIONS, PROFILE_SECTION_STATUS } from '@tmg180/shared';
+import { FIRST_SECTION_PATH, SECTION_PATHS, useProfile } from '../../hooks/participant/profile';
 
 /**
- * Hub cards in seed order. `key` ties each card to its section in
- * @tmg180/shared and its saved answers; layout variants are pure design.
- * Card titles are the Figma hub wording — known to differ from some page
- * titles (M-12 "My support network" -> Decision Making page) pending R-01.
+ * My Personal Profile — the hub of the one living profile (Final Override P1).
+ * Cards come straight from the contract in @tmg180/shared: seed order, seed
+ * titles, seed plain-language descriptions. Only the icons and the layout
+ * variants live here.
  */
-const SECTIONS = [
-  {
-    key: 'about-me',
-    variant: 'featured',
-    title: 'About me',
-    description: 'Tell us about yourself, your strengths, interests and what is important to you.',
-    icon: LayoutGrid,
-  },
-  {
-    key: 'my-goals',
-    variant: 'small',
-    title: 'My goals',
-    description: 'Share the goals that are important to you and what you would like to work towards.',
-    icon: Flag,
-  },
-  {
-    key: 'daily-living',
-    variant: 'small',
-    title: 'Daily living',
-    description: 'Tell us about your daily routines, household activities and any support you use.',
-    icon: Home,
-  },
-  {
-    key: 'mobility-access',
-    variant: 'wide',
-    title: 'Mobility & transport',
-    description: 'Describe how you travel, move around and access places that are important to you.',
-    icon: Accessibility,
-  },
-  {
-    key: 'how-i-communicate',
-    variant: 'small',
-    title: 'Communication',
-    description: 'Tell us how you prefer to communicate and what helps others understand you.',
-    icon: Speech,
-  },
-  {
-    key: 'social-community',
-    variant: 'wide',
-    title: 'Social participation',
-    description:
-      'Share how you connect with family, friends and your community, and any support that helps you participate.',
-    icon: Users,
-  },
-  {
-    key: 'self-care',
-    variant: 'small',
-    title: 'Self-care',
-    description:
-      'Tell us about personal care activities such as dressing, bathing, eating and other daily routines.',
-    icon: SquareActivity,
-  },
-  {
-    key: 'learning-employment',
-    variant: 'small',
-    title: 'Learning & employment',
-    description:
-      'Tell us about learning, study, work or volunteering, and any support that helps you participate.',
-    icon: Heart,
-  },
-  {
-    key: 'health-wellbeing',
-    variant: 'small',
-    title: 'Health & wellbeing',
-    description:
-      'Share any health conditions, wellbeing needs or ongoing supports that are important for us to understand.',
-    icon: HeartPulse,
-  },
-  {
-    key: 'safety-support',
-    variant: 'small',
-    title: 'Safety',
-    description: 'Tell us about anything that helps you feel safe, secure and supported in everyday life.',
-    icon: Shield,
-  },
-  {
-    key: 'decision-making',
-    variant: 'small',
-    title: 'My support network',
-    description: 'Tell us about the people who support you and the roles they play in your life.',
-    icon: Users,
-  },
-];
+const SECTION_ICONS = {
+  overview: BookOpenText,
+  about_me: LayoutGrid,
+  communication: Speech,
+  what_matters: Heart,
+  goals: Flag,
+  daily_living: Home,
+  mobility_access: Accessibility,
+  health_wellbeing: HeartPulse,
+  social_community: Users,
+  decision_making: Scale,
+  safety_preferences: Shield,
+};
+
+/** Layout rhythm for the card grid; everything else is contract-driven. */
+const VARIANT_BY_KEY = {
+  overview: 'featured',
+  what_matters: 'wide',
+  health_wellbeing: 'wide',
+};
+
+const SECTIONS = PROFILE_SECTIONS.map((section) => ({
+  key: section.key,
+  title: section.title,
+  description: section.description,
+  icon: SECTION_ICONS[section.key] ?? LayoutGrid,
+  variant: VARIANT_BY_KEY[section.key] ?? 'small',
+}));
 
 function StatusBadge({ status }) {
   if (status === PROFILE_SECTION_STATUS.COMPLETE) {
@@ -192,20 +138,20 @@ export default function MyPersonalProfile() {
   const overall = isComplete ? 'Complete' : started || completed > 0 ? 'In progress' : 'Not started';
 
   // Continue where you left off (P1-01); a fresh profile starts at the top.
-  const continueTo = SECTION_PATHS[lastKey] ?? SECTION_PATHS['about-me'];
+  const continueTo = SECTION_PATHS[lastKey] ?? FIRST_SECTION_PATH;
 
   return (
     <div className="max-w-236 mx-auto flex flex-col gap-8">
       <div className="flex items-start gap-6">
         <div className="flex-1 flex flex-col gap-2">
-          <span className="text-base text-[#004ac6]">Your Personal Profile</span>
+          <span className="text-base text-[#004ac6]">My Personal Profile</span>
           <h1 className="text-3xl font-bold text-[#0b1c30]">
-            Your Personal Profile
+            My Personal Profile
           </h1>
           <p className="text-base text-[#434655] max-w-2xl">
-            Share information about your everyday life, what matters most to you, and the
-            supports that help you live well. You can complete your profile at your own pace
-            and return whenever you're ready.
+            Your profile belongs to you. Your profile grows over time — every section you add
+            gives meaning to your Daily Logs and Monthly Snapshots. You can complete it at your
+            own pace and return whenever you're ready.
           </p>
         </div>
         <div className="w-74.75 shrink-0 bg-white border border-slate-200 rounded-xl shadow-sm p-6 flex flex-col gap-4">
@@ -223,7 +169,7 @@ export default function MyPersonalProfile() {
       {!isComplete && (
       <div className="flex items-center gap-10 rounded-3xl bg-linear-to-br from-[#ece5fb] via-[#e9e4fa] to-[#e2e2f9] shadow-[0_18px_40px_rgb(120,0,206,0.12)] p-8">
         <div className="flex-1 flex flex-col gap-3">
-          <h2 className="text-xl font-semibold text-black">Continue Your Personal Profile</h2>
+          <h2 className="text-xl font-semibold text-black">Continue My Personal Profile</h2>
           {started ? (
             <>
               <p className="text-base text-black">
@@ -233,7 +179,7 @@ export default function MyPersonalProfile() {
             </>
           ) : (
             <p className="text-base text-black">
-              You haven't started yet — begin with About me.
+              You haven't started yet — begin with the Overview.
             </p>
           )}
           <div className="flex items-center gap-4 pt-3">
@@ -246,7 +192,6 @@ export default function MyPersonalProfile() {
             </button>
           </div>
         </div>
-        {/* <div className="w-70.75 h-39.75 shrink-0 rounded-xl bg-linear-to-br from-[#2563eb] via-[#5b8def] to-[#9db8f5] shadow-md" /> */}
         <div className="w-70.75 h-39.75 overflow-hidden rounded-xl">
           <img src="/images/img.jpg" alt="" className='w-full h-full object-cover' />
         </div>

@@ -182,16 +182,26 @@ export default function GovernanceItemDetail() {
                 </ul>
 
                 {data.reading && (
-                  <button
-                    onClick={() => navigate(workerLearningPath.resource(data.reading.slug))}
-                    disabled={data.reading.status !== LEARNING_RESOURCE_STATUS.PUBLISHED}
-                    className="w-full sm:w-auto inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-5 py-2.5 mt-5 hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <BookOpen size={15} className="text-brand-600" />
-                    {data.reading.status === LEARNING_RESOURCE_STATUS.PUBLISHED
-                      ? `Read: ${data.reading.title}`
-                      : `${data.reading.title} — not published yet`}
-                  </button>
+                  <>
+                    <button
+                      onClick={() =>
+                        navigate(workerLearningPath.resource(data.reading.slug, data.item.key))
+                      }
+                      disabled={data.reading.status !== LEARNING_RESOURCE_STATUS.PUBLISHED}
+                      className="w-full sm:w-auto inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-5 py-2.5 mt-5 hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <BookOpen size={15} className="text-brand-600" />
+                      {data.reading.status === LEARNING_RESOURCE_STATUS.PUBLISHED
+                        ? `Read: ${data.reading.title}`
+                        : `${data.reading.title} — not published yet`}
+                    </button>
+                    {data.reading.status === LEARNING_RESOURCE_STATUS.PUBLISHED && (
+                      <p className="text-xs text-slate-500 mt-2">
+                        Opens the reading in the Learning Hub — it is the same library every
+                        reading lives in. You come back here to confirm.
+                      </p>
+                    )}
+                  </>
                 )}
               </section>
 

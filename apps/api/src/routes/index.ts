@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { health } from '../controllers/health.controller.js';
+import { adminRoutes } from './admin.route.js';
 import { authRoutes } from './auth.route.js';
 import { dailyLogRoutes } from './dailyLog.route.js';
 import { directoryRoutes } from './directory.route.js';
@@ -38,6 +39,7 @@ v1Routes.use('/worker', workerProfileRoutes);
 v1Routes.use('/worker', workerGovernanceRoutes);
 v1Routes.use('/worker', workerLearningRoutes);
 v1Routes.use('/worker', workerSnapshotRoutes);
+v1Routes.use('/admin', adminRoutes);
 
 // Still to build (22-item register): the worker authoring screen over
 // /worker/profile, participant check-ins (M-04), consent granting,

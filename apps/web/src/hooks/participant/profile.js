@@ -7,6 +7,7 @@ import {
   PROFILE_TOTAL_SECTIONS,
   nextProfileSection,
   profileSection,
+  profileSectionSlug,
 } from '@tmg180/shared';
 import { api } from '../../lib/apiClient';
 import { queryClient } from '../../lib/queryClient';
@@ -22,20 +23,16 @@ export const profileKeys = {
   profile: ['participant', 'profile'],
 };
 
-/** Section key -> route. Seed order in @tmg180/shared drives the chain. */
-export const SECTION_PATHS = {
-  'about-me': PARTICIPANT_PATHS.profileAboutMe,
-  'my-goals': PARTICIPANT_PATHS.profileMyGoals,
-  'daily-living': PARTICIPANT_PATHS.profileDailyLiving,
-  'mobility-access': PARTICIPANT_PATHS.profileMobilityAccess,
-  'how-i-communicate': PARTICIPANT_PATHS.profileHowICommunicate,
-  'social-community': PARTICIPANT_PATHS.profileSocialCommunity,
-  'self-care': PARTICIPANT_PATHS.profileSelfCare,
-  'learning-employment': PARTICIPANT_PATHS.profileLearningEmployment,
-  'health-wellbeing': PARTICIPANT_PATHS.profileHealthWellbeing,
-  'safety-support': PARTICIPANT_PATHS.profileSafetySupport,
-  'decision-making': PARTICIPANT_PATHS.profileDecisionMaking,
-};
+/** Section key -> route, derived from the canonical seed order. */
+export const SECTION_PATHS = Object.fromEntries(
+  PROFILE_SECTIONS.map((section) => [
+    section.key,
+    `${PARTICIPANT_PATHS.profile}/${profileSectionSlug(section.key)}`,
+  ])
+);
+
+/** Where "start" and stale continue-keys land: the first section in seed order. */
+export const FIRST_SECTION_PATH = SECTION_PATHS[PROFILE_SECTIONS[0].key];
 
 export function useProfile() {
   return useQuery({
@@ -57,8 +54,8 @@ export function useSaveSection() {
 
 /**
  * Everything a section page needs: a react-hook-form instance prefilled from
- * the saved answers, save actions for each button idiom the Figma frames use,
- * and the section's live status for the sidebar chip.
+ * the saved answers, save actions for each button idiom, and the section's
+ * live status.
  *
  * Drafts are never blocked client-side — completeness only affects the status
  * the server computes, so every save action just sends what's typed.
@@ -93,11 +90,13 @@ export function useSectionForm(sectionKey, { transform } = {}) {
   };
 
   return {
+    section,
     form,
     isLoading,
     isSaving: save.isPending,
     error: save.error,
     status: saved?.status ?? PROFILE_SECTION_STATUS.NOT_STARTED,
+    isLast: !next,
     /** e.g. "04/11" — position in the seed order, for the sidebar counter. */
     position: `${String(section.order).padStart(2, '0')}/${PROFILE_TOTAL_SECTIONS}`,
     saveDraft: saveThen(null),

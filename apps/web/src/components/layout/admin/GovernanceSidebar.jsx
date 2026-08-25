@@ -1,146 +1,114 @@
 import {
-  ShieldCheck,
   LayoutDashboard,
   FileBarChart2,
   Landmark,
+  ShieldCheck,
   AlertTriangle,
   Users,
   ClipboardCheck,
   Settings,
   UserCircle,
-  HelpCircle,
   LogOut,
-  LifeBuoy,
-  Disc,
 } from 'lucide-react';
-import { ROLES } from '../../../store';
-import { useRoleNav } from '../../../navigation/useRoleNav';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ADMIN_PATHS as P, PUBLIC_PATHS } from '../../../routes/paths';
+import { useAuthStore } from '../../../store';
+
+/**
+ * Fixed governance portal sidebar — the one sidebar every admin screen shares,
+ * in the participant / worker sidebar idiom so the three portals read as one
+ * product.
+ *
+ * The admin frames each drew their own variant (different item sets, labels,
+ * logos, active styles). The item set here is the full portal map; per-frame
+ * variants were dropped for consistency, the same call made for the worker
+ * workspace. The active item derives from the URL, so subpages highlight
+ * their section (e.g. /admin/incidents/ticket highlights "Incidents").
+ */
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutDashboard },
-  { label: 'Workers Report', icon: FileBarChart2 },
-  { label: 'Governance Standing', icon: Landmark },
-  { label: 'Policies', icon: ShieldCheck },
-  { label: 'Incidents', icon: AlertTriangle },
-  { label: 'Participant Overview', icon: Users },
-  { label: 'Consent Audit Log', icon: ClipboardCheck },
+  { label: 'Dashboard', icon: LayoutDashboard, path: P.dashboard },
+  {
+    label: 'Workers Report',
+    icon: FileBarChart2,
+    path: P.workersReport,
+    match: [P.workersReport, P.reportDetail, P.reportNew],
+  },
+  { label: 'Governance Standing', icon: Landmark, path: P.governanceStanding },
+  { label: 'Policies', icon: ShieldCheck, path: P.policies },
+  { label: 'Incidents', icon: AlertTriangle, path: P.incidents },
+  { label: 'Participant Overview', icon: Users, path: P.participantOverview },
+  { label: 'Consent Audit Log', icon: ClipboardCheck, path: P.consentAuditLog },
 ];
 
-export const GOV_NAV_ITEMS = NAV_ITEMS;
-
-const DEFAULT_BOTTOM_ITEMS = [
-  { label: 'Settings', icon: Settings },
-  { label: 'Admin Profile', icon: UserCircle },
+const BOTTOM_ITEMS = [
+  { label: 'Settings', icon: Settings, path: P.settings },
+  { label: 'Admin Profile', icon: UserCircle, path: P.profile },
 ];
 
-export const GOV_BOTTOM_ITEMS = {
-  default: DEFAULT_BOTTOM_ITEMS,
-  withHelp: [
-    { label: 'Settings', icon: Settings },
-    { label: 'Help', icon: HelpCircle },
-    { label: 'Sign Out', icon: LogOut },
-  ],
-};
+function isActive(pathname, { path, match }) {
+  return (match ?? [path]).some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
 
-const ACTIVE_STYLES = {
-  solid: 'bg-brand-700 text-white font-medium rounded-full',
-  soft: 'bg-purple-100 text-brand-700 font-medium rounded-full',
-};
-
-const HOVER_STYLES = {
-  default: 'text-slate-600 hover:bg-slate-100 rounded-lg',
-  gradient:
-    'text-slate-600 rounded-full hover:rounded-full hover:bg-linear-to-r hover:from-purple-100 hover:to-white hover:text-brand-700 hover:font-medium',
-};
-
-function NavButton({ label, icon: Icon, active, activeStyle, hoverStyle }) {
-  const go = useRoleNav(ROLES.ADMIN);
+function NavItem({ icon: Icon, label, active, wide, onClick }) {
   return (
     <button
-      onClick={() => go(label)}
-      className={`w-full flex items-center gap-2.5 text-sm px-3 py-2.5 text-left transition-colors ${
-        active ? ACTIVE_STYLES[activeStyle] : HOVER_STYLES[hoverStyle]
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-full transition-colors ${
+        wide ? 'text-base' : 'text-sm'
+      } ${
+        active
+          ? 'bg-purple-600/30 text-brand-700 font-semibold'
+          : 'text-slate-600 hover:bg-slate-100'
       }`}
     >
-      <Icon size={16} />
+      <Icon size={17} className="shrink-0" />
       <span>{label}</span>
     </button>
   );
 }
 
-export default function GovernanceSidebar({
-  portalLabel = 'Governance Portal',
-  activeItem = 'Workers Report',
-  navItems = NAV_ITEMS,
-  bottomItems = DEFAULT_BOTTOM_ITEMS,
-  showSupportPortal = false,
-  logo = 'shield',
-  showLogo = true,
-  uppercaseLabel = true,
-  activeStyle = 'solid',
-  hoverStyle = 'default',
-  actionButton = null,
-}) {
+export default function GovernanceSidebar() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const signOut = useAuthStore((s) => s.signOut);
+
+  const logout = () => {
+    signOut();
+    navigate(PUBLIC_PATHS.signIn, { replace: true });
+  };
+
   return (
-    <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col py-6 px-3 overflow-y-auto">
-      <div className="flex items-center gap-2 mb-6 px-1">
-        {showLogo && (logo === 'diamond' ? (
-          <div className="w-7 h-7 rotate-45 border-2 border-brand-600 rounded-sm shrink-0" />
-        ) : (
-          <div className="w-9 h-9 rounded-full bg-brand-700 flex items-center justify-center shrink-0">
-            {logo === 'ring' ? (
-              <Disc size={17} className="text-white" />
-            ) : (
-              <ShieldCheck size={17} className="text-white" />
-            )}
-          </div>
-        ))}
-        <div>
-          <div className="text-lg font-black tracking-wider text-brand-700 leading-none">
-            TMG180
-          </div>
-          <div
-            className={`text-[10px] text-slate-400 mt-0.5 tracking-wide ${uppercaseLabel ? 'uppercase' : ''}`}
-          >
-            {portalLabel}
-          </div>
-        </div>
+    <aside className="print:hidden fixed inset-y-0 left-0 z-20 w-64 bg-[#f8f9ff]/70 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col py-6 px-6 overflow-y-auto">
+      <div className="mb-10 px-2">
+        <div className="text-2xl font-bold text-brand-600 leading-tight">TMG180</div>
+        <div className="text-sm font-medium text-slate-500 mt-1">Governance Portal</div>
       </div>
 
-      {actionButton && (
-        <button className="w-full bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 text-white text-sm font-medium rounded-full py-2.5 mb-4 transition-opacity">
-          {actionButton.label}
-        </button>
-      )}
-
-      <nav className="flex flex-col gap-1">
-        {navItems.map((item) => (
-          <NavButton
+      <nav className="flex flex-col gap-2">
+        {NAV_ITEMS.map((item) => (
+          <NavItem
             key={item.label}
-            {...item}
-            active={item.label === activeItem}
-            activeStyle={activeStyle}
-            hoverStyle={hoverStyle}
+            icon={item.icon}
+            label={item.label}
+            active={isActive(pathname, item)}
+            onClick={() => navigate(item.path)}
           />
         ))}
       </nav>
 
-      <div className="mt-auto pt-4 flex flex-col gap-2">
-        {showSupportPortal && (
-          <button className="w-full flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 text-brand-700 text-sm font-medium rounded-full py-2.5 transition-colors">
-            <LifeBuoy size={15} />
-            <span>Support Portal</span>
-          </button>
-        )}
-        {bottomItems.map((item) => (
-          <NavButton
+      <div className="mt-auto pt-6 flex flex-col gap-2">
+        {BOTTOM_ITEMS.map((item) => (
+          <NavItem
             key={item.label}
-            {...item}
-            active={item.label === activeItem}
-            activeStyle={activeStyle}
-            hoverStyle={hoverStyle}
+            icon={item.icon}
+            label={item.label}
+            active={isActive(pathname, item)}
+            onClick={() => navigate(item.path)}
+            wide
           />
         ))}
+        <NavItem icon={LogOut} label="Sign Out" onClick={logout} wide />
       </div>
     </aside>
   );

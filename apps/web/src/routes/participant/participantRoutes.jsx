@@ -1,16 +1,6 @@
 import ParticipantDashboard from '../../pages/participant/ParticipantDashboard';
 import MyPersonalProfile from '../../pages/participant/MyPersonalProfile';
-import ProfileAboutMe from '../../pages/participant/ProfileAboutMe';
-import ProfileHowICommunicate from '../../pages/participant/ProfileHowICommunicate';
-import ProfileMyGoals from '../../pages/participant/ProfileMyGoals';
-import ProfileDailyLiving from '../../pages/participant/ProfileDailyLiving';
-import ProfileMobilityAccess from '../../pages/participant/ProfileMobilityAccess';
-import ProfileHealthWellbeing from '../../pages/participant/ProfileHealthWellbeing';
-import ProfileSocialCommunity from '../../pages/participant/ProfileSocialCommunity';
-import ProfileDecisionMaking from '../../pages/participant/ProfileDecisionMaking';
-import ProfileSafetySupport from '../../pages/participant/ProfileSafetySupport';
-import ProfileLearningEmployment from '../../pages/participant/ProfileLearningEmployment';
-import ProfileSelfCare from '../../pages/participant/ProfileSelfCare';
+import ProfileSection from '../../pages/participant/ProfileSection';
 import DailyLogList from '../../pages/participant/DailyLogList';
 import ParticipantDailyLog from '../../pages/participant/ParticipantDailyLog';
 import DailySupportEvidenceLog from '../../pages/participant/DailySupportEvidenceLog';
@@ -30,21 +20,14 @@ import { PARTICIPANT_PATHS as P, rel } from '../paths';
 /**
  * Participant Portal — participant-owned records, browse + direct contact.
  * These render inside ParticipantLayout (shared fixed sidebar + top bar).
+ *
+ * The Personal Profile's 11 sections share one contract-driven page
+ * (Final Override P1) — the slug picks the section definition.
  */
 export const participantRoutes = [
   { path: rel(P.dashboard), element: <ParticipantDashboard /> },
   { path: rel(P.profile), element: <MyPersonalProfile /> },
-  { path: rel(P.profileAboutMe), element: <ProfileAboutMe /> },
-  { path: rel(P.profileHowICommunicate), element: <ProfileHowICommunicate /> },
-  { path: rel(P.profileMyGoals), element: <ProfileMyGoals /> },
-  { path: rel(P.profileDailyLiving), element: <ProfileDailyLiving /> },
-  { path: rel(P.profileMobilityAccess), element: <ProfileMobilityAccess /> },
-  { path: rel(P.profileHealthWellbeing), element: <ProfileHealthWellbeing /> },
-  { path: rel(P.profileSocialCommunity), element: <ProfileSocialCommunity /> },
-  { path: rel(P.profileDecisionMaking), element: <ProfileDecisionMaking /> },
-  { path: rel(P.profileSafetySupport), element: <ProfileSafetySupport /> },
-  { path: rel(P.profileLearningEmployment), element: <ProfileLearningEmployment /> },
-  { path: rel(P.profileSelfCare), element: <ProfileSelfCare /> },
+  { path: rel(P.profileSection), element: <ProfileSection /> },
   { path: rel(P.dailyLog), element: <DailyLogList /> },
   { path: rel(P.dailyLogNew), element: <ParticipantDailyLog /> },
   { path: rel(P.dailyLogEdit), element: <ParticipantDailyLog /> },

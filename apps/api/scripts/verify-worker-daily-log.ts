@@ -84,7 +84,7 @@ async function main() {
   // through the My Goals profile section — so this also proves the save
   // derives the goal rows immediately (write-through, not read-on-demand).
   console.log('\nParticipant writes goals');
-  const savedGoals = await call('PATCH', '/participant/profile/sections/my-goals', {
+  const savedGoals = await call('PATCH', '/participant/profile/sections/goals', {
     token: participantToken,
     body: { answers: { primary_aspiration: 'Get out into the community more', goal_steps: [{ text: 'Catch the bus on my own', done: false }, { text: 'Join the Tuesday art group', done: false }] } },
   });

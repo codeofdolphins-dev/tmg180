@@ -14,7 +14,10 @@ import AdminProfile from '../../pages/admin/AdminProfile';
 import PermissionDeniedAdmin from '../../pages/admin/PermissionDeniedAdmin';
 import { ADMIN_PATHS as P, rel } from '../paths';
 
-/** Platform Governance — metadata-only admin portal. */
+/**
+ * Platform Governance — metadata-only admin portal.
+ * These render inside GovernanceLayout (shared fixed sidebar + top bar).
+ */
 export const adminRoutes = [
   { path: rel(P.dashboard), element: <PlatformGovernanceDashboard /> },
   { path: rel(P.workersReport), element: <WorkersReport /> },
@@ -29,5 +32,9 @@ export const adminRoutes = [
   { path: rel(P.consentAuditLog), element: <ConsentAuditLog /> },
   { path: rel(P.settings), element: <SettingsPage /> },
   { path: rel(P.profile), element: <AdminProfile /> },
+];
+
+/** Full-screen states that intentionally render without the portal chrome. */
+export const adminStandaloneRoutes = [
   { path: rel(P.permissionDenied), element: <PermissionDeniedAdmin /> },
 ];

@@ -169,10 +169,13 @@ export default function WorkerProfile() {
   const unpublish = useUnpublishProfile();
 
   const form = useForm({
+    // keepDirtyValues stops a background refetch wiping what someone is
+    // mid-typing — but it also keeps those fields flagged dirty after they are
+    // saved, so onSave re-baselines the form on the server's answer.
     values: profile?.fields,
     resetOptions: { keepDirtyValues: true },
   });
-  const { register, handleSubmit, watch, setValue, formState } = form;
+  const { register, handleSubmit, reset, watch, setValue, formState } = form;
   const values = watch();
 
   const serverErrors = save.error?.status === 400 ? (save.error.data ?? {}) : {};
@@ -187,13 +190,18 @@ export default function WorkerProfile() {
   const setList = (key, list) => setValue(key, list, { shouldDirty: true });
 
   const onSave = handleSubmit((fields) =>
-    save.mutate({
-      ...fields,
-      experienceYears:
-        fields.experienceYears === '' || fields.experienceYears === null
-          ? null
-          : Number(fields.experienceYears),
-    })
+    save.mutate(
+      {
+        ...fields,
+        experienceYears:
+          fields.experienceYears === '' || fields.experienceYears === null
+            ? null
+            : Number(fields.experienceYears),
+      },
+      // What was saved is no longer unsaved: clear the dirty flags against the
+      // stored values, so "Publish profile" enables without a page reload.
+      { onSuccess: (fresh) => reset(fresh.fields) }
+    )
   );
 
   if (isLoading) {

@@ -1,0 +1,522 @@
+<title>Governance Context — Metadata Only</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #faf9fc;
+    --card: #ffffff;
+    --ink: #221e33;
+    --muted: #6f6a84;
+    --line: #d9d5e6;
+    --line-soft: #e7e4f0;
+    --accent: #7c3aed;
+    --accent-soft: rgba(124, 58, 237, 0.06);
+    --off: #b45309;
+    --off-soft: rgba(180, 83, 9, 0.055);
+    --ok: #0f7a55;
+    --ok-soft: rgba(15, 122, 85, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #161320;
+      --card: #1f1b2c;
+      --ink: #eceaf4;
+      --muted: #9a94ad;
+      --line: #3a3450;
+      --line-soft: #2b2740;
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.09);
+      --off: #f0a848;
+      --off-soft: rgba(240, 168, 72, 0.07);
+      --ok: #3ecf95;
+      --ok-soft: rgba(62, 207, 149, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #161320;
+    --card: #1f1b2c;
+    --ink: #eceaf4;
+    --muted: #9a94ad;
+    --line: #3a3450;
+    --line-soft: #2b2740;
+    --accent: #a78bfa;
+    --accent-soft: rgba(167, 139, 250, 0.09);
+    --off: #f0a848;
+    --off-soft: rgba(240, 168, 72, 0.07);
+    --ok: #3ecf95;
+    --ok-soft: rgba(62, 207, 149, 0.09);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  header.top { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  h1 {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700; letter-spacing: -0.02em; line-height: 1.12;
+    margin: 0; text-wrap: balance;
+  }
+  .thesis { font-size: 16px; color: var(--muted); max-width: 64ch; margin: 0; }
+  .thesis strong { color: var(--ink); font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .meta span {
+    font-size: 11.5px; font-weight: 600; color: var(--accent);
+    background: var(--accent-soft); border: 1px solid var(--line-soft);
+    border-radius: 999px; padding: 4px 11px;
+  }
+
+  h2.section {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em;
+  }
+  .section-sub { font-size: 14px; color: var(--muted); margin: 0 0 18px; max-width: 68ch; }
+  .section-sub b { color: var(--ink); font-weight: 600; }
+
+  figure.flow { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .fig-scroll { overflow-x: auto; }
+  .fig-scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  figcaption { font-size: 13px; color: var(--muted); text-align: center; }
+
+  .zone { fill: var(--accent-soft); stroke: var(--line-soft); }
+  .zone-off { fill: var(--off-soft); stroke: var(--off); stroke-dasharray: 6 5; }
+  .zone-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-dasharray: 6 5; }
+  .chip { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; fill: var(--accent); }
+  .chip-off { fill: var(--off); }
+  .chip-ok { fill: var(--ok); }
+  .box { fill: var(--card); stroke: var(--line); }
+  .box-hero { stroke: var(--accent); stroke-width: 1.5; }
+  .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+  .box-ghost { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; }
+  .box-dead { fill: none; stroke: var(--off); stroke-dasharray: 4 4; }
+  .t { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .sub { font-size: 10.5px; fill: var(--muted); }
+  .t-ok { fill: var(--ok); }
+  .t-off { fill: var(--off); }
+  .lbl { font-size: 10.5px; fill: var(--muted); }
+  .foot { font-size: 11px; font-weight: 600; fill: var(--off); }
+  .flowline { fill: none; stroke: var(--ink); stroke-width: 1.2; opacity: 0.55; }
+  .flowline-ok { fill: none; stroke: var(--ok); stroke-width: 1.4; }
+  .flowline-off { fill: none; stroke: var(--off); stroke-width: 1.2; stroke-dasharray: 5 4; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cards.three { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: var(--card); border: 1px solid var(--line-soft);
+    border-radius: 12px; padding: 15px 17px 13px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .card h3 { font-size: 14.5px; font-weight: 600; margin: 0; line-height: 1.3; }
+  .card p { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .card p b { color: var(--ink); font-weight: 600; }
+  .card .tag {
+    margin-top: auto; padding-top: 6px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .card .tag.built { color: var(--ok); }
+  .card .tag.pending { color: var(--off); }
+  .card.dashed { border-style: dashed; }
+
+  .rules {
+    border-top: 1px solid var(--line-soft); padding-top: 22px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px;
+  }
+  .rules h3 {
+    grid-column: 1 / -1; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px;
+  }
+  .rule { font-size: 14px; margin: 0; }
+  .rule b { font-weight: 600; }
+  .rule span { color: var(--muted); }
+
+  .slices { display: flex; flex-direction: column; gap: 0; }
+  .slice { display: grid; grid-template-columns: 64px 1fr; gap: 0 18px; position: relative; padding-bottom: 22px; }
+  .slice::before {
+    content: ""; position: absolute; left: 31px; top: 34px; bottom: 0;
+    width: 2px; background: var(--line-soft);
+  }
+  .slice:last-child::before { display: none; }
+  .slice .code {
+    font-family: "Sora", "Inter", sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft); border: 1px solid var(--line-soft);
+    border-radius: 999px; width: 46px; height: 30px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto;
+  }
+  .slice .body { padding-top: 3px; }
+  .slice h3 { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+  .slice p { font-size: 13.5px; color: var(--muted); margin: 0 0 7px; max-width: 66ch; }
+  .slice p b { color: var(--ink); font-weight: 600; }
+  .tests { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tests span {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em;
+    color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 2.5px 9px;
+  }
+
+  .flags {
+    background: var(--off-soft); border: 1px dashed var(--off);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .flags h3 {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--off); margin: 0 0 10px;
+  }
+  .flags ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+  .flags li { font-size: 13.5px; }
+  .flags li b { font-weight: 600; }
+  .flags li span { color: var(--muted); }
+
+  footer.src {
+    border-top: 1px solid var(--line-soft); padding-top: 16px;
+    font-size: 12px; color: var(--muted);
+  }
+  footer.src code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 11.5px; background: var(--accent-soft); border-radius: 5px; padding: 1px 5px;
+  }
+
+  @media (max-width: 720px) { .cards.three { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) {
+    .cards, .cards.three { grid-template-columns: 1fr; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">TMG180 · Governance phase reference</span>
+    <h1>Platform Governance</h1>
+    <p class="thesis"><strong>The admin sees that the system is working — never what anyone wrote in it.</strong> Counts, standing, verification stamps and access trails. No daily-note text, no snapshot narratives, no profile answers. Routine administration must never mean browsing participant content.</p>
+    <div class="meta">
+      <span>Metadata only · never content</span>
+      <span>Provisioned role · never self-served</span>
+      <span>Portal live · 27 assertions</span>
+      <span>Least-privilege is a canon rule</span>
+    </div>
+  </header>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 700" role="img"
+           aria-label="Governance flow: participant and worker records sit behind a metadata boundary; only counts, standing, verification state and audit trails cross it into the governance portal, where the single write is credential verification.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor" opacity="0.55"/>
+          </marker>
+          <marker id="arrok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--ok)"/>
+          </marker>
+          <marker id="arroff" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--off)"/>
+          </marker>
+        </defs>
+
+        <!-- ZONE 1 · the records -->
+        <rect class="zone" x="16" y="16" width="728" height="140" rx="14"/>
+        <text class="chip" x="36" y="44">THE RECORDS · OWNED BY THE PEOPLE IN THEM</text>
+
+        <rect class="box" x="36" y="64" width="164" height="64" rx="9"/>
+        <text class="t" x="118" y="84" text-anchor="middle">Personal Profile</text>
+        <text class="sub" x="118" y="100" text-anchor="middle">14 modules of the</text>
+        <text class="sub" x="118" y="112" text-anchor="middle">participant's own words</text>
+
+        <rect class="box" x="212" y="64" width="164" height="64" rx="9"/>
+        <text class="t" x="294" y="84" text-anchor="middle">Daily evidence</text>
+        <text class="sub" x="294" y="100" text-anchor="middle">shared layer + the worker's</text>
+        <text class="sub" x="294" y="112" text-anchor="middle">private Layer A</text>
+
+        <rect class="box" x="388" y="64" width="164" height="64" rx="9"/>
+        <text class="t" x="470" y="84" text-anchor="middle">Monthly snapshots</text>
+        <text class="sub" x="470" y="100" text-anchor="middle">narratives the participant</text>
+        <text class="sub" x="470" y="112" text-anchor="middle">approved and locked</text>
+
+        <rect class="box" x="564" y="64" width="160" height="64" rx="9"/>
+        <text class="t" x="644" y="84" text-anchor="middle">Consent grants</text>
+        <text class="sub" x="644" y="100" text-anchor="middle">who may see what,</text>
+        <text class="sub" x="644" y="112" text-anchor="middle">and since when</text>
+
+        <!-- THE BOUNDARY -->
+        <rect class="zone-off" x="16" y="176" width="728" height="72" rx="14"/>
+        <text class="chip chip-off" x="36" y="202">THE METADATA BOUNDARY · CONTENT STOPS HERE</text>
+        <text class="t t-off" x="380" y="228" text-anchor="middle">Counts, dates, statuses and access events cross. Words never do.</text>
+
+        <polyline class="flowline-off" points="118,128 118,164" marker-end="url(#arroff)"/>
+        <polyline class="flowline-off" points="294,128 294,164" marker-end="url(#arroff)"/>
+        <polyline class="flowline-off" points="470,128 470,164" marker-end="url(#arroff)"/>
+        <polyline class="flowline-off" points="644,128 644,164" marker-end="url(#arroff)"/>
+
+        <line class="flowline" x1="380" y1="248" x2="380" y2="288" marker-end="url(#arr)"/>
+
+        <!-- ZONE 2 · portal -->
+        <rect class="zone" x="16" y="294" width="728" height="256" rx="14"/>
+        <text class="chip" x="36" y="322">THE GOVERNANCE PORTAL · WHAT AN ADMIN ACTUALLY SEES</text>
+
+        <rect class="box" x="36" y="342" width="216" height="60" rx="9"/>
+        <text class="t" x="144" y="362" text-anchor="middle">Platform aggregates</text>
+        <text class="sub" x="144" y="378" text-anchor="middle">active workers &amp; participants</text>
+        <text class="sub" x="144" y="390" text-anchor="middle">snapshot &amp; consent volumes</text>
+
+        <rect class="box box-hero" x="272" y="342" width="216" height="60" rx="9"/>
+        <text class="t" x="380" y="362" text-anchor="middle">Worker registry</text>
+        <text class="sub" x="380" y="378" text-anchor="middle">publication state · governance</text>
+        <text class="sub" x="380" y="390" text-anchor="middle">items confirmed · credentials</text>
+
+        <rect class="box" x="508" y="342" width="216" height="60" rx="9"/>
+        <text class="t" x="616" y="362" text-anchor="middle">Consent audit trail</text>
+        <text class="sub" x="616" y="378" text-anchor="middle">granted · revoked · viewed</text>
+        <text class="sub" x="616" y="390" text-anchor="middle">IDs and timestamps only</text>
+
+        <line class="flowline" x1="380" y1="402" x2="380" y2="438" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="424">the one write</text>
+
+        <rect class="box box-ok" x="248" y="442" width="264" height="56" rx="9"/>
+        <text class="t t-ok" x="380" y="462" text-anchor="middle">Verify a worker's credential</text>
+        <text class="sub" x="380" y="478" text-anchor="middle">stamps verified_at · audited · reversible</text>
+        <text class="sub" x="380" y="490" text-anchor="middle">only what the worker has put on file</text>
+
+        <text class="foot" x="380" y="528" text-anchor="middle">Everything else the governance portal does is reading. There is no admin edit of anyone's record.</text>
+
+        <!-- ZONE 3 · what admin can never do -->
+        <rect class="zone-off" x="16" y="566" width="728" height="118" rx="14"/>
+        <text class="chip chip-off" x="36" y="594">NEVER · NOT A PERMISSION, AN ABSENCE</text>
+
+        <rect class="box-dead" x="36" y="608" width="164" height="56" rx="9"/>
+        <text class="t t-off" x="118" y="632" text-anchor="middle">Read a daily note</text>
+        <text class="sub" x="118" y="648" text-anchor="middle">shared or private</text>
+
+        <rect class="box-dead" x="212" y="608" width="164" height="56" rx="9"/>
+        <text class="t t-off" x="294" y="632" text-anchor="middle">Read a Profile</text>
+        <text class="sub" x="294" y="648" text-anchor="middle">no admin grant exists</text>
+
+        <rect class="box-dead" x="388" y="608" width="164" height="56" rx="9"/>
+        <text class="t t-off" x="470" y="632" text-anchor="middle">Edit anyone's record</text>
+        <text class="sub" x="470" y="648" text-anchor="middle">participant or worker</text>
+
+        <rect class="box-dead" x="564" y="608" width="160" height="56" rx="9"/>
+        <text class="t t-off" x="644" y="632" text-anchor="middle">Grant consent</text>
+        <text class="sub" x="644" y="648" text-anchor="middle">only participants do</text>
+      </svg>
+    </div>
+    <figcaption>One boundary, one write. The governance portal proves the system is working without ever reading what it holds.</figcaption>
+  </figure>
+
+  <section class="rules">
+    <h3>Non-negotiables · governance</h3>
+    <p class="rule"><b>Metadata only, always.</b> <span>Counts, statuses, dates, provenance and access events. Never record content.</span></p>
+    <p class="rule"><b>Least privilege.</b> <span>Routine administration must not mean unrestricted browsing of participant content — a canon rule, not a preference.</span></p>
+    <p class="rule"><b>Provisioned, never self-served.</b> <span>Admin is outside the sign-up path; the seed script is the only way an account comes to exist.</span></p>
+    <p class="rule"><b>Verification attests to a document.</b> <span>An empty credential row can't be verified — and a later edit clears the stamp.</span></p>
+    <p class="rule"><b>No service-delivery oversight.</b> <span>Governance verifies eligibility and handles standards. It never supervises how a worker works.</span></p>
+    <p class="rule"><b>Standing is never a rating.</b> <span>No scoring, ranking or league table of workers — counts of what is in order.</span></p>
+    <p class="rule"><b>Every sensitive act is auditable.</b> <span>Share, revoke, access, finalise — with actor, object and time.</span></p>
+    <p class="rule"><b>Real numbers or none.</b> <span>What the platform can't measure is shown switched off, never filled with a plausible figure.</span></p>
+  </section>
+
+  <section>
+    <h2 class="section">The portal as it stands</h2>
+    <p class="section-sub">Shared chrome across all screens; two are backend-powered, the rest still mirror their Figma frames with local sample rows because <b>no backing tables exist for them yet</b>.</p>
+    <div class="cards three">
+      <div class="card">
+        <h3>Dashboard</h3>
+        <p>Six live aggregates: workers &amp; published profiles, participants, acknowledgement rate, credentials awaiting verification, snapshot coverage, consent updates.</p>
+        <span class="tag built">Live · zero mock data</span>
+      </div>
+      <div class="card">
+        <h3>Workers Report</h3>
+        <p>The registry, and the home of verification. Expand a worker to review and stamp each credential.</p>
+        <span class="tag built">Live · 27 assertions</span>
+      </div>
+      <div class="card dashed">
+        <h3>Consent Audit Log</h3>
+        <p>Frame only — but <b>the closest to real</b>: the audit table already records grants, revocations and snapshot views.</p>
+        <span class="tag pending">Next to wire</span>
+      </div>
+      <div class="card dashed">
+        <h3>Governance Standing</h3>
+        <p>Platform-wide acknowledgement and policy status. Partially derivable today from worker acknowledgement rows.</p>
+        <span class="tag pending">Frame only</span>
+      </div>
+      <div class="card dashed">
+        <h3>Policies + versions</h3>
+        <p>Policy versioning and acknowledgement tracking. The 5 governance items live in shared code, not a table.</p>
+        <span class="tag pending">Frame only</span>
+      </div>
+      <div class="card dashed">
+        <h3>Incidents &amp; tickets</h3>
+        <p>No ticketing table exists. The dashboard shows this tile visibly switched off rather than inventing a count.</p>
+        <span class="tag pending">No data model</span>
+      </div>
+      <div class="card dashed">
+        <h3>Participant Overview</h3>
+        <p>Aggregated participant activity — no clinical content. Most figures are derivable from existing tables.</p>
+        <span class="tag pending">Frame only</span>
+      </div>
+      <div class="card dashed">
+        <h3>Reports</h3>
+        <p>Detail and "add new report" screens exist; nothing generates or stores a report yet.</p>
+        <span class="tag pending">Frame only</span>
+      </div>
+      <div class="card">
+        <h3>Settings · Admin Profile</h3>
+        <p>Platform essentials and the admin's own account, on the shared select and card components.</p>
+        <span class="tag built">Chrome live</span>
+      </div>
+    </div>
+  </section>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 236" role="img"
+           aria-label="What the governance dashboard can and cannot count: five live aggregates derived from existing tables, and incident tickets which have no table and are shown switched off.">
+        <rect class="zone" x="16" y="16" width="500" height="204" rx="14"/>
+        <text class="chip" x="36" y="44">MEASURABLE TODAY · REAL AGGREGATES</text>
+
+        <rect class="box" x="36" y="62" width="220" height="44" rx="9"/>
+        <text class="t" x="146" y="80" text-anchor="middle">Active workers &amp; participants</text>
+        <text class="sub" x="146" y="95" text-anchor="middle">accounts by role and status</text>
+
+        <rect class="box" x="272" y="62" width="220" height="44" rx="9"/>
+        <text class="t" x="382" y="80" text-anchor="middle">Acknowledgement rate</text>
+        <text class="sub" x="382" y="95" text-anchor="middle">current-version items ÷ expected</text>
+
+        <rect class="box" x="36" y="118" width="220" height="44" rx="9"/>
+        <text class="t" x="146" y="136" text-anchor="middle">Credentials awaiting review</text>
+        <text class="sub" x="146" y="151" text-anchor="middle">recorded but not yet verified</text>
+
+        <rect class="box" x="272" y="118" width="220" height="44" rx="9"/>
+        <text class="t" x="382" y="136" text-anchor="middle">Consent updates this month</text>
+        <text class="sub" x="382" y="151" text-anchor="middle">grants + revocations</text>
+
+        <rect class="box box-ok" x="36" y="174" width="456" height="34" rx="9"/>
+        <text class="t t-ok" x="264" y="196" text-anchor="middle">Snapshot coverage — locked last month ÷ active participants</text>
+
+        <rect class="zone-off" x="532" y="16" width="212" height="204" rx="14"/>
+        <text class="chip chip-off" x="552" y="44">NOT MEASURABLE</text>
+        <rect class="box-dead" x="552" y="62" width="172" height="100" rx="9"/>
+        <text class="t t-off" x="638" y="96" text-anchor="middle">Incident tickets</text>
+        <text class="sub" x="638" y="116" text-anchor="middle">no backing table</text>
+        <text class="sub" x="638" y="132" text-anchor="middle">shown switched off</text>
+        <text class="foot" x="638" y="192" text-anchor="middle">A plausible number</text>
+        <text class="foot" x="638" y="206" text-anchor="middle">is worse than none.</text>
+      </svg>
+    </div>
+    <figcaption>The dashboard's honesty rule: every tile is a live aggregate, and the one thing the platform can't measure says so.</figcaption>
+  </figure>
+
+  <section>
+    <h2 class="section">What the 25 Aug canon adds for governance</h2>
+    <p class="section-sub">The Longitudinal package says relatively little about admin directly — but what it says is sharp, and it creates real work.</p>
+    <div class="cards">
+      <div class="card dashed">
+        <h3>Least privilege, written down</h3>
+        <p>§11 makes it explicit: <b>routine administration must not mean unrestricted browsing of participant content</b>. Our metadata-only posture already matches; now it's a canon rule to hold, not a habit.</p>
+        <span class="tag pending">Posture confirmed</span>
+      </div>
+      <div class="card dashed">
+        <h3>Audit becomes a product surface</h3>
+        <p>Every share, revoke and sensitive access must be recorded <b>and reviewable</b>. The rows exist; the Consent Audit Log screen is the view that makes them governable.</p>
+        <span class="tag pending">AUD-01</span>
+      </div>
+      <div class="card dashed">
+        <h3>A governance / audit report view</h3>
+        <p>§16 names a fifth reporting lens: version, access, provenance, consent and change history — the trail behind an evidence statement, not the statement itself.</p>
+        <span class="tag pending">§16</span>
+      </div>
+      <div class="card dashed">
+        <h3>Derived-layer review state</h3>
+        <p>AI/NDIS-derived text carries <b>unreviewed → accepted / edited / rejected</b> with a reviewer identity. Someone has to be able to see what's unreviewed — plausibly a governance surface.</p>
+        <span class="tag pending">AI-02 · owner TBD</span>
+      </div>
+      <div class="card dashed">
+        <h3>Definition versions to oversee</h3>
+        <p>Profile definitions become immutable, hash-checked, versioned records. Which bundle is active, and what superseded what, is governance information.</p>
+        <span class="tag pending">Feeds Policies screen</span>
+      </div>
+      <div class="card dashed">
+        <h3>Migration provenance</h3>
+        <p>Legacy answers preserved as flagged unmapped records (MIG-01) need somewhere accountable to be counted and inspected — without exposing their content.</p>
+        <span class="tag pending">MIG-01</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section">Governance build slices</h2>
+    <p class="section-sub">Ordered by how much real data already exists behind each screen — the cheapest genuine wins first, and nothing invented to fill a frame.</p>
+    <div class="slices">
+      <div class="slice">
+        <span class="code">G1</span>
+        <div class="body">
+          <h3>Consent Audit Log — real rows</h3>
+          <p>The audit table already records grants, revocations, snapshot views, publish/unpublish and credential verification. This screen is mostly <b>a query and a filter set</b> away from being true, and it is the canon's most explicit governance ask.</p>
+          <div class="tests"><span>AUD-01</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">G2</span>
+        <div class="body">
+          <h3>Governance Standing — platform-wide</h3>
+          <p>Aggregate the acknowledgement rows we already hold: per item, per version, confirmed vs awaiting, adoption over time. Reuses the worker registry's derivation with no new tables.</p>
+          <div class="tests"><span>—</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">G3</span>
+        <div class="body">
+          <h3>Participant Overview — aggregates only</h3>
+          <p>Monthly aggregation of profile completion, logs created, snapshots approved and exports — <b>counts derived across participants, never a per-person drill-down</b>. The privacy notice on the screen has to stay true.</p>
+          <div class="tests"><span>—</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">G4</span>
+        <div class="body">
+          <h3>Policies + definition versions</h3>
+          <p>Promote governance items and profile definitions into governable records: which version is active, what superseded what, who has acknowledged which version. Needs a table; the 5 items currently live in shared code.</p>
+          <div class="tests"><span>§10</span><span>§16</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">G5</span>
+        <div class="body">
+          <h3>Incidents &amp; complaints</h3>
+          <p>The only slice that is genuinely greenfield — a ticket model, statuses, assignment and an audit trail. Until it exists the dashboard tile stays visibly off.</p>
+          <div class="tests"><span>new model</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flags">
+    <h3>Open flags · governance</h3>
+    <ol>
+      <li><b>"Governance Admin" is a banned term</b> <span>— still live as a card title on the Admin Profile screen. Small fix, real rule.</span></li>
+      <li><b>Who reviews derived AI text?</b> <span>The canon requires a reviewer identity and status but never says whose job it is — participant, worker, or governance.</span></li>
+      <li><b>Incident tickets have no data model</b> <span>— four admin screens are drawn against a concept that has never been specified.</span></li>
+      <li><b>Reports generate nothing</b> <span>— the detail and creation screens exist; there is no report record, no export, no schedule.</span></li>
+      <li><b>Admin verification is the only write</b> <span>— confirm no other governance action is expected to change a record, or the least-privilege posture needs revisiting deliberately.</span></li>
+      <li><b>Suspension has a backend but no screen</b> <span>— revoking all sessions is built and wired to password reset; an admin suspension flow should call it too.</span></li>
+    </ol>
+  </section>
+
+  <footer class="src">
+    Sources: <code>md/TMG180_Longitudinal_Spec_2026-08-25.md</code> (§11, §15–16) · <code>md/TMG180_Developer_Technical_Brief.md</code> · <code>md/TMG180_Project_Memory.md</code> · verified against the live <code>/api/v1/admin/*</code> surface, <code>apps/web/src/pages/admin/</code> and <code>scripts/verify-admin-workers.ts</code> on 2026-08-25.
+  </footer>
+</div>

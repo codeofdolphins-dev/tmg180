@@ -1,0 +1,616 @@
+<title>Participant Context — the 25 Aug Canon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #faf9fc;
+    --card: #ffffff;
+    --ink: #221e33;
+    --muted: #6f6a84;
+    --line: #d9d5e6;
+    --line-soft: #e7e4f0;
+    --accent: #7c3aed;
+    --accent-soft: rgba(124, 58, 237, 0.06);
+    --off: #b45309;
+    --off-soft: rgba(180, 83, 9, 0.055);
+    --ok: #0f7a55;
+    --ok-soft: rgba(15, 122, 85, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #161320;
+      --card: #1f1b2c;
+      --ink: #eceaf4;
+      --muted: #9a94ad;
+      --line: #3a3450;
+      --line-soft: #2b2740;
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.09);
+      --off: #f0a848;
+      --off-soft: rgba(240, 168, 72, 0.07);
+      --ok: #3ecf95;
+      --ok-soft: rgba(62, 207, 149, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #161320;
+    --card: #1f1b2c;
+    --ink: #eceaf4;
+    --muted: #9a94ad;
+    --line: #3a3450;
+    --line-soft: #2b2740;
+    --accent: #a78bfa;
+    --accent-soft: rgba(167, 139, 250, 0.09);
+    --off: #f0a848;
+    --off-soft: rgba(240, 168, 72, 0.07);
+    --ok: #3ecf95;
+    --ok-soft: rgba(62, 207, 149, 0.09);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  header.top { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .thesis {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 64ch;
+    margin: 0;
+  }
+  .thesis strong { color: var(--ink); font-weight: 600; }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .meta span {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    padding: 4px 11px;
+  }
+
+  h2.section {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .section-sub { font-size: 14px; color: var(--muted); margin: 0 0 18px; max-width: 68ch; }
+  .section-sub b { color: var(--ink); font-weight: 600; }
+
+  figure.flow { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .fig-scroll { overflow-x: auto; }
+  .fig-scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  figcaption { font-size: 13px; color: var(--muted); text-align: center; }
+
+  /* Diagram vocabulary — all colors via tokens so both themes hold. */
+  .zone { fill: var(--accent-soft); stroke: var(--line-soft); }
+  .zone-off { fill: var(--off-soft); stroke: var(--off); stroke-dasharray: 6 5; }
+  .chip { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; fill: var(--accent); }
+  .chip-off { fill: var(--off); }
+  .box { fill: var(--card); stroke: var(--line); }
+  .box-hero { stroke: var(--accent); stroke-width: 1.5; }
+  .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+  .box-ghost { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; }
+  .box-dead { fill: none; stroke: var(--off); stroke-dasharray: 4 4; }
+  .t { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .sub { font-size: 10.5px; fill: var(--muted); }
+  .t-ok { fill: var(--ok); }
+  .t-off { fill: var(--off); }
+  .lbl { font-size: 10.5px; fill: var(--muted); }
+  .foot { font-size: 11px; font-weight: 600; fill: var(--off); }
+  .flowline { fill: none; stroke: var(--ink); stroke-width: 1.2; opacity: 0.55; }
+  .flowline-ok { fill: none; stroke: var(--ok); stroke-width: 1.4; }
+  .flowline-off { fill: none; stroke: var(--off); stroke-width: 1.2; stroke-dasharray: 5 4; }
+
+  /* Module grid */
+  .modules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .module {
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .module .head { display: flex; align-items: baseline; gap: 10px; }
+  .module .num {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+  }
+  .module h3 { font-size: 14px; font-weight: 600; margin: 0; line-height: 1.3; }
+  .module .topics { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .module .stats {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-top: auto;
+    padding-top: 4px;
+  }
+  .module .note { font-size: 11.5px; color: var(--off); font-weight: 600; }
+  .module.intro { border-style: dashed; }
+
+  /* Rules */
+  .rules {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 28px;
+  }
+  .rules h3 {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 4px;
+  }
+  .rule { font-size: 14px; margin: 0; }
+  .rule b { font-weight: 600; }
+  .rule span { color: var(--muted); }
+
+  /* Build slices */
+  .slices { display: flex; flex-direction: column; gap: 0; }
+  .slice {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 0 18px;
+    position: relative;
+    padding-bottom: 22px;
+  }
+  .slice::before {
+    content: "";
+    position: absolute;
+    left: 31px;
+    top: 34px;
+    bottom: 0;
+    width: 2px;
+    background: var(--line-soft);
+  }
+  .slice:last-child::before { display: none; }
+  .slice .code {
+    font-family: "Sora", "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    width: 46px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .slice .body { padding-top: 3px; }
+  .slice h3 { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+  .slice p { font-size: 13.5px; color: var(--muted); margin: 0 0 7px; max-width: 66ch; }
+  .slice p b { color: var(--ink); font-weight: 600; }
+  .tests { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tests span {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--ok);
+    background: var(--ok-soft);
+    border-radius: 999px;
+    padding: 2.5px 9px;
+  }
+
+  /* Flags */
+  .flags {
+    background: var(--off-soft);
+    border: 1px dashed var(--off);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .flags h3 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--off);
+    margin: 0 0 10px;
+  }
+  .flags ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+  .flags li { font-size: 13.5px; }
+  .flags li b { font-weight: 600; }
+  .flags li span { color: var(--muted); }
+
+  footer.src {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 16px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer.src code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 11.5px;
+    background: var(--accent-soft);
+    border-radius: 5px;
+    padding: 1px 5px;
+  }
+
+  @media (max-width: 640px) {
+    .modules { grid-template-columns: 1fr; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">TMG180 · Participant phase reference</span>
+    <h1>My Personal Profile — the 25&nbsp;Aug Canon</h1>
+    <p class="thesis"><strong>The Personal Profile is both a participant-facing living document and the baseline of the longitudinal evidence chain.</strong> Fourteen modules, verbatim canonical copy, versioned answers that never overwrite history — <em>the system holds the memory while the participant retains the voice.</em></p>
+    <div class="meta">
+      <span>FINAL CANONICAL OVERRIDE · 2026-08-25.1</span>
+      <span>14 modules · 2,383 blocks</span>
+      <span>~330 free-text · ~294 choice groups</span>
+      <span>17 release-blocker tests</span>
+    </div>
+  </header>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 860" role="img"
+           aria-label="Flow: the canonical seed becomes immutable definitions, which render My Personal Profile; participant answers are versioned source records feeding daily and monthly evidence, ending in participant-owned longitudinal exports. A derived AI layer reads the source but can never write back.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor" opacity="0.55"/>
+          </marker>
+          <marker id="arrok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--ok)"/>
+          </marker>
+          <marker id="arroff" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill: var(--off)"/>
+          </marker>
+        </defs>
+
+        <!-- ZONE 1 · definitions -->
+        <rect class="zone" x="16" y="16" width="728" height="150" rx="14"/>
+        <text class="chip" x="36" y="44">THE SOURCE · VERSIONED DEFINITIONS — NOBODY EDITS THESE</text>
+
+        <rect class="box" x="36" y="64" width="320" height="52" rx="9"/>
+        <text class="t" x="196" y="84" text-anchor="middle">Canonical seed 2026-08-25.1</text>
+        <text class="sub" x="196" y="100" text-anchor="middle">14 modules · 2,383 blocks · SHA-256 per module</text>
+
+        <line class="flowline" x1="356" y1="90" x2="400" y2="90" marker-end="url(#arr)"/>
+        <text class="lbl" x="378" y="80" text-anchor="middle">import</text>
+
+        <rect class="box" x="404" y="64" width="320" height="52" rx="9"/>
+        <text class="t" x="564" y="84" text-anchor="middle">profile_definition — immutable once active</text>
+        <text class="sub" x="564" y="100" text-anchor="middle">verbatim copy + derived interaction model, both versioned</text>
+
+        <text class="lbl" x="380" y="146" text-anchor="middle">copy fidelity is a release blocker (PP-01) — length is solved by UX, never by cutting content</text>
+
+        <line class="flowline" x1="380" y1="166" x2="380" y2="204" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="192">renders</text>
+
+        <!-- ZONE 2 · the participant -->
+        <rect class="zone" x="16" y="210" width="728" height="270" rx="14"/>
+        <text class="chip" x="36" y="238">THE PARTICIPANT · SOURCE OF TRUTH</text>
+
+        <rect class="box box-hero" x="240" y="258" width="280" height="52" rx="9"/>
+        <text class="t" x="380" y="278" text-anchor="middle">My Personal Profile</text>
+        <text class="sub" x="380" y="294" text-anchor="middle">one living document · 14 modules inside</text>
+
+        <polyline class="flowline" points="240,284 141,284 141,342" marker-end="url(#arr)"/>
+        <text class="lbl" x="150" y="330">answers</text>
+        <polyline class="flowline" points="520,284 619,284 619,342" marker-end="url(#arr)"/>
+        <text class="lbl" x="612" y="330" text-anchor="end">reads back</text>
+
+        <rect class="box" x="36" y="346" width="210" height="56" rx="9"/>
+        <text class="t" x="141" y="366" text-anchor="middle">Versioned responses</text>
+        <text class="sub" x="141" y="382" text-anchor="middle">prompt + option wording snapshotted</text>
+        <text class="sub" x="141" y="394" text-anchor="middle">an edit supersedes — never overwrites</text>
+
+        <rect class="box" x="514" y="346" width="210" height="56" rx="9"/>
+        <text class="t" x="619" y="366" text-anchor="middle">History stays queryable</text>
+        <text class="sub" x="619" y="382" text-anchor="middle">"what did I have here before"</text>
+        <text class="sub" x="619" y="394" text-anchor="middle">current view by default</text>
+
+        <rect class="box" x="275" y="352" width="210" height="44" rx="9"/>
+        <text class="t" x="380" y="370" text-anchor="middle">Save &amp; return anywhere</text>
+        <text class="sub" x="380" y="385" text-anchor="middle">optional questions stay optional</text>
+
+        <text class="lbl" x="380" y="432" text-anchor="middle">"not sure" · "prefer not to answer" · "not applicable" are answers — never null</text>
+        <text class="lbl" x="380" y="450" text-anchor="middle">no backend-only profile: every stored response is visible to the participant (PP-04)</text>
+
+        <line class="flowline" x1="380" y1="480" x2="380" y2="518" marker-end="url(#arr)"/>
+        <text class="lbl" x="392" y="506">gives context to</text>
+
+        <!-- ZONE 3 · evidence chain -->
+        <rect class="zone" x="16" y="524" width="728" height="212" rx="14"/>
+        <text class="chip" x="36" y="552">THE EVIDENCE CHAIN · READS THE PROFILE, NEVER REWRITES IT</text>
+
+        <rect class="box" x="36" y="572" width="210" height="56" rx="9"/>
+        <text class="t" x="141" y="592" text-anchor="middle">Daily Case Note</text>
+        <text class="sub" x="141" y="608" text-anchor="middle">checkbox-led · participant voice</text>
+        <text class="sub" x="141" y="620" text-anchor="middle">kept separate from worker record</text>
+
+        <line class="flowline" x1="246" y1="600" x2="271" y2="600" marker-end="url(#arr)"/>
+
+        <rect class="box" x="275" y="572" width="210" height="56" rx="9"/>
+        <text class="t" x="380" y="592" text-anchor="middle">Monthly Case Note</text>
+        <text class="sub" x="380" y="608" text-anchor="middle">"My Month" shared reflection</text>
+        <text class="sub" x="380" y="620" text-anchor="middle">maintenance is a valid outcome</text>
+
+        <line class="flowline" x1="485" y1="600" x2="510" y2="600" marker-end="url(#arr)"/>
+
+        <rect class="box box-ok" x="514" y="572" width="210" height="56" rx="9"/>
+        <text class="t t-ok" x="619" y="592" text-anchor="middle">Longitudinal evidence</text>
+        <text class="sub" x="619" y="608" text-anchor="middle">patterns · fluctuation · reports</text>
+        <text class="sub" x="619" y="620" text-anchor="middle">views of source, never new facts</text>
+
+        <polyline class="flowline-off" points="380,628 380,668 300,668" marker-end="url(#arroff)"/>
+        <rect class="box-dead" x="120" y="648" width="176" height="40" rx="9"/>
+        <text class="t t-off" x="208" y="665" text-anchor="middle">"Profile may need updating"</text>
+        <text class="sub" x="208" y="680" text-anchor="middle">review prompt only — never an edit</text>
+
+        <text class="foot" x="380" y="720" text-anchor="middle">Daily and Monthly may reference Profile context — nothing in the chain can mutate a Profile answer.</text>
+
+        <!-- ZONE 4 · derived -->
+        <rect class="zone-off" x="16" y="752" width="728" height="92" rx="14"/>
+        <text class="chip chip-off" x="36" y="780">DERIVED LAYER · OPTIONAL, SEPARATE, HUMAN-REVIEWED</text>
+        <rect class="box" x="36" y="794" width="430" height="40" rx="9"/>
+        <text class="t" x="251" y="811" text-anchor="middle">AI · functional · NDIS wording</text>
+        <text class="sub" x="251" y="826" text-anchor="middle">separate records with provenance + review status</text>
+        <polyline class="flowline-off" points="530,814 604,814" marker-end="url(#arroff)"/>
+        <text class="t t-off" x="614" y="810">reads source.</text>
+        <text class="t t-off" x="614" y="826">Never writes back.</text>
+      </svg>
+    </div>
+    <figcaption>One direction of authority: definitions render the Profile, the participant answers it, evidence reads it — and the derived layer can only ever look.</figcaption>
+  </figure>
+
+  <section>
+    <h2 class="section">The 14 modules</h2>
+    <p class="section-sub">Canonical order by <b>module_id</b>. Source titles keep the source documents' own numbering slips (the 3rd is titled "Module&nbsp;2", the 5th "Module&nbsp;3") — §8.2 forbids correcting them. Counts are derived from the seed for sizing; the seed itself is the only source of wording.</p>
+    <div class="modules">
+      <div class="module intro">
+        <div class="head"><span class="num">1</span><h3>Your Personal Profile</h3></div>
+        <p class="topics">Pure explanatory copy — the natural "Before You Begin" landing page: your diagnosis doesn't tell your whole story · improvement and ongoing impairment can coexist · building your own evidence · your Profile belongs to you.</p>
+        <span class="stats">125 blocks · no inputs</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">2</span><h3>About Me, My Disability &amp; What Matters to Me</h3></div>
+        <p class="topics">About me · my disability/diagnosis (record if I choose) · <b>My Goals (repeatable "+ Add another goal")</b> · what I already have around me · things I've already tried · what helps me function.</p>
+        <span class="stats">163 blocks · ~32 free-text · 11 groups (103 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">3</span><h3>Who am I?</h3></div>
+        <p class="topics">Short warm-up: things I enjoy / used to / would like again · "I'm not really sure what I enjoy at the moment" is a legitimate answer · what makes a good day for me.</p>
+        <span class="note">⚠ source copy contains leftover drafting artifacts — flagged to Saf</span>
+        <span class="stats">27 blocks · ~5 free-text · 2 groups (57 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">4</span><h3>My Body, Movement &amp; Physical Abilities</h3></div>
+        <p class="topics">Moving around · strength, balance, coordination · hands &amp; smaller movements · pain · energy &amp; fatigue · "my body can be different at different times" · effect on the rest of my life.</p>
+        <span class="stats">155 blocks · ~28 free-text · 19 groups (196 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">5</span><h3>Executive Functioning &amp; Everyday Life</h3></div>
+        <p class="topics">Getting started · planning &amp; organising · following through · time &amp; transitions · when several demands build up · what affects my executive functioning.</p>
+        <span class="stats">137 blocks · ~20 free-text · 13 groups (156 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">6</span><h3>Personal Care &amp; Looking After Myself</h3></div>
+        <p class="topics">Dressing · grooming &amp; hygiene · toileting &amp; continence · skin &amp; positioning · "knowing how doesn't mean it happens" · sensory experiences · when another person supports me.</p>
+        <span class="stats">129 blocks · ~20 free-text · 13 groups (164 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">7</span><h3>Getting Around &amp; Leaving Home</h3></div>
+        <p class="topics">Getting ready to leave · physically getting around · transport · wayfinding · "sometimes the thought of leaving is the difficult part" · being in public · getting home matters too.</p>
+        <span class="stats">153 blocks · ~26 free-text · 24 groups (245 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">8</span><h3>Food, Meals &amp; Everyday Nutrition</h3></div>
+        <p class="topics">What food is like for me · choosing · planning · shopping · cooking · eating &amp; drinking safely · <b>mealtime management plan</b> · food, emotions &amp; regulation · eating out.</p>
+        <span class="stats">208 blocks · ~32 free-text · 28 groups (348 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">9</span><h3>My Home &amp; Everyday Household Tasks</h3></div>
+        <p class="topics">Everyday cleaning · laundry · bedding · keeping organised · when tasks build up · household safety · supplies · outdoor area · when someone helps in my home.</p>
+        <span class="stats">174 blocks · ~27 free-text · 25 groups (247 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">10</span><h3>Keeping My Mind &amp; Body Healthy</h3></div>
+        <p class="topics">Movement &amp; activity · rest, sleep &amp; recovery · mental &amp; emotional health · therapy &amp; professional support · connection · what already works · when things become difficult.</p>
+        <span class="stats">230 blocks · ~49 free-text · 26 groups (240 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">11</span><h3>My Emotions, Stress &amp; Nervous System</h3></div>
+        <p class="topics">Anxiety · panic · low mood · overwhelm &amp; dysregulation · shutdown/freeze · trauma-related responses · sensory overload · masking · communication when I'm distressed.</p>
+        <span class="stats">223 blocks · ~38 free-text · 28 groups (335 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">12</span><h3>My Health, Medication &amp; Ongoing Health Needs</h3></div>
+        <p class="topics">Current health · pain · fatigue · medication &amp; side effects · prescriptions &amp; health admin · appointments · my health team · nursing support · fluctuating health.</p>
+        <span class="stats">183 blocks · ~31 free-text · 23 groups (231 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">13</span><h3>Equipment, Technology &amp; My Environment</h3></div>
+        <p class="topics">Equipment I use · technology in everyday life · my home environment · accessibility outside home · sensory environment · safety &amp; emergency access · when equipment fails.</p>
+        <span class="stats">182 blocks · ~31 free-text · 26 groups (291 options)</span>
+      </div>
+      <div class="module">
+        <div class="head"><span class="num">14</span><h3>My Life, Purpose, Dreams &amp; Aspirations</h3></div>
+        <p class="topics">My roles · employment · education &amp; skills · contribution · interests &amp; passions · what I don't want to lose · belonging · choice &amp; control · <b>My Goals</b> · my version of an ordinary good life.</p>
+        <span class="stats">294 blocks · ~58 free-text · 25 groups (301 options) — the largest</span>
+      </div>
+    </div>
+  </section>
+
+  <figure class="flow">
+    <div class="fig-scroll">
+      <svg viewBox="0 0 760 300" role="img"
+           aria-label="Two mechanisms: response versioning where an edit creates a new row that supersedes the old one, and module-scoped sharing where the participant grants a worker read-only access to the full profile or selected modules, revocable immediately.">
+        <!-- versioning -->
+        <rect class="zone" x="16" y="16" width="352" height="268" rx="14"/>
+        <text class="chip" x="36" y="44">EDITING = SUPERSEDING</text>
+
+        <rect class="box" x="46" y="64" width="292" height="52" rx="9"/>
+        <text class="t" x="192" y="84" text-anchor="middle">Answer v1 · "I manage most days"</text>
+        <text class="sub" x="192" y="100" text-anchor="middle">prompt wording snapshotted at write</text>
+
+        <line class="flowline" x1="192" y1="116" x2="192" y2="152" marker-end="url(#arr)"/>
+        <text class="lbl" x="204" y="140">participant edits</text>
+
+        <rect class="box box-hero" x="46" y="156" width="292" height="52" rx="9"/>
+        <text class="t" x="192" y="176" text-anchor="middle">Answer v2 · current</text>
+        <text class="sub" x="192" y="192" text-anchor="middle">v1 kept, marked superseded_by v2</text>
+
+        <text class="lbl" x="192" y="238" text-anchor="middle">current view by default (PP-02)</text>
+        <text class="lbl" x="192" y="256" text-anchor="middle">history retrievable, never erased (PP-05)</text>
+
+        <!-- sharing -->
+        <rect class="zone" x="392" y="16" width="352" height="268" rx="14"/>
+        <text class="chip" x="412" y="44">SHARING IS THE PARTICIPANT'S</text>
+
+        <rect class="box box-hero" x="422" y="64" width="292" height="44" rx="9"/>
+        <text class="t" x="568" y="82" text-anchor="middle">Participant grants access</text>
+        <text class="sub" x="568" y="97" text-anchor="middle">full Profile — or selected modules only</text>
+
+        <line class="flowline" x1="568" y1="108" x2="568" y2="144" marker-end="url(#arr)"/>
+
+        <rect class="box-ghost" x="422" y="148" width="292" height="44" rx="9"/>
+        <text class="t" x="568" y="166" text-anchor="middle">Worker reads — read-only</text>
+        <text class="sub" x="568" y="181" text-anchor="middle">nothing visible before a grant (PP-07)</text>
+
+        <polyline class="flowline-off" points="568,192 568,228" marker-end="url(#arroff)"/>
+        <rect class="box-dead" x="452" y="232" width="232" height="36" rx="18"/>
+        <text class="t t-off" x="568" y="254" text-anchor="middle">Revoke → immediate (PP-09)</text>
+      </svg>
+    </div>
+    <figcaption>The two mechanisms everything else leans on: answers supersede instead of overwrite, and access exists only while a participant-issued grant does.</figcaption>
+  </figure>
+
+  <section class="rules">
+    <h3>Non-negotiables · participant-facing digest</h3>
+    <p class="rule"><b>A living document, never backend intake.</b> <span>The participant reads back exactly what they entered — always.</span></p>
+    <p class="rule"><b>Verbatim canonical copy.</b> <span>Exact prompts, exact options, canonical order. Length is a UX problem, not a content one.</span></p>
+    <p class="rule"><b>Edits supersede, never overwrite.</b> <span>Every answer snapshots its prompt wording; history stays queryable.</span></p>
+    <p class="rule"><b>"Not sure" is an answer.</b> <span>Prefer-not-to-answer and not-applicable are stored values, never null.</span></p>
+    <p class="rule"><b>One document, fourteen modules.</b> <span>Continue / Review My Personal Profile — never fourteen separate assessments.</span></p>
+    <p class="rule"><b>Save and return anywhere.</b> <span>No forced completion of optional questions, no data loss part-way.</span></p>
+    <p class="rule"><b>Sharing is granted, scoped, revocable.</b> <span>Full profile or selected modules; workers see nothing by default.</span></p>
+    <p class="rule"><b>Nothing edits the Profile but the participant.</b> <span>Monthly "may need updating" raises a review prompt — it never writes.</span></p>
+  </section>
+
+  <section>
+    <h2 class="section">Build slices — one by one</h2>
+    <p class="section-sub">Participant type first. Each slice lands with its release-blocker acceptance tests from spec §19; the built 11-section profile stays untouched until P3.</p>
+    <div class="slices">
+      <div class="slice">
+        <span class="code">P0</span>
+        <div class="body">
+          <h3>Definition layer + seed import</h3>
+          <p>New tables mirroring the reference SQL's intent: versioned, immutable-once-active definitions holding <b>verbatim content + SHA-256</b>, and a response table with prompt snapshots and a supersede chain. An idempotent importer reads the canonical JSON — and derives the interaction model (free-text / multi-select / headings / repeatable goals) <b>deterministically, never editing text</b>.</p>
+          <div class="tests"><span>PP-01</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">P1</span>
+        <div class="body">
+          <h3>"My Personal Profile" renderer</h3>
+          <p>The 14-module hub plus one generic module page rendering the active definition and current responses: explanatory copy, topic headings, free-text, multi-selects with "Other" inlines, repeatable goals, per-module progress, save-and-return. Participant UI scale — <b>no Figma frames exist for these modules yet</b>.</p>
+          <div class="tests"><span>PP-02</span><span>PP-03</span><span>PP-04</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">P2</span>
+        <div class="body">
+          <h3>Versioning + history</h3>
+          <p>Supersede-chain on every response write, a participant-visible history view, and audit events on view/update.</p>
+          <div class="tests"><span>PP-05</span><span>PP-06</span><span>AUD-01</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">P3</span>
+        <div class="body">
+          <h3>Migration — §18, no rip-out</h3>
+          <p>Field-by-field review found <b>no defensible exact matches</b> between the 74-key 11-section contract and the 14 modules — so every current answer is preserved as read-only legacy (visible, flagged, never guessed into a new field) and participants enter the new modules fresh. The one live wire: the <b>goals evidence chain</b> (1–3 goals per daily log) keeps working throughout.</p>
+          <div class="tests"><span>MIG-01</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">P4</span>
+        <div class="body">
+          <h3>Sharing grants — the granting side</h3>
+          <p>Module-scoped grants from Privacy &amp; Sharing: full profile or selected modules, optional expiry, immediate revocation. The worker read view is the worker phase.</p>
+          <div class="tests"><span>PP-07</span><span>PP-08</span><span>PP-09</span></div>
+        </div>
+      </div>
+      <div class="slice">
+        <span class="code">P5</span>
+        <div class="body">
+          <h3>Daily / Monthly participant surfaces</h3>
+          <p>The participant's side of the new canonical forms: their voice on daily notes, "My Month" section 12, review status, and the Profile review prompts — sequenced with the worker-phase rebuild of authoring.</p>
+          <div class="tests"><span>DN-02</span><span>MN-01</span><span>MN-02</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flags">
+    <h3>Open flags · for Saf &amp; Sue</h3>
+    <ol>
+      <li><b>No Figma frames</b> <span>for the 14 modules, history view, module-scoped sharing, or the new case-note forms — building on the participant UI scale and existing idiom until design lands.</span></li>
+      <li><b>Module 3 drafting artifacts</b> <span>("Then don't merely ask what they currently do:") sit inside canonical copy that render-exact rules force us to display. Needs a corrected signed bundle.</span></li>
+      <li><b>Title numbering slips</b> <span>(3rd module titled "Module 2", 5th titled "Module 3") — kept per §8.2; confirm intended.</span></li>
+      <li><b>Two goal surfaces</b> <span>(Module 2 §3 and Module 14 "My Goals") — which one feeds the 1–3-goals-per-daily-log evidence chain, or both?</span></li>
+      <li><b>FCA intake derivation</b> <span>— the 11-section content it fed is superseded; confirm it retires.</span></li>
+      <li><b>M-04 participant check-in</b> <span>— does it survive alongside the new Daily Case Note, or fold into it?</span></li>
+    </ol>
+  </section>
+
+  <footer class="src">
+    Sources: <code>md/TMG180_Longitudinal_Spec_2026-08-25.md</code> · <code>md/TMG180_Participant_Longitudinal_Brief.md</code> · <code>md/canonical-2026-08-25/</code> (seed JSON + reference SQL) · <code>md/TMG180_Daily_Monthly_Case_Notes_2026-08-25.md</code>. Counts derived from the seed on 2026-08-25 — the seed is the only source of wording.
+  </footer>
+</div>

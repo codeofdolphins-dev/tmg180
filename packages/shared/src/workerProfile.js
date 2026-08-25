@@ -13,58 +13,58 @@ import { SESSION_PREFERENCE_GROUPS } from './sessionPreferences.js';
  * availability is never part of a directory list — only of one profile's
  * detail (R-04). The directory is browse + direct contact, never booking.
  *
- * The prompt labels are verbatim from the seed (Handoff v1.1 §Priority 3).
- * The helper texts are NOT — seed_bundle_final_override_v1.json has never
- * reached this repo, so these are provisional and need Sue's sign-off.
+ * Prompt labels AND helper texts are verbatim from the Final Override seed
+ * (seed_bundle_final_override_v1.json §worker_profile_prompts) — the bundle
+ * reached the repo Aug 2026, replacing the earlier provisional helpers.
  */
 
 export const WORKER_PROFILE_PROMPTS = [
   {
     key: 'relational_intro',
     label: 'A little about me',
-    helper: 'Who you are and how you came to this work, in your own words.',
+    helper: 'Write as if introducing yourself to someone who may be nervous about choosing support.',
     kind: 'text',
     readLabel: 'A little about me',
   },
   {
     key: 'natural_support_style',
     label: 'How I naturally support people',
-    helper: 'The way you tend to work alongside someone — your rhythm, not a method.',
+    helper: 'Describe whether you are calm, practical, creative, structured, humorous, outdoorsy, quiet, energetic, nurturing, task-focused, or relationship-focused. There is no right answer.',
     kind: 'text',
     readLabel: 'Natural Support Style',
   },
   {
     key: 'communication_style',
     label: 'How I usually communicate',
-    helper: 'A few short phrases — for example "Patient & attentive", "Uses visual aids".',
+    helper: 'Explain whether you prefer plain language, written notes, visual information, direct conversations, gentle reminders, humour, or quiet presence.',
     kind: 'list',
     readLabel: 'Communication',
   },
   {
     key: 'preferred_environments',
     label: 'Where I do my best support work',
-    helper: 'The settings where support tends to go well for you — home, community, outdoors, online.',
+    helper: 'Examples: home routines, community access, outdoors, appointments, creative activities, quiet environments, busy environments, transport, skill-building.',
     kind: 'text',
     readLabel: 'Where I do my best support work',
   },
   {
     key: 'interests',
     label: 'Things I enjoy',
-    helper: 'A few interests, so people can see what you might have in common.',
+    helper: 'Share everyday interests that may help participants understand you as a person.',
     kind: 'list',
     readLabel: 'Interests',
   },
   {
     key: 'participants_appreciate',
     label: 'What people often appreciate about working with me',
-    helper: 'Short phrases in your own words — these are yours, not ratings or feedback.',
+    helper: 'Describe feedback you commonly receive, without overclaiming.',
     kind: 'list',
     readLabel: 'What I bring to support',
   },
   {
     key: 'boundaries_and_fit',
     label: 'The kind of working relationship that suits me best',
-    helper: 'What helps a working relationship go well for you, and what does not suit you.',
+    helper: 'Explain what helps you work well while staying professional and independent.',
     kind: 'text',
     readLabel: 'Best Working Relationship',
   },

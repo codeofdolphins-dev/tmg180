@@ -1,91 +1,43 @@
 import {
-  Search,
-  Bell,
-  HelpCircle,
-  Settings,
-  UserCircle,
-  LifeBuoy,
-  LogOut,
-  ThumbsUp,
   Users,
   ShieldCheck,
-  AlertTriangle,
-  PieChart,
+  BadgeCheck,
   FilePenLine,
-  TrendingUp,
+  CalendarCheck2,
+  AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
-import GovernanceSidebar, { GOV_NAV_ITEMS } from '../../components/layout/admin/GovernanceSidebar';
+import { useNavigate } from 'react-router-dom';
+import { useAdminOverview } from '../../hooks/admin/platform';
+import { ADMIN_PATHS } from '../../routes/paths';
 
-const NAV_ITEMS = [
-  ...GOV_NAV_ITEMS,
-  { label: 'Settings', icon: Settings },
-  { label: 'Admin Profile', icon: UserCircle },
-];
+/**
+ * Platform Governance Dashboard — governance portal home, on live platform
+ * aggregates (GET /admin/overview). Renders inside GovernanceLayout; content
+ * only, on the shared portal card idiom.
+ *
+ * Every number is a real aggregate — there is no sample data anywhere on
+ * this screen. What the platform cannot measure yet (incident tickets) is
+ * shown visibly switched off, per the "real or visibly switched off" rule.
+ */
 
-const BOTTOM_ITEMS = [
-  { label: 'Support', icon: LifeBuoy },
-  { label: 'Sign Out', icon: LogOut },
-];
+const CARD = 'bg-white/80 rounded-xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
-const STATS = [
-  {
-    label: 'Total Active Workers',
-    value: '1,240',
-    valueColor: 'text-brand-600',
-    icon: ThumbsUp,
-    iconBg: 'bg-purple-100 text-brand-600',
-    trend: '+2.4% vs last month',
-  },
-  {
-    label: 'Total Active Participants',
-    value: '3,850',
-    valueColor: 'text-blue-600',
-    icon: Users,
-    iconBg: 'bg-blue-100 text-blue-600',
-    trend: '+5.1% vs last month',
-  },
-  {
-    label: 'Policy Acknowledgements',
-    value: '98.2%',
-    valueColor: 'text-emerald-600',
-    icon: ShieldCheck,
-    iconBg: 'bg-emerald-100 text-emerald-600',
-    progress: 98,
-    progressColor: 'bg-emerald-500',
-  },
-  {
-    label: 'Open Tickets',
-    value: '14',
-    valueColor: 'text-rose-600',
-    icon: AlertTriangle,
-    iconBg: 'bg-rose-100 text-rose-600',
-    note: '4 high priority requiring action',
-  },
-  {
-    label: 'Avg. Snapshot Completion',
-    value: '88%',
-    valueColor: 'text-brand-600',
-    icon: PieChart,
-    iconBg: 'bg-purple-100 text-brand-600',
-    progress: 88,
-    progressColor: 'bg-brand-600',
-  },
-  {
-    label: 'Consent Updates (Month)',
-    value: '412',
-    valueColor: 'text-blue-700',
-    icon: FilePenLine,
-    iconBg: 'bg-blue-100 text-blue-600',
-    note: 'Steady volume',
-    noteTrend: true,
-  },
-];
+/** "2026-08" -> "August 2026". */
+function monthLabel(key) {
+  if (!key) return '';
+  const [year, month] = key.split('-').map(Number);
+  return new Date(year, month - 1, 1).toLocaleDateString('en-AU', {
+    month: 'long',
+    year: 'numeric',
+  });
+}
 
-function StatCard({ label, value, valueColor, icon: Icon, iconBg, trend, progress, progressColor, note, noteTrend }) {
+function StatCard({ label, value, valueColor = 'text-slate-900', icon: Icon, iconBg, note, progress, progressColor, action }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5">
+    <div className={CARD}>
       <div className="flex items-start justify-between mb-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400 max-w-[140px]">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-400 max-w-40">
           {label}
         </p>
         <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}>
@@ -94,118 +46,163 @@ function StatCard({ label, value, valueColor, icon: Icon, iconBg, trend, progres
       </div>
       <p className={`text-3xl font-bold mb-3 ${valueColor}`}>{value}</p>
 
-      {trend && (
-        <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-          <TrendingUp size={12} />
-          {trend}
-        </div>
-      )}
-      {progress !== undefined && (
-        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      {progress !== undefined && progress !== null && (
+        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-2">
           <div
             className={`h-full rounded-full ${progressColor}`}
-            style={{ width: `${progress}%` }}
+            style={{ width: `${Math.min(100, progress)}%` }}
           />
         </div>
       )}
-      {note && (
-        <div
-          className={`flex items-center gap-1 text-xs ${
-            noteTrend ? 'text-emerald-600 font-medium' : 'text-slate-500'
-          }`}
-        >
-          {noteTrend && <TrendingUp size={12} />}
-          {note}
-        </div>
-      )}
+      {note && <p className="text-xs text-slate-500">{note}</p>}
+      {action}
     </div>
   );
 }
 
 export default function PlatformGovernanceDashboard() {
+  const navigate = useNavigate();
+  const { data, isLoading, error } = useAdminOverview();
+
+  const loading = isLoading || !data;
+  const v = (value) => (loading ? '…' : value);
+
+  const ackPct =
+    !loading && data.governance.expected > 0
+      ? Math.round((data.governance.acknowledged / data.governance.expected) * 100)
+      : null;
+  const snapshotPct =
+    !loading && data.snapshots.activeParticipants > 0
+      ? Math.round((data.snapshots.locked / data.snapshots.activeParticipants) * 100)
+      : null;
+
   return (
-    <div className="min-h-screen flex bg-slate-50 font-sans text-slate-800">
-      <GovernanceSidebar
-        portalLabel="Governance Portal"
-        activeItem="Dashboard"
-        navItems={NAV_ITEMS}
-        bottomItems={BOTTOM_ITEMS}
-        showLogo={false}
-        uppercaseLabel={false}
-        actionButton={{ label: 'Export Report' }}
-        hoverStyle="gradient"
-      />
+    <div className="max-w-238 mx-auto flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">
+          TMG180 Platform Governance
+        </h1>
+        <p className="text-base text-slate-600 mt-2 max-w-2xl">
+          Platform-level verification metadata, policy versioning/acknowledgements,
+          and incident/complaint tickets. No service-delivery oversight.
+        </p>
+      </div>
 
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <header className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-100 bg-white">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2 w-80 shrink-0">
-            <Search size={16} className="text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search governance records..."
-              className="bg-transparent outline-none text-sm text-slate-600 placeholder:text-slate-400 flex-1 min-w-0"
-            />
-          </div>
+      {error && (
+        <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4 text-sm text-rose-700">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+          <span>The platform overview could not be loaded. {error.message}</span>
+        </div>
+      )}
 
-          <div className="flex items-center gap-4 text-slate-500">
-            <button className="hover:text-slate-700 transition-colors">
-              <Bell size={18} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Active Workers"
+          value={v(data?.workers.active)}
+          valueColor="text-brand-600"
+          icon={Users}
+          iconBg="bg-purple-100 text-brand-600"
+          note={loading ? '' : `${data.workers.published} directory ${data.workers.published === 1 ? 'profile' : 'profiles'} published`}
+        />
+        <StatCard
+          label="Total Active Participants"
+          value={v(data?.participants.active)}
+          valueColor="text-blue-600"
+          icon={Users}
+          iconBg="bg-blue-100 text-blue-600"
+        />
+        <StatCard
+          label="Governance Acknowledgements"
+          value={loading ? '…' : ackPct === null ? '—' : `${ackPct}%`}
+          valueColor="text-emerald-600"
+          icon={ShieldCheck}
+          iconBg="bg-emerald-100 text-emerald-600"
+          progress={ackPct}
+          progressColor="bg-emerald-500"
+          note={
+            loading
+              ? ''
+              : ackPct === null
+                ? 'No active workers yet'
+                : `${data.governance.acknowledged} of ${data.governance.expected} current items acknowledged`
+          }
+        />
+        <StatCard
+          label="Credentials Awaiting Verification"
+          value={v(data?.credentials.awaiting)}
+          valueColor={!loading && data.credentials.awaiting > 0 ? 'text-rose-600' : 'text-slate-900'}
+          icon={BadgeCheck}
+          iconBg="bg-rose-100 text-rose-600"
+          note={loading ? '' : `${data.credentials.verified} of ${data.credentials.recorded} recorded credentials verified`}
+          action={
+            <button
+              onClick={() => navigate(ADMIN_PATHS.workersReport)}
+              className="mt-2 flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-800 transition-colors"
+            >
+              Review in Workers Report
+              <ArrowRight size={12} />
             </button>
-            <button className="hover:text-slate-700 transition-colors">
-              <HelpCircle size={18} />
-            </button>
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
-                alt="Admin avatar"
-                className="w-full h-full object-cover"
-              />
+          }
+        />
+        <StatCard
+          label={`Monthly Snapshots — ${loading ? '' : monthLabel(data.snapshots.month)}`}
+          value={v(data?.snapshots.locked)}
+          valueColor="text-brand-600"
+          icon={CalendarCheck2}
+          iconBg="bg-purple-100 text-brand-600"
+          progress={snapshotPct}
+          progressColor="bg-brand-600"
+          note={
+            loading
+              ? ''
+              : `approved and locked, of ${data.snapshots.activeParticipants} active ${data.snapshots.activeParticipants === 1 ? 'participant' : 'participants'}`
+          }
+        />
+        <StatCard
+          label={`Consent Updates — ${loading ? '' : monthLabel(data.consent.month)}`}
+          value={v(data?.consent.updates)}
+          valueColor="text-blue-700"
+          icon={FilePenLine}
+          iconBg="bg-blue-100 text-blue-600"
+          note={loading ? '' : 'grants and revocations this month'}
+        />
+
+        {/* Ticketing has no backing table yet — shown switched off, never faked. */}
+        <div className={`${CARD} opacity-60`} aria-disabled="true">
+          <div className="flex items-start justify-between mb-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400 max-w-40">
+              Incident &amp; Complaint Tickets
+            </p>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-slate-100 text-slate-400">
+              <AlertTriangle size={16} />
             </div>
           </div>
-        </header>
+          <p className="text-3xl font-bold text-slate-400 mb-3">—</p>
+          <p className="text-xs text-slate-400">Ticketing is not built yet — nothing is recorded.</p>
+        </div>
+      </div>
 
-        <main className="flex-1 p-6">
-          <div className="max-w-5xl mx-auto flex flex-col gap-5">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                TMG180 Platform Governance
-              </h1>
-              <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-                Platform-level verification metadata, policy versioning/acknowledgements,
-                and incident/complaint tickets. No service-delivery oversight.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {STATS.map((s) => (
-                <StatCard key={s.label} {...s} />
-              ))}
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200 pt-6">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1.5">
-                  Regulatory Compliance
-                </p>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  This platform operates in strict accordance with the Australian
-                  Privacy Act 1988 (APPs) and the Notifiable Data Breaches (NDB)
-                  scheme. All data shown is aggregated for governance oversight.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 shrink-0">
-                <ShieldCheck size={20} className="text-brand-600" />
-                <span>
-                  Secure
-                  <br />
-                  Governance
-                  <br />
-                  Environment
-                </span>
-              </div>
-            </div>
-          </div>
-        </main>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200 pt-6">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1.5">
+            Regulatory Compliance
+          </p>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            This platform operates in strict accordance with the Australian
+            Privacy Act 1988 (APPs) and the Notifiable Data Breaches (NDB)
+            scheme. All data shown is aggregated for governance oversight.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-slate-500 shrink-0">
+          <ShieldCheck size={20} className="text-brand-600" />
+          <span>
+            Secure
+            <br />
+            Governance
+            <br />
+            Environment
+          </span>
+        </div>
       </div>
     </div>
   );

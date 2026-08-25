@@ -332,19 +332,39 @@ export type ProfileQuestionType =
   | 'scale'
   | 'steps';
 
+export interface ProfileQuestionOption {
+  value: string;
+  label: string;
+}
+
 export interface ProfileQuestion {
   key: string;
   type: ProfileQuestionType;
+  label: string;
+  helper?: string;
+  placeholder?: string;
   required?: boolean;
-  options?: readonly string[];
+  options?: readonly ProfileQuestionOption[];
   min?: number;
   max?: number;
+}
+
+/** One titled block of the intake, with its participant-facing framing copy. */
+export interface ProfileSectionGroup {
+  title: string;
+  intro?: readonly string[];
+  questions: readonly ProfileQuestion[];
 }
 
 export interface ProfileSection {
   key: string;
   order: number;
   title: string;
+  /** Seed plain-language description (hub card + page subtitle). */
+  description: string;
+  intro?: readonly string[];
+  groups: readonly ProfileSectionGroup[];
+  /** Flat view of every group's questions — what validation reads. */
   questions: readonly ProfileQuestion[];
 }
 
@@ -361,6 +381,11 @@ export declare const PROFILE_SECTIONS: readonly ProfileSection[];
 export declare const PROFILE_TOTAL_SECTIONS: number;
 
 export declare function profileSection(key: string): ProfileSection | undefined;
+
+/** Canonical keys are snake_case (seed); URLs use kebab-case slugs. */
+export declare function profileSectionSlug(key: string): string;
+
+export declare function profileSectionBySlug(slug: string): ProfileSection | undefined;
 
 export declare function nextProfileSection(key: string): ProfileSection | null;
 

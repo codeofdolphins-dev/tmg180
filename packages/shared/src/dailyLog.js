@@ -21,6 +21,8 @@
  *     location, participantVoice, safetyNote, privateNarrative }
  */
 
+import { GOAL_LINK_HELPER_CODES, NDIS_BUCKET_KEYS, RN_RATIONALE_TAG_KEYS } from './goalLinkHelper.js';
+
 export const DAILY_LOG_STATUS = {
   DRAFT: 'draft',
   /** Submitted is final: the record is locked and addendum-only from here. */
@@ -42,16 +44,17 @@ export const DAILY_LOG_AUTHOR_ROLE = {
  * sections. It needs a ruling before launch: if the real code list differs,
  * this array and a data migration of `domain_tags` are the only changes.
  */
+// The six NDIS functional capacity domains, verbatim from "goal mapping
+// examples" §2 (client document set, 27 Aug 2026); Learning Hub module 4 asks
+// "which NDIS functional areas were involved? (1-3, mandatory)". This replaces
+// the nine-item list that had been lifted from a Figma frame.
 export const FUNCTIONAL_DOMAINS = [
-  { key: 'daily_living', label: 'Daily living' },
-  { key: 'mobility_transport', label: 'Mobility & transport' },
+  { key: 'mobility', label: 'Mobility' },
   { key: 'communication', label: 'Communication' },
-  { key: 'social_community', label: 'Social & community' },
+  { key: 'social_interaction', label: 'Social interaction' },
+  { key: 'learning', label: 'Learning' },
   { key: 'self_care', label: 'Self-care' },
-  { key: 'learning_employment', label: 'Learning & employment' },
-  { key: 'health_wellbeing', label: 'Health & wellbeing' },
-  { key: 'safety', label: 'Safety' },
-  { key: 'support_network', label: 'Support network' },
+  { key: 'self_management', label: 'Self-management' },
 ];
 
 export const FUNCTIONAL_DOMAIN_KEYS = FUNCTIONAL_DOMAINS.map((domain) => domain.key);
@@ -161,6 +164,17 @@ export function validateDailyLogFields(fields = {}, { layer = DAILY_LOG_AUTHOR_R
     errors.domainTags = 'Contains a domain tag that is not allowed.';
   }
 
+  // Goal Link Helper pack (v1.1): bucket, optional grouping, optional rationale tags.
+  if (!isBlank(fields.ndisBucket) && !NDIS_BUCKET_KEYS.includes(fields.ndisBucket)) {
+    errors.ndisBucket = 'Not one of the NDIS budget buckets.';
+  }
+  if (!isBlank(fields.functionalGrouping) && !GOAL_LINK_HELPER_CODES.includes(fields.functionalGrouping)) {
+    errors.functionalGrouping = 'Not one of the functional groupings.';
+  }
+  if (fields.rnRationaleTags !== undefined && !isKeyList(fields.rnRationaleTags, RN_RATIONALE_TAG_KEYS)) {
+    errors.rnRationaleTags = 'Contains a rationale tag that is not allowed.';
+  }
+
   if (!isBlank(fields.comparison) && !comparisonKeysFor(layer).includes(fields.comparison)) {
     errors.comparison = 'Not one of the allowed options.';
   }
@@ -185,7 +199,8 @@ export function validateDailyLogFields(fields = {}, { layer = DAILY_LOG_AUTHOR_R
 
 /**
  * The evidence rule, non-negotiable and enforced on both sides: a log cannot be
- * finalised without 1-3 linked goals and at least one functional domain tag.
+ * finalised without 1-3 linked goals, at least one functional domain tag and
+ * (Goal Link Helper pack) an NDIS budget bucket.
  * A session date is added because a log with no date is not evidence of a day.
  *
  * @returns {{ ok: boolean, errors: Record<string, string> }}
@@ -206,6 +221,10 @@ export function canSubmitDailyLog(log = {}, options = {}) {
   }
   if (!errors.domainTags && domainTags.length < 1) {
     errors.domainTags = 'Choose at least one area of daily life this support touched.';
+  }
+  // Goal Link Helper spec: "Every Support Evidence Log must link to … (2) a budget bucket".
+  if (!errors.ndisBucket && isBlank(log.ndisBucket)) {
+    errors.ndisBucket = 'Choose the NDIS budget bucket this support sits in — Core, Capacity Building or Capital.';
   }
 
   return { ok: Object.keys(errors).length === 0, errors };

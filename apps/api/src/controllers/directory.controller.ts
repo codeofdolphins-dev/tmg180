@@ -49,6 +49,9 @@ type ListRow = {
   worker_id: number;
   display_name: string | null;
   relational_intro: string | null;
+  natural_support_style: string | null;
+  communication_style: string[];
+  preferred_environments: string | null;
   support_philosophy: string | null;
   values_tags: string[];
   published_at: Date | null;
@@ -72,8 +75,16 @@ function toCard(row: ListRow) {
     experienceLabel: experienceLabel(details?.experience_years),
     philosophy: row.support_philosophy,
     introExcerpt: excerpt(row.relational_intro),
+    // Final Override seed directory_card_config.primary_fields — the card
+    // leads with these three alongside the name and the intro excerpt.
+    naturalSupportStyle: row.natural_support_style,
+    communicationStyle: row.communication_style,
+    preferredEnvironments: row.preferred_environments,
     relationalTags: row.values_tags,
-    supportAreas: (details?.support_areas ?? []).map((key) => ({ key, label: supportAreaLabel(key) })),
+    // Only areas the contract knows — a stored value outside SUPPORT_AREAS has no label to show.
+    supportAreas: (details?.support_areas ?? [])
+      .filter((key) => SUPPORT_AREA_KEYS.includes(key))
+      .map((key) => ({ key, label: supportAreaLabel(key) })),
     publishedAt: row.published_at,
   };
 }
@@ -115,6 +126,9 @@ export const listDirectory = asyncHandler(async (req, res) => {
         worker_id: true,
         display_name: true,
         relational_intro: true,
+        natural_support_style: true,
+        communication_style: true,
+        preferred_environments: true,
         support_philosophy: true,
         values_tags: true,
         published_at: true,

@@ -333,6 +333,24 @@ model DailyNotePrivate {
   @@map("tmg_daily_note_private")
 }
 
+/// Goal Link Helper reference table — TMG180 Goal Link Helper Pack v1
+/// (schema_and_seed_postgres_v1.sql). Seeded from @tmg180/shared GOAL_LINK_HELPER;
+/// read as autocomplete suggestions, never enforced as a match.
+model GoalLinkHelper {
+  support_domain_code      String   @id
+  ndis_support_domain      String
+  tmg_functional_grouping  String
+  ndis_bucket_default      String
+  includes_examples        String?
+  common_goal_links_plain  String?
+  functional_barrier_plain String?
+  rn_rationale_tags        String?
+  created_at               DateTime @default(now()) @db.Timestamptz
+  updated_at               DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@map("tmg_goal_link_helper")
+}
+
 model DailyNoteStructured {
   id              Int  @id @default(autoincrement())
   private_note_id Int?
@@ -357,6 +375,12 @@ model DailyNoteStructured {
 
   domain_tags      String[] @db.VarChar(50)
   domain_validated Boolean? @default(false)
+
+  // Goal Link Helper pack: the bucket is required to submit; the grouping and
+  // the rationale tags are optional and store what was selected (override kept).
+  ndis_bucket                  String?  @db.VarChar(20)
+  rn_rationale_tags            String[] @default([])
+  tmg_functional_grouping_code String?  @db.VarChar(40)
 
   impact_tags       String[]
   support_type_tags String[]

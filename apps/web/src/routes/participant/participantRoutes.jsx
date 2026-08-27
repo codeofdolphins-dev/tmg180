@@ -11,7 +11,7 @@ import SnapshotExports from '../../pages/participant/SnapshotExports';
 import BrowseVerifiedWorkers from '../../pages/participant/BrowseVerifiedWorkers';
 import RelationalWorkerProfile from '../../pages/participant/RelationalWorkerProfile';
 import Library from '../../pages/participant/Library';
-import SessionPreferences from '../../pages/participant/SessionPreferences';
+import LibraryReading from '../../pages/participant/LibraryReading';
 import PrivacySharing from '../../pages/participant/PrivacySharing';
 import ParticipantHelpCentre from '../../pages/participant/ParticipantHelpCentre';
 import PermissionDeniedParticipant from '../../pages/participant/PermissionDeniedParticipant';
@@ -39,7 +39,7 @@ export const participantRoutes = [
   { path: rel(P.browseWorkers), element: <BrowseVerifiedWorkers /> },
   { path: rel(P.browseWorkersProfile), element: <RelationalWorkerProfile /> },
   { path: rel(P.library), element: <Library /> },
-  { path: rel(P.preferences), element: <SessionPreferences /> },
+  { path: rel(P.libraryReading), element: <LibraryReading /> },
   { path: rel(P.privacySharing), element: <PrivacySharing /> },
   { path: rel(P.help), element: <ParticipantHelpCentre /> },
 ];

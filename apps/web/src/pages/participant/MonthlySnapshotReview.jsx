@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import SupportsByBucket from '../../components/snapshot/SupportsByBucket';
 import {
   Lock,
   Target,
-  Sparkles,
   Info,
   RefreshCw,
   LoaderCircle,
@@ -222,6 +222,9 @@ export default function MonthlySnapshotReview() {
             </div>
           </Card>
 
+          {/* Goal Link Helper roll-up — supports used this month, by NDIS budget bucket */}
+          <SupportsByBucket buckets={stats.buckets ?? []} />
+
           {/* Section 6 — Goal progress summary */}
           {stats.goals?.length > 0 && (
             <Card>
@@ -384,33 +387,6 @@ export default function MonthlySnapshotReview() {
             </p>
           </div>
 
-          {/* Section 10 — writing helper, not switched on */}
-          <div className="bg-white/70 rounded-3xl p-6">
-            <div className="flex items-center gap-3">
-              <Sparkles size={20} className="text-[#7800ce] shrink-0" />
-              <h3 className="text-base font-semibold text-[#7800ce]">Help me review this</h3>
-            </div>
-            <p className="text-sm text-[#4d4354] mt-3 leading-relaxed">
-              A review helper would suggest where your evidence could be stronger before
-              you approve it.
-            </p>
-            <div className="mt-4 flex flex-col gap-2">
-              {['Suggest what to expand', 'Ask a specific question'].map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  disabled
-                  className="w-full rounded-full bg-[#f8f9ff] border border-purple-200 text-sm text-[#7800ce] py-2.5 opacity-60 cursor-not-allowed"
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-[#4d4354] mt-3">
-              Not switched on yet. When it is, a person reviews any suggestion before it
-              reaches your record.
-            </p>
-          </div>
 
           {/* Section 11 — approval */}
           <div className="bg-white/70 rounded-3xl p-6 lg:sticky lg:top-24">

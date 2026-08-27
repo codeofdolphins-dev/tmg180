@@ -135,9 +135,9 @@ async function main() {
   const goalId: number = goals.json.data[0].id;
 
   for (const [day, tags, comparison, times] of [
-    [4, ['daily_living'], 'same_as_usual', ['09:00', '11:00']],
-    [5, ['daily_living', 'social_community'], 'better_than_usual', ['09:00', '10:30']],
-    [20, ['mobility_transport'], 'below_usual', ['13:00', '14:00']],
+    [4, ['self_care'], 'same_as_usual', ['09:00', '11:00']],
+    [5, ['self_care', 'social_interaction'], 'better_than_usual', ['09:00', '10:30']],
+    [20, ['mobility'], 'below_usual', ['13:00', '14:00']],
   ] as [number, string[], string, [string, string]][]) {
     const draft = await call('POST', '/participant/daily-logs', {
       token: participantToken,

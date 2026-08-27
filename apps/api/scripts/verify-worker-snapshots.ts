@@ -148,9 +148,9 @@ async function main() {
   };
 
   // THIS_MONTH: three logs across two consecutive days plus one later day.
-  await submitLog(participantToken, dayIn(THIS_MONTH, 4), ['daily_living'], 'same_as_usual', ['09:00', '11:00']);
-  await submitLog(participantToken, dayIn(THIS_MONTH, 5), ['daily_living', 'social_community'], 'better_than_usual', ['09:00', '10:30']);
-  await submitLog(participantToken, dayIn(THIS_MONTH, 20), ['mobility_transport'], 'below_usual', ['13:00', '14:00']);
+  await submitLog(participantToken, dayIn(THIS_MONTH, 4), ['self_care'], 'same_as_usual', ['09:00', '11:00']);
+  await submitLog(participantToken, dayIn(THIS_MONTH, 5), ['self_care', 'social_interaction'], 'better_than_usual', ['09:00', '10:30']);
+  await submitLog(participantToken, dayIn(THIS_MONTH, 20), ['mobility'], 'below_usual', ['13:00', '14:00']);
   // LAST_MONTH: one log, so the month filter has two months to choose between.
   await submitLog(participantToken, dayIn(LAST_MONTH, 12), ['self_care'], 'variable', ['10:00', '11:00']);
 
@@ -202,7 +202,7 @@ async function main() {
     body: {
       sessionDate: dayIn(THIS_MONTH, 8),
       goalIds: [secondGoalIds[0]],
-      domainTags: ['health_wellbeing'],
+      domainTags: ['self_management'],
       impactText: 'x',
       supportText: 'y',
       outcomeText: 'z',
@@ -303,7 +303,7 @@ async function main() {
   check('…totals the minutes', s.stats.totalMinutes === 270, s.stats.totalMinutes);
   check(
     '…tallies the areas of daily life',
-    s.stats.domains.daily_living === 2 && s.stats.domains.social_community === 1 && s.stats.domains.mobility_transport === 1,
+    s.stats.domains.self_care === 2 && s.stats.domains.social_interaction === 1 && s.stats.domains.mobility === 1,
     s.stats.domains
   );
   check(

@@ -169,7 +169,9 @@ export default function MyPersonalProfile() {
       {!isComplete && (
       <div className="flex items-center gap-10 rounded-3xl bg-linear-to-br from-[#ece5fb] via-[#e9e4fa] to-[#e2e2f9] shadow-[0_18px_40px_rgb(120,0,206,0.12)] p-8">
         <div className="flex-1 flex flex-col gap-3">
-          <h2 className="text-xl font-semibold text-black">Continue My Personal Profile</h2>
+          {/* Handoff Mapping v1.1 §3: the profile's own primary action is "Continue My
+              Profile"; the dashboard's (§5) is "Continue My Personal Profile". */}
+          <h2 className="text-xl font-semibold text-black">Continue My Profile</h2>
           {started ? (
             <>
               <p className="text-base text-black">

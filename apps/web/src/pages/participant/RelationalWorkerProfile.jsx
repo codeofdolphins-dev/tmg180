@@ -350,7 +350,7 @@ export default function RelationalWorkerProfile() {
           <h2 className={`${H2} text-slate-900`}>Weekly Availability</h2>
         </div>
         <p className="text-sm text-slate-500 mt-1">
-          A general pattern, not a booking — you arrange times directly with {firstName}.
+          A general pattern — you arrange times directly with {firstName}.
         </p>
         <div className="mt-4">
           {details.availabilitySet ? (

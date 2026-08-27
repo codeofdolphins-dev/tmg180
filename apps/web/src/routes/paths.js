@@ -35,7 +35,7 @@ export const PARTICIPANT_PATHS = {
   browseWorkers: '/participant/browse-workers',
   browseWorkersProfile: '/participant/browse-workers/:workerId',
   library: '/participant/library',
-  preferences: '/participant/preferences',
+  libraryReading: '/participant/library/:slug',
   privacySharing: '/participant/privacy-sharing',
   help: '/participant/help',
   permissionDenied: '/participant/permission-denied',
@@ -124,6 +124,11 @@ export const workerLearningPath = {
     fromItem
       ? `/worker/learning-hub/resource/${slug}?from=${encodeURIComponent(fromItem)}`
       : `/worker/learning-hub/resource/${slug}`,
+};
+
+/** Library → one reading; the slug is a PARTICIPANT_READING_SLUGS value. */
+export const participantLibraryPath = {
+  reading: (slug) => `/participant/library/${slug}`,
 };
 
 /** Browse Directory → one published worker profile. */

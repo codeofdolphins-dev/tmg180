@@ -22,6 +22,7 @@ import {
   domainLabel,
   validateAddendum,
 } from '@tmg180/shared';
+import GoalLinkSummary from '../../components/dailyLog/GoalLinkSummary';
 import Button from '../../components/ui/Button';
 import { formatLogDate, formatTimeRange, formatTimestamp } from '../../lib/dates';
 import { useAddAddendum, useDailyLog } from '../../hooks/participant/dailyLog';
@@ -285,6 +286,10 @@ export default function DailySupportEvidenceLog() {
                   {domainLabel(tag)}
                 </span>
               ))}
+            </div>
+
+            <div className="mt-5">
+              <GoalLinkSummary log={log} />
             </div>
           </div>
 

@@ -9,8 +9,11 @@
  * Canon: the section list is the Final Override seed
  * (seed_bundle_final_override_v1.json, 11 sections — resolves ruling R-01);
  * titles, order and plain-language descriptions are verbatim from the seed.
- * The question content inside each section is the FCA intake
- * ("FCA (INTAKE FINAL).docx", Aug 2026) — the Personal Profile IS the intake:
+ * The question content inside each section is the Participant Personal Profile
+ * Support Needs Tool v4 (client document set, 27 Aug 2026 — the FCA intake
+ * questionnaire re-labelled, plus its Participant / Support Overview block:
+ * Basic Details, Worker / Support Network Overview, Participant Goals) — the
+ * Personal Profile IS that document:
  * one living document, never a set of disconnected forms. FCA_BASELINE stays
  * an internal model term; none of the copy here may say FCA / Baseline /
  * Assessment (see @tmg180/terminology).
@@ -27,7 +30,11 @@
  *   multi     array of values from `options` (checkbox groups)
  *   toggle    boolean
  *   scale     integer from `min` to `max`
- *   steps     array of { text, done } (goal steps)
+ *   steps     array of { text, done } (legacy goal steps — kept so stored answers validate)
+ *   date      'YYYY-MM-DD'
+ *   rows      array of { [column.key]: string } — a table in the source (goals, support network)
+ *
+ * Groups may carry `outro` lines: source copy that follows a question.
  */
 
 /** P1-03: every answer carries a visibility, private by default. */
@@ -47,6 +54,8 @@ const MAX_TEXT = 255;
 const MAX_TEXTAREA = 5000;
 const MAX_MULTI = 50;
 const MAX_STEPS = 20;
+const MAX_ROWS = 20;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 const opts = (pairs) => pairs.map(([value, label]) => ({ value, label }));
 
@@ -58,31 +67,142 @@ export const PROFILE_SECTIONS = [
     order: 1,
     title: 'Overview',
     description: 'A gentle introduction to your profile and how it belongs to you.',
+    // Support Needs Tool v4 → "Participant Introduction / Before You Begin", verbatim.
+    // NB the source says "Functional Capacity Assessment" (in a negation) and
+    // "assessments … intake processes": rendered as written; the P1-04 zero-hits
+    // rule is logged as a deviation in md/TMG180_Participant_Portal_Context_2026-08-27.md.
     intro: [
-      'What you are completing here is your Personal Profile. It is about understanding your own life clearly enough that support aligns with what you actually experience.',
-      'This is not about exaggerating or proving anything.',
-      'For some people, this is straightforward. For others — especially when challenges are hidden, fluctuating, psychosocial, neurological, or fatigue-based — it can be much harder to explain how things affect everyday life. Many people live with patterns they have adapted to for years without ever putting those impacts into words. This profile is designed to help you do that.',
-      'Everyone has strengths and challenges. This profile is about seeing you as a whole person. It looks at what is difficult, what supports you, what affects your energy, what matters to you, and where support genuinely makes a difference. It focuses not only on everyday activities, but on quality of life.',
-      'You do not need to complete this all at once. It saves automatically and you can come back to it at any time. You can sit with someone you trust while you complete it. You do not need to answer anything you are not ready to answer.',
-      'What matters is that what is written here reflects your real experience. Nothing here is fixed. Nothing locks you in. This is simply a starting point.',
+      'What you are completing today is your Participant Personal Profile.',
+      'This is not a clinical Functional Capacity Assessment. It does not replace an Occupational Therapist assessment, allied health report, NDIA assessment, or professional advice.',
+      'This support needs tool is important because the NDIS expects a clear picture of your support needs, your lived experience, your goals, and the evidence showing how supports are used over time. Your voice, experiences and understanding of your support needs matter alongside worker and professional reports.',
+      'This can be empowering, but it can also feel challenging or overwhelming to describe your support needs in your own words, explain how they relate to your goals, and build evidence as your support needs change over time.',
+      'For some people, explaining support needs is straightforward. For others, especially when needs are fluctuating, psychosocial, neurological, fatigue-based, pain-related, or not easily visible, this can be difficult.',
+      'This Personal Profile and Support Needs Tool was designed with this in mind. It recognises that information collection is important, but for many people the process of collecting this information can feel intrusive or overwhelming.',
+      'This support needs tool tries to make the process easier by giving examples of daily, real-life support situations. You can tick, skip, or write in your own words depending on what feels right for you.',
+      'The tool also helps you name your strengths, hopes, goals, and how support may help you work towards them.',
+      'For some people, this may still feel challenging. Some people have past experiences with child protection, out-of-home care, state guardianship, mental health systems, hospitals, justice systems, homelessness services, or disability services. For some people, forms, reviews, or evidence requests can bring up distress.',
+      'Forms, reviews, assessments, provider intake processes, case notes, risk questions, and requests for evidence may trigger past experiences of being controlled, judged, moved, disbelieved, recorded, or spoken about.',
+      'You can think about what would make completing this profile feel most comfortable and manageable for you.',
+      'You can choose to complete it on your own, or with support from a support worker, allied health professional, recovery coach, coordinator, advocate, family member, or another trusted person.',
+      'You can choose to complete as much or as little as you like. You can complete some and come back to it later.',
+      'You can also choose to share some or all of your Personal Profile with future support workers. This may reduce the need to repeat yourself each time a new person becomes involved.',
+      'Try to remember that this is not about exaggerating or proving anything. It is a tool to help you name your support needs in your own words. It is also not set in stone and can be updated or changed at any time.',
+      'This tool is based on the idea that everyone has strengths and support needs. It helps identify both. It is about seeing you as a whole person.',
+      'It looks at:',
+      '• what is difficult',
+      '• what supports you',
+      '• what affects your energy',
+      '• what matters to you',
+      '• where support genuinely makes a difference',
+      '• what support may be needed over time',
+      'It focuses not only on tasks, but on quality of life.',
+      'Support is not only about learning how to do things. It can also be about conserving energy, reducing overwhelm, maintaining stability, preventing burnout, staying connected, and allowing you to focus on what matters to you.',
+      'The important thing is that what is written here reflects your real experience.',
+      'Nothing here is fixed. Nothing locks you in. This is simply a starting point.',
+      "Let's begin.",
     ],
     groups: [
       {
-        title: 'Your profile belongs to you',
+        // v4 "Participant / Support Overview → Basic Details". "Date profile
+        // started" and "Date last updated" are the record's own timestamps,
+        // not questions.
+        title: 'Basic Details',
         intro: [
-          'You choose who sees it, who you share it with, whether you update it, and whether you download it. No one can access your profile unless you allow it — though sharing it with your chosen workers will allow your support network to understand your support needs and how you would like them delivered.',
-          'Your notes are visible to you at all times. You can read them, contribute to them, add reflections, upload notes from other workers, and choose who has access. Workers will add notes about sessions; you can also add your own perspective.',
-          'TMG180 organises and summarises your information over time. It does not replace your voice. It does not make decisions for you. It translates patterns into clear language so you can see how your support is being used, how your needs fluctuate, where improvements are happening, where support remains essential, and how this connects to your goals.',
-          'This means that when reassessment time comes, you are not trying to prove your life from memory. You have structured evidence built gradually over time. You remain the one who explains it — but you are not starting from scratch.',
-          'Nothing is hidden from you. Nothing is created without visibility. Nothing is shared without your consent.',
+          "This section records basic details and the participant's own goals before the Personal Profile begins. It should be completed, updated, or shared only with the participant's consent.",
         ],
+        questions: [
+          { key: 'participant_full_name', type: 'text', label: 'Participant full name' },
+          { key: 'preferred_name', type: 'text', label: 'Preferred name' },
+          { key: 'date_of_birth', type: 'date', label: 'Date of birth' },
+          { key: 'ndis_number', type: 'text', label: 'NDIS number' },
+          { key: 'plan_management_type', type: 'text', label: 'Plan management type' },
+          { key: 'ndis_plan_dates', type: 'text', label: 'NDIS plan dates' },
+          { key: 'emergency_contact_person', type: 'text', label: 'Emergency/contact person' },
+          { key: 'preferred_contact_method', type: 'text', label: 'Preferred contact method' },
+          { key: 'accessibility_needs', type: 'text', label: 'Accessibility needs' },
+          {
+            key: 'primary_language_communication_needs',
+            type: 'text',
+            label: 'Primary language / communication needs',
+          },
+        ],
+      },
+      // v4 "Consent, Ownership, and How Your Information Works on the TMG180 Platform", verbatim.
+      {
+        title: 'You Own Your Personal Profile',
+        intro: [
+          'This platform is participant-controlled. You choose whether to use it and what information you share.',
+          'By joining, you agree that your profile and support documentation are stored securely on your personal portal.',
+          'But you own your information.',
+          'Your profile belongs to you.',
+          'You choose:',
+          '• who sees it',
+          '• who you share it with',
+          '• whether you update it',
+          '• whether you download it',
+          'No one can access your profile unless you allow it. Sharing it with your chosen workers may help your support network understand your support needs and how you would like support delivered.',
+        ],
+        questions: [],
+      },
+      {
+        title: 'You Own Your Support Evidence Notes',
+        intro: [
+          'TMG180 support evidence notes are visible to you at all times.',
+          'You can:',
+          '• read them',
+          '• contribute to them',
+          '• add reflections',
+          '• upload notes from other workers',
+          '• choose who has access',
+          'Workers will add notes about sessions.',
+          'You can also add your own perspective.',
+          'Allied Health workers, Recovery Coaches and coordinators will also keep relevant case notes because they are required to by law, however they are kept completely confidential and secured securely on their own portal. These are only required if a worker is required to produce them in a court of law, which is rare.',
+          'You can ask for access to records that relate to you through the relevant privacy and access pathways. TMG180 should provide clear guidance about this in the dashboard.',
+        ],
+        questions: [],
+      },
+      {
+        title: 'Why Documentation Matters',
+        intro: [
+          'Under the NDIS, participants are now expected to explain how their disability impacts daily life and how supports are being used.',
+          'This can be difficult to do from memory, especially during reassessments.',
+          'Workers using TMG180 use structured documentation to track:',
+          '• frequency of support',
+          '• duration of support',
+          '• type of support provided',
+          '• fluctuations',
+          '• changes over time',
+          '• outcomes and impacts',
+          'The more consistently information is added, the clearer the picture becomes.',
+        ],
+        questions: [],
+      },
+      {
+        title: 'How the System Works',
+        intro: [
+          'TMG180 uses an internal system to organise and summarise your information over time.',
+          'It does not replace your voice.',
+          'It does not make decisions for you.',
+          'It translates patterns into clear language so you can see:',
+          '• how your support is being used',
+          '• how your needs fluctuate',
+          '• where improvements are happening',
+          '• where support remains essential',
+          '• how this connects to your goals',
+          'This means that when reassessment time comes, you are not trying to prove your life from memory.',
+          'You have structured evidence built gradually over time.',
+          'You remain the one who explains it.',
+          'But you are not starting from scratch.',
+        ],
+        questions: [],
+      },
+      {
+        title: 'Your Choice',
         questions: [
           {
             key: 'documentation_choice',
             type: 'multi',
-            label: 'Your Choice',
-            helper:
-              'The platform works best when documentation is consistent, but participation is still your choice.',
+            label: 'You can:',
             options: opts([
               ['allow_full_documentation', 'Allow full structured documentation'],
               ['participate_actively', 'Participate actively in adding reflections'],
@@ -91,6 +211,13 @@ export const PROFILE_SECTIONS = [
               ['decide_later', 'Decide later'],
             ]),
           },
+        ],
+        outro: [
+          'The platform works best when documentation is consistent.',
+          'But participation is still your choice.',
+          'Nothing is hidden from you.',
+          'Nothing is created without visibility.',
+          'Nothing is shared without your consent.',
         ],
       },
     ],
@@ -102,7 +229,7 @@ export const PROFILE_SECTIONS = [
     description: 'What you want people to know about you as a person.',
     groups: [
       {
-        title: 'Your Personality Style',
+        title: 'About You',
         intro: [
           'This section is about getting to know you. Not in a clinical way — in a real way.',
           'Different people feel comfortable with different types of support. Some people prefer structure and predictability. Others prefer flexibility. Some value independence strongly. Others value connection. There is no right answer here.',
@@ -326,20 +453,26 @@ export const PROFILE_SECTIONS = [
     description: 'What you are working towards and what good progress looks like.',
     groups: [
       {
-        title: 'What I Am Working Towards',
+        // v4 "Participant / Support Overview → Participant Goals" (a four-column
+        // table). Each row's "Goal" is what a Daily Log can link to
+        // (tmg_participant_goals derives from it on save).
+        title: 'Participant Goals',
         intro: [
-          'Your goals can change over time, and you can update them whenever you need. Your Daily Logs can link to these goals, so progress builds up as evidence over time.',
+          "Record the participant's goals in their own words where possible. These goals help connect daily support evidence and monthly snapshots back to what matters to the participant.",
         ],
         questions: [
           {
-            key: 'primary_aspiration',
-            type: 'textarea',
-            required: true,
-            label: 'What are you currently working towards?',
-            placeholder:
-              'For example:\n• Becoming more independent at home\n• Finding a job\n• Travelling independently\n• Improving communication',
+            key: 'goals',
+            type: 'rows',
+            label: 'Participant Goals',
+            addLabel: 'Add another goal',
+            columns: [
+              { key: 'goal', label: 'Goal' },
+              { key: 'meaning', label: 'What this means in everyday life' },
+              { key: 'support', label: 'Support that may help' },
+              { key: 'review', label: 'Review / notes' },
+            ],
           },
-          { key: 'goal_steps', type: 'steps', label: 'Steps Towards My Goal' },
         ],
       },
       {
@@ -375,7 +508,7 @@ export const PROFILE_SECTIONS = [
     description: 'How daily routines work best for you.',
     groups: [
       {
-        title: 'Personal Care and Body',
+        title: 'Your Personal Care and Body',
         intro: [
           'This looks at how you manage everyday personal care. For some people, this is straightforward. For others, physical symptoms, trauma responses, executive functioning, fatigue, pain, or overwhelm can affect consistency.',
           'You can choose what feels true for you.',
@@ -465,7 +598,7 @@ export const PROFILE_SECTIONS = [
         ],
       },
       {
-        title: 'Household Routines and Keeping Up With the Home',
+        title: 'Household Tasks and Keeping Up With the Home',
         intro: [
           'A home is not just a place to sleep. The condition of your environment can affect how you feel emotionally, physically, and mentally.',
           'For many people, clutter, unfinished jobs, or a space that feels chaotic can increase stress, overwhelm, and exhaustion. A clean, safe, and organised home can create stability, reduce anxiety, and make daily life feel more manageable.',
@@ -609,7 +742,7 @@ export const PROFILE_SECTIONS = [
     description: 'Things that affect your energy, health, wellbeing and pacing.',
     groups: [
       {
-        title: 'Emotional Regulation, Stress, and Your Nervous System',
+        title: 'Emotional Regulation, Stress, and Nervous System',
         intro: [
           'Everyone responds to stress differently. For some people, stress passes through quickly. For others, stress builds up in the body and nervous system and affects thinking, energy, emotions, or safety.',
           'This is not about weakness or personality. It is about how your body and nervous system respond to pressure, change, or overwhelm.',
@@ -647,7 +780,7 @@ export const PROFILE_SECTIONS = [
               ['early_signs', 'I need support recognising early signs of overload'],
               ['routines_when_stressed', 'I need help maintaining routines when stressed'],
               ['reduced_demands', 'I need reduced demands during burnout'],
-              ['flexibility', 'I need flexibility when my capacity fluctuates'],
+              ['flexibility', 'I need flexibility when my support needs change'],
               ['increased_difficult_periods', 'During difficult periods, I need increased support'],
             ]),
           },
@@ -928,6 +1061,30 @@ export const PROFILE_SECTIONS = [
           { key: 'planning_notes', type: 'textarea', label: EXPLAIN_FURTHER },
         ],
       },
+      {
+        // v4 "Participant / Support Overview → Worker / Support Network
+        // Overview" (a five-column table). Homed here per the Build Guide
+        // ("My support network folds into decision_making").
+        title: 'Worker / Support Network Overview',
+        intro: [
+          'List people the participant chooses to involve or share information with. This does not create employment, assignment, or provider management.',
+        ],
+        questions: [
+          {
+            key: 'support_network',
+            type: 'rows',
+            label: 'Worker / Support Network Overview',
+            addLabel: 'Add another person',
+            columns: [
+              { key: 'name', label: 'Name' },
+              { key: 'role', label: 'Role / relationship' },
+              { key: 'contact', label: 'Contact details' },
+              { key: 'access', label: 'Access permission' },
+              { key: 'notes', label: 'Notes / limits' },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -1164,6 +1321,25 @@ export function validateAnswerValue(question, value) {
       return Number.isInteger(value) && value >= question.min && value <= question.max
         ? null
         : `Must be a whole number between ${question.min} and ${question.max}.`;
+    case 'date':
+      return typeof value === 'string' && DATE_PATTERN.test(value) && !Number.isNaN(Date.parse(value))
+        ? null
+        : 'Must be a date (YYYY-MM-DD).';
+    case 'rows': {
+      if (!Array.isArray(value) || value.length > MAX_ROWS) return 'Must be a list of rows.';
+      const columns = new Set(question.columns.map((column) => column.key));
+      return value.every(
+        (row) =>
+          row &&
+          typeof row === 'object' &&
+          !Array.isArray(row) &&
+          Object.entries(row).every(
+            ([key, cell]) => columns.has(key) && isPlainString(cell, MAX_TEXTAREA)
+          )
+      )
+        ? null
+        : 'Each row may only hold text in the columns of this table.';
+    }
     case 'steps':
       if (!Array.isArray(value) || value.length > MAX_STEPS) return 'Must be a list of steps.';
       return value.every(

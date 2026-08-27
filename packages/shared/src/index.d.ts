@@ -117,6 +117,17 @@ export declare const DAILY_LOG_LIMITS: {
 
 /** Taken from the built screens, not from canon — see the note in dailyLog.js. */
 export declare const FUNCTIONAL_DOMAINS: readonly { key: string; label: string }[];
+
+export interface DashboardAction {
+  key: string;
+  label: string;
+  description: string;
+  route: string;
+  priority: number;
+  optional: boolean;
+}
+export declare const DASHBOARD_ACTIONS: readonly DashboardAction[];
+export declare const DASHBOARD_ACTION_KEYS: readonly string[];
 export declare const FUNCTIONAL_DOMAIN_KEYS: readonly string[];
 
 export declare const USUAL_PATTERN_COMPARISONS: readonly { key: string; label: string }[];
@@ -126,12 +137,39 @@ export declare const SUPPORT_LEVEL_COMPARISONS: readonly { key: string; label: s
 export declare const SUPPORT_LEVEL_COMPARISON_KEYS: readonly string[];
 export declare function comparisonKeysFor(layer?: DailyLogAuthorRole): readonly string[];
 
+export interface GoalLinkHelperEntry {
+  code: string;
+  domain: string;
+  grouping: string;
+  bucketDefault: string;
+  examples: string;
+  goalLinks: string;
+  barrier: string;
+  rationaleTags: readonly string[];
+}
+export declare const NDIS_BUCKETS: readonly { key: string; label: string }[];
+export declare const NDIS_BUCKET_KEYS: readonly string[];
+export declare function bucketLabel(key: string): string;
+export declare const GOAL_LINK_HELPER: readonly GoalLinkHelperEntry[];
+export declare const GOAL_LINK_HELPER_CODES: readonly string[];
+export declare function goalLinkHelperEntry(code: string | null | undefined): GoalLinkHelperEntry | null;
+export declare function goalLinkSuggestions(
+  code: string | null | undefined
+): { bucket: string; rationaleTags: readonly string[] } | null;
+export declare const RN_RATIONALE_TAG_KEYS: readonly string[];
+export declare const RN_RATIONALE_TAGS: readonly { key: string; label: string }[];
+export declare function rnRationaleTagLabel(tag: string): string;
+
 export interface DailyLogFields {
   sessionDate?: string | null;
   startTime?: string | null;
   endTime?: string | null;
   goalIds?: number[];
   domainTags?: string[];
+  /** Goal Link Helper pack: bucket required to submit; grouping and tags optional. */
+  ndisBucket?: string | null;
+  functionalGrouping?: string | null;
+  rnRationaleTags?: string[];
   impactText?: string | null;
   supportText?: string | null;
   outcomeText?: string | null;
@@ -330,7 +368,9 @@ export type ProfileQuestionType =
   | 'multi'
   | 'toggle'
   | 'scale'
-  | 'steps';
+  | 'steps'
+  | 'date'
+  | 'rows';
 
 export interface ProfileQuestionOption {
   value: string;
@@ -345,6 +385,8 @@ export interface ProfileQuestion {
   placeholder?: string;
   required?: boolean;
   options?: readonly ProfileQuestionOption[];
+  columns?: readonly { key: string; label: string }[];
+  addLabel?: string;
   min?: number;
   max?: number;
 }
@@ -354,6 +396,7 @@ export interface ProfileSectionGroup {
   title: string;
   intro?: readonly string[];
   questions: readonly ProfileQuestion[];
+  outro?: readonly string[];
 }
 
 export interface ProfileSection {

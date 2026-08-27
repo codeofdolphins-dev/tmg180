@@ -22,6 +22,7 @@ import {
   validateSnapshotAddendum,
 } from '@tmg180/shared';
 import Select from '../../components/ui/Select';
+import SupportsByBucket from '../../components/snapshot/SupportsByBucket';
 import { formatLogDate, formatShortDate, formatTimestamp } from '../../lib/dates';
 import {
   useAddSnapshotAddendum,
@@ -342,6 +343,9 @@ export default function MonthlySnapshotSummary() {
           )}
         </div>
       </div>
+
+      {/* Goal Link Helper roll-up — supports used this month, by NDIS budget bucket */}
+      <SupportsByBucket buckets={stats.buckets ?? []} />
 
       <div className="bg-white/70 rounded-3xl p-8">
         <div className="flex items-center gap-3">

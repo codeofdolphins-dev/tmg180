@@ -5,12 +5,14 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 /**
  * The goals a daily log can link to.
  *
- * Canon has `tmg_participant_goals` filled from the FCA intake, which is not
- * built — so goals are derived from what the participant already wrote in My
- * Goals (profile section `my-goals`): their primary aspiration plus each step
- * towards it. Deriving keeps one source of truth: goals are edited in the
- * profile, never here, and the evidence chain still reads a real goal row with
- * a stable id that a submitted log can point at forever.
+ * Goals are derived from the Personal Profile's Participant Goals table
+ * (Support Needs Tool v4 → profile section `goals`, question `goals`: one
+ * row per goal, its `goal` cell "in their own words"). Answers stored under
+ * the earlier shape — `primary_aspiration` + `goal_steps` — are still read
+ * after the table, so nothing already recorded stops resolving. Deriving keeps
+ * one source of truth: goals are edited in the profile, never here, and the
+ * evidence chain still reads a real goal row with a stable id that a submitted
+ * log can point at forever.
  *
  * The sync is idempotent. A goal whose text is still in the profile keeps its
  * id; one that has been rewritten or removed is deactivated rather than
@@ -18,17 +20,24 @@ import { asyncHandler } from '../utils/asyncHandler.js';
  */
 
 export const GOALS_SECTION_KEY = 'goals';
-const MAX_GOALS = 21; // one aspiration + the 20 steps the profile allows
+const MAX_GOALS = 41; // 20 table rows + the legacy aspiration and its 20 steps
 
 type Answer = { question_key: string; value: unknown };
 
-/** [primary aspiration, ...steps] — trimmed, de-duplicated, in profile order. */
+/** [...table goals, legacy aspiration, ...legacy steps] — trimmed, de-duplicated, in profile order. */
 function deriveGoalTexts(answers: Answer[]) {
   const byKey = new Map(answers.map((answer) => [answer.question_key, answer.value]));
+  const rows = byKey.get('goals');
   const aspiration = byKey.get('primary_aspiration');
   const steps = byKey.get('goal_steps');
 
   const texts: string[] = [];
+  if (Array.isArray(rows)) {
+    for (const row of rows) {
+      const goal = (row as { goal?: unknown })?.goal;
+      if (typeof goal === 'string') texts.push(goal);
+    }
+  }
   if (typeof aspiration === 'string') texts.push(aspiration);
   if (Array.isArray(steps)) {
     for (const step of steps) {

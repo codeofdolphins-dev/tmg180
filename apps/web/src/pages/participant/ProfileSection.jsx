@@ -9,16 +9,18 @@ import {
   X,
 } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
-import { useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
 import { profileSectionBySlug } from '@tmg180/shared';
 import ProfileSectionFooter from '../../components/participant/ProfileSectionFooter';
+import DateField from '../../components/ui/DateField';
 import { toggleInList, useSectionForm } from '../../hooks/participant/profile';
 import { PARTICIPANT_PATHS } from '../../routes/paths';
 
 /**
  * One page renders every Personal Profile section straight from the contract
  * in @tmg180/shared (Final Override P1: the profile is one living document —
- * the intake's own groups, framing copy and checklists, in seed order).
+ * the Support Needs Tool v4's own groups, framing copy, checklists and tables,
+ * in seed order).
  * Adding or changing a section is a contract edit; nothing here is bespoke.
  */
 
@@ -200,12 +202,83 @@ function StepsQuestion({ question, form }) {
   );
 }
 
+function DateQuestion({ question, form }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={question.key} className="text-base font-medium text-[#0b1c30]">
+        {question.label}
+      </label>
+      <Controller
+        control={form.control}
+        name={question.key}
+        render={({ field }) => (
+          <DateField
+            id={question.key}
+            ariaLabel={question.label}
+            look="box"
+            value={field.value ?? ''}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+          />
+        )}
+      />
+    </div>
+  );
+}
+
+/** A table in the source document — one card per row, one field per column. */
+function RowsQuestion({ question, form }) {
+  const rows = useFieldArray({ control: form.control, name: question.key });
+  const blank = Object.fromEntries(question.columns.map((column) => [column.key, '']));
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <span className="text-base font-medium text-[#0b1c30]">{question.label}</span>
+        <button
+          type="button"
+          onClick={() => rows.append(blank)}
+          className="flex items-center gap-1 text-base text-brand-600 hover:text-brand-700 transition-colors"
+        >
+          <Plus size={12} className="shrink-0" />
+          {question.addLabel ?? 'Add another'}
+        </button>
+      </div>
+      <div className="flex flex-col gap-3">
+        {rows.fields.map((field, index) => (
+          <div key={field.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold tracking-wide text-slate-500">{index + 1}</span>
+              <button type="button" aria-label="Remove row" onClick={() => rows.remove(index)}>
+                <X size={16} className="text-slate-400 hover:text-slate-600" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {question.columns.map((column) => (
+                <label key={column.key} className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-[#0b1c30]">{column.label}</span>
+                  <textarea
+                    rows={2}
+                    className="resize-none bg-white border border-slate-300 rounded-xl p-3 text-sm text-[#0b1c30] outline-none focus:border-[#7800ce] transition-colors"
+                    {...form.register(`${question.key}.${index}.${column.key}`)}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const QUESTION_RENDERERS = {
   multi: MultiQuestion,
   textarea: TextareaQuestion,
   text: TextQuestion,
   select: SelectQuestion,
   steps: StepsQuestion,
+  date: DateQuestion,
+  rows: RowsQuestion,
 };
 
 function GroupCard({ group, form }) {
@@ -223,6 +296,11 @@ function GroupCard({ group, form }) {
         const Renderer = QUESTION_RENDERERS[question.type];
         return Renderer ? <Renderer key={question.key} question={question} form={form} /> : null;
       })}
+      {group.outro?.map((line) => (
+        <p key={line} className="text-base text-[#434655] leading-relaxed">
+          {line}
+        </p>
+      ))}
     </div>
   );
 }
@@ -245,6 +323,12 @@ function SectionForm({ def }) {
       for (const question of def.questions) {
         if (question.type === 'steps' && Array.isArray(cleaned[question.key])) {
           cleaned[question.key] = cleaned[question.key].filter((step) => step.text?.trim());
+        }
+        // Blank table rows likewise.
+        if (question.type === 'rows' && Array.isArray(cleaned[question.key])) {
+          cleaned[question.key] = cleaned[question.key].filter((row) =>
+            Object.values(row ?? {}).some((cell) => String(cell ?? '').trim())
+          );
         }
       }
       return cleaned;

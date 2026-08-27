@@ -62,6 +62,15 @@ export function useSaveSection() {
  */
 export function useSectionForm(sectionKey, { transform } = {}) {
   const navigate = useNavigate();
+  /**
+   * A section is long — Overview runs several screens. Landing on the next one
+   * still scrolled to the bottom hides its heading and its first question, so
+   * every move between sections starts at the top.
+   */
+  const goTo = (path) => {
+    navigate(path);
+    window.scrollTo({ top: 0, left: 0 });
+  };
   const { data: profile, isLoading } = useProfile();
   const save = useSaveSection();
 
@@ -83,7 +92,7 @@ export function useSectionForm(sectionKey, { transform } = {}) {
     const answers = transform ? transform(values) : values;
     try {
       await save.mutateAsync({ sectionKey, answers });
-      if (path) navigate(path);
+      if (path) goTo(path);
     } catch {
       // save.error renders in the page's banner; stay put on failure.
     }
@@ -104,7 +113,7 @@ export function useSectionForm(sectionKey, { transform } = {}) {
     saveAndContinue: saveThen(next ? SECTION_PATHS[next.key] : PARTICIPANT_PATHS.profile),
     /** Previous never saves — matches the built screens. */
     goPrevious: () =>
-      navigate(previous ? SECTION_PATHS[previous.key] : PARTICIPANT_PATHS.profile),
+      goTo(previous ? SECTION_PATHS[previous.key] : PARTICIPANT_PATHS.profile),
   };
 }
 

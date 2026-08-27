@@ -23,6 +23,7 @@ import {
 import { formatRelativeTime, formatShortDate, formatTimestamp } from '../../lib/dates';
 import { isConsentLost, useWorkerSnapshot } from '../../hooks/worker/snapshot';
 import { WORKER_PATHS } from '../../routes/paths';
+import SupportsByBucket from '../../components/snapshot/SupportsByBucket';
 
 /**
  * One approved Monthly Snapshot, worker side — the read half of Figma
@@ -240,6 +241,9 @@ export default function WorkerSnapshotDetail() {
           )}
         </Panel>
       </div>
+
+      {/* Goal Link Helper roll-up — supports used this month, by NDIS budget bucket */}
+      <SupportsByBucket buckets={stats.buckets ?? []} />
 
       {comparisonEntries.length > 0 && (
         <Panel icon={History} tone="bg-amber-50 text-amber-700" title="Compared with their usual pattern">

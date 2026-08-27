@@ -21,7 +21,6 @@ import { participantDirectoryPath } from '../../routes/paths';
  */
 
 const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
-const CHIP = 'text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-brand-700';
 
 const initialsOf = (name = '') =>
   name
@@ -31,9 +30,26 @@ const initialsOf = (name = '') =>
     .map((part) => part[0]?.toUpperCase())
     .join('');
 
+/**
+ * Final Override seed `directory_card_config`: the card leads with the
+ * display name, the relational intro excerpt, natural support style,
+ * communication style and preferred environments (primary_fields); location
+ * and support areas are secondary_fields — findable, never the first thing
+ * scanned. Row labels are the seed's worker_profile_prompts labels.
+ */
+const RELATIONAL_ROWS = [
+  { key: 'naturalSupportStyle', label: 'How I naturally support people' },
+  { key: 'communicationStyle', label: 'How I usually communicate' },
+  { key: 'preferredEnvironments', label: 'Where I do my best support work' },
+];
+
+const asText = (value) => (Array.isArray(value) ? value.filter(Boolean).join(', ') : value);
+
 function WorkerRow({ worker, onOpen }) {
-  const meta = ['Relational Worker', worker.location, worker.experienceLabel].filter(Boolean);
-  const lead = worker.philosophy ? `“${worker.philosophy}”` : worker.introExcerpt;
+  const relational = RELATIONAL_ROWS.map((row) => ({ ...row, value: asText(worker[row.key]) })).filter(
+    (row) => row.value
+  );
+  const secondary = [worker.location, ...worker.supportAreas.map((area) => area.label)].filter(Boolean);
   return (
     <article className={`${CARD} flex items-start gap-5`}>
       <div className="w-14 h-14 rounded-full bg-purple-100 text-brand-700 flex items-center justify-center text-lg font-semibold shrink-0">
@@ -41,17 +57,20 @@ function WorkerRow({ worker, onOpen }) {
       </div>
       <div className="min-w-0 flex-1">
         <h2 className="text-lg font-semibold text-brand-700 leading-snug">{worker.name}</h2>
-        <p className="text-sm text-slate-500 mt-1">{meta.join(' · ')}</p>
-        {lead && <p className="text-sm text-slate-600 leading-relaxed mt-2">{lead}</p>}
-        {worker.supportAreas.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {worker.supportAreas.map((area) => (
-              <span key={area.key} className={CHIP}>
-                {area.label}
-              </span>
-            ))}
-          </div>
+        {worker.introExcerpt && (
+          <p className="text-sm text-slate-600 leading-relaxed mt-2">{worker.introExcerpt}</p>
         )}
+        {relational.length > 0 && (
+          <dl className="mt-3 flex flex-col gap-1.5">
+            {relational.map((row) => (
+              <div key={row.key} className="text-sm leading-relaxed">
+                <dt className="inline font-semibold text-slate-700">{row.label}: </dt>
+                <dd className="inline text-slate-600">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {secondary.length > 0 && <p className="text-xs text-slate-500 mt-3">{secondary.join(' · ')}</p>}
       </div>
       <button
         onClick={onOpen}
@@ -177,7 +196,7 @@ export default function BrowseVerifiedWorkers() {
         <>
           <p className="text-sm text-slate-500 -mt-2" aria-live="polite">
             {data.total} {data.total === 1 ? 'profile' : 'profiles'}
-            {filtered ? (data.total === 1 ? ' matches these filters' : ' match these filters') : ''}
+            {filtered ? ' for these filters' : ''}
             {isFetching ? ' · updating…' : ''}
           </p>
           <div className={`flex flex-col gap-4 ${isFetching ? 'opacity-70' : ''}`}>
@@ -198,7 +217,7 @@ export default function BrowseVerifiedWorkers() {
             <Users size={26} />
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mt-6">
-            {filtered ? 'No profiles match these filters' : 'No published profiles yet'}
+            {filtered ? 'No profiles for these filters' : 'No published profiles yet'}
           </h2>
           <p className="text-base text-slate-600 mt-2 max-w-md mx-auto">
             {filtered

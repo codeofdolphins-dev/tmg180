@@ -1,3 +1,4 @@
+import { NDIS_BUCKETS, goalLinkHelperEntry } from '@tmg180/shared';
 import { prisma } from '../config/prisma.js';
 import { toDay } from '../utils/dbDates.js';
 
@@ -22,6 +23,9 @@ export type SourceLog = {
   goal_ids: number[];
   domain_tags: string[];
   baseline_comparison: string | null;
+  ndis_bucket?: string | null;
+  rn_rationale_tags?: string[];
+  tmg_functional_grouping_code?: string | null;
 };
 
 /** The longest run of consecutive days logged — the frame's "consistency streak". */
@@ -74,6 +78,33 @@ export async function buildStats(logs: SourceLog[]) {
     }
   }
 
+  // Goal Link Helper roll-up: "Supports used this month grouped by bucket
+  // (Core/Capacity/Capital). For each bucket: list top goal links and 2–3
+  // functional barrier phrases + outcomes markers" — counted from the logs,
+  // phrases from the helper table.
+  type BucketTally = {
+    logsCount: number;
+    goals: Record<number, number>;
+    groupings: Record<string, number>;
+    tags: Record<string, number>;
+  };
+  const bucketTally: Record<string, BucketTally> = {};
+  for (const log of logs) {
+    if (!log.ndis_bucket) continue;
+    const bucket = (bucketTally[log.ndis_bucket] ??= { logsCount: 0, goals: {}, groupings: {}, tags: {} });
+    bucket.logsCount += 1;
+    for (const goalId of log.goal_ids) bucket.goals[goalId] = (bucket.goals[goalId] ?? 0) + 1;
+    if (log.tmg_functional_grouping_code) {
+      bucket.groupings[log.tmg_functional_grouping_code] =
+        (bucket.groupings[log.tmg_functional_grouping_code] ?? 0) + 1;
+    }
+    for (const tag of log.rn_rationale_tags ?? []) bucket.tags[tag] = (bucket.tags[tag] ?? 0) + 1;
+  }
+  const topKeys = (counts: Record<string, number>, limit: number) =>
+    Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, limit);
+
   const goalRows = Object.keys(goalCounts).length
     ? await prisma.participantGoal.findMany({
         where: { id: { in: Object.keys(goalCounts).map(Number) } },
@@ -96,6 +127,26 @@ export async function buildStats(logs: SourceLog[]) {
       logsCount: goalCounts[goal.id] ?? 0,
       comparisons: goalComparisons[goal.id] ?? {},
     })),
+    buckets: NDIS_BUCKETS.flatMap((bucket) => {
+      const tally = bucketTally[bucket.key];
+      if (!tally) return [];
+      return [
+        {
+          key: bucket.key,
+          label: bucket.label,
+          logsCount: tally.logsCount,
+          goals: topKeys(tally.goals as unknown as Record<string, number>, 3).flatMap(([id, count]) => {
+            const goal = goalRows.find((row) => row.id === Number(id));
+            return goal ? [{ id: goal.id, text: goal.goal_text, logsCount: count }] : [];
+          }),
+          barriers: topKeys(tally.groupings, 3).flatMap(([code]) => {
+            const entry = goalLinkHelperEntry(code);
+            return entry ? [entry.barrier] : [];
+          }),
+          rationaleTags: topKeys(tally.tags, 6).map(([key, count]) => ({ key, count })),
+        },
+      ];
+    }),
     firstSessionDate: toDay(logs.at(-1)?.session_date ?? null),
     lastSessionDate: toDay(logs.at(0)?.session_date ?? null),
   };

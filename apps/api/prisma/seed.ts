@@ -20,13 +20,14 @@
  * Credentials come from the environment; the dev defaults below are only
  * allowed outside production:
  *   SEED_ADMIN_EMAIL      default admin@tmg180.test
- *   SEED_ADMIN_PASSWORD   default Governance1! (dev only)
+ *   SEED_ADMIN_PASSWORD   default 12345678 (dev only)
  *   SEED_ADMIN_NAME       default Platform Governance
  */
 import { ACCOUNT_STATUS, ROLES } from '@tmg180/shared';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../src/config/prisma.js';
 import { env } from '../src/config/env.js';
+import { seedGoalLinkHelper } from './seedGoalLinkHelper.js';
 
 const DEV_DEFAULTS = {
   email: 'admin@tmg180.test',
@@ -53,6 +54,9 @@ function credentials() {
 }
 
 async function main() {
+  // Reference data first: the Goal Link Helper table (pack seed, verbatim).
+  await seedGoalLinkHelper();
+
   const { email, password, name } = credentials();
 
   const existing = await prisma.user.findUnique({

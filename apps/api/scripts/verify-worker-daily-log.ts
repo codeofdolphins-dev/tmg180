@@ -177,7 +177,7 @@ async function main() {
 
   const save = await call('PATCH', `/worker/daily-logs/${logId}`, {
     token: workerToken,
-    body: { sessionDate: TODAY, startTime: '09:00', endTime: '11:00', goalIds: [goalIds[0], goalIds[1]], domainTags: ['daily_living'], comparison: 'more_support', participantVoice: 'I want to try the bus next week', safetyNote: 'None', privateNarrative: 'Updated private note', outcomeText: 'Made a plan.' },
+    body: { sessionDate: TODAY, startTime: '09:00', endTime: '11:00', goalIds: [goalIds[0], goalIds[1]], domainTags: ['self_care'], comparison: 'more_support', participantVoice: 'I want to try the bus next week', safetyNote: 'None', privateNarrative: 'Updated private note', outcomeText: 'Made a plan.' },
   });
   check('save draft → 200 with the new values', save.status === 200 && save.json.data.goalIds.length === 2 && save.json.data.comparison === 'more_support' && save.json.data.durationMinutes === 120 && save.json.data.participantVoice === 'I want to try the bus next week' && save.json.data.privateNarrative === 'Updated private note', save.json.data);
   check('goals resolved on the detail', save.json.data.goals.length === 2 && save.json.data.goals[0].text === 'Get out into the community more');
@@ -219,7 +219,7 @@ async function main() {
 
   const submitted = await call('POST', `/worker/daily-logs/${logId}/submit`, {
     token: workerToken,
-    body: { sessionDate: TODAY, startTime: '09:00', endTime: '11:00', goalIds: [goalIds[0]], domainTags: ['daily_living', 'communication'], comparison: 'typical', impactText: 'Final impact text', privateNarrative: 'Final private note' },
+    body: { sessionDate: TODAY, startTime: '09:00', endTime: '11:00', goalIds: [goalIds[0]], domainTags: ['self_care', 'communication'], comparison: 'typical', impactText: 'Final impact text', privateNarrative: 'Final private note' },
   });
   check('submit → 200, status submitted, submittedAt stamped', submitted.status === 200 && submitted.json.data.status === DAILY_LOG_STATUS.SUBMITTED && submitted.json.data.submittedAt, submitted.json);
   const lockedRow = await prisma.dailyNoteStructured.findUnique({ where: { id: logId }, include: { private_note: true } });

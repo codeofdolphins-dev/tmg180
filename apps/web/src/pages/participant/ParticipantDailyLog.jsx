@@ -6,8 +6,6 @@ import {
   Target,
   PenLine,
   BarChart2,
-  Sparkles,
-  Info,
   StickyNote,
   SendHorizontal,
   LoaderCircle,
@@ -17,6 +15,8 @@ import {
 import { Controller } from 'react-hook-form';
 import { Navigate, useParams } from 'react-router-dom';
 import { FUNCTIONAL_DOMAINS, USUAL_PATTERN_COMPARISONS, DAILY_LOG_LIMITS } from '@tmg180/shared';
+import NoteIntroduction from '../../components/participant/NoteIntroduction';
+import GoalLinkHelperFields from '../../components/dailyLog/GoalLinkHelperFields';
 import DateField from '../../components/ui/DateField';
 import Select from '../../components/ui/Select';
 import TimeField from '../../components/ui/TimeField';
@@ -32,19 +32,10 @@ import { useAuthStore } from '../../store';
  * bounces to its read-only view — the evidence chain is append-only, so this
  * form never edits a finalised record.
  *
- * The "Help me write this" panel is one of the three approved AI endpoints and
- * is not specced yet (draft-only, behind a human review gate). It renders
- * disabled rather than removed: a control that looks live but does nothing is
- * worse than one that says it is not ready.
+ * No AI control on this screen: SPEC-AI-1 (client document set, 27 Aug 2026)
+ * puts every AI job inside the worker portal at MVP — "no participant-facing
+ * agent". The three approved AI endpoints stay worker-side.
  */
-
-const PRIVACY_TEXT =
-  'This tool only uses the dot points you provide below to generate suggestions. It does not access your broader history and complies with Australian Privacy Principles (APPs).';
-
-const ROUGH_NOTES_PLACEHOLDER =
-  '- Went to cafe\n- ordered coffee independently\n- felt overwhelmed by noise\n- support worker helped me find a quiet spot';
-
-const AI_FORMATS = ['Plain language', 'NDIS evidence language', 'Both formats'];
 
 function FieldError({ message }) {
   if (!message) return null;
@@ -144,6 +135,9 @@ export default function ParticipantDailyLog() {
             </p>
           </div>
         </div>
+
+        {/* Master Document Map #10: the Case Note Introduction "at the top of every note screen". */}
+        <NoteIntroduction />
 
         {error && (
           <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-3xl p-5 text-rose-800">
@@ -315,6 +309,11 @@ export default function ParticipantDailyLog() {
                   </div>
                   <FieldError message={errors.domainTags?.message} />
                 </div>
+
+                <hr className="border-slate-200" />
+
+                {/* Goal Link Helper pack: bucket (required), grouping + rationale tags (optional). */}
+                <GoalLinkHelperFields watch={watch} setValue={setValue} errors={errors} />
               </div>
             </section>
 
@@ -404,62 +403,6 @@ export default function ParticipantDailyLog() {
           </div>
 
           <div className="w-96 shrink-0 hidden xl:flex flex-col gap-6">
-            <div className="relative overflow-hidden bg-[#7800ce]/5 rounded-4xl p-6">
-              <div className="absolute -top-10 -right-2 w-32 h-32 rounded-full bg-[#7800ce]/20 blur-2xl pointer-events-none" />
-              <div className="relative">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <Sparkles size={22} className="text-[#7800ce] shrink-0" />
-                    <h3 className="text-base font-semibold text-[#7800ce]">
-                      Help me write this
-                    </h3>
-                  </div>
-                  <span title="Not switched on yet. When it is, a person reviews any drafted wording before it is saved.">
-                    <Info size={20} className="text-slate-700" />
-                  </span>
-                </div>
-
-                <div className="mt-4 bg-[#f8f9ff]/50 rounded-3xl p-4">
-                  <p className="text-xs font-bold text-[#7800ce]">
-                    Privacy First (Australian Privacy Principles)
-                  </p>
-                  <p className="mt-1 text-xs font-bold text-[#4d4354] leading-relaxed">
-                    {PRIVACY_TEXT}
-                  </p>
-                </div>
-
-                <div className="mt-5">
-                  <p className="text-xs font-bold text-[#4d4354]">
-                    Jot down a few rough notes here:
-                  </p>
-                  <textarea
-                    rows={5}
-                    disabled
-                    aria-label="Rough notes for writing help"
-                    placeholder={ROUGH_NOTES_PLACEHOLDER}
-                    className="mt-2 w-full bg-white/80 rounded-3xl px-3.5 py-3 text-base text-[#0b1c30] placeholder:text-[#6b7280] outline-none resize-none disabled:opacity-70"
-                  />
-                </div>
-
-                <div className="mt-4 flex flex-col gap-2">
-                  {AI_FORMATS.map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      disabled
-                      className="w-full h-10.5 rounded-full bg-[#f8f9ff] border border-purple-200 text-sm text-[#7800ce] opacity-60 cursor-not-allowed"
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-
-                <p className="mt-3 text-xs text-[#4d4354] text-center">
-                  Writing help isn&rsquo;t switched on yet. Your own words are all this log
-                  needs.
-                </p>
-              </div>
-            </div>
 
             <details className="bg-[#f8f9ff] rounded-4xl px-6 py-6 group">
               <summary className="flex items-center justify-between cursor-pointer list-none">

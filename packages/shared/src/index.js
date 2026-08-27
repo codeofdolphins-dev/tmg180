@@ -35,6 +35,18 @@ export {
   comparisonLabel,
 } from './dailyLog.js';
 export {
+  NDIS_BUCKETS,
+  NDIS_BUCKET_KEYS,
+  bucketLabel,
+  GOAL_LINK_HELPER,
+  GOAL_LINK_HELPER_CODES,
+  goalLinkHelperEntry,
+  goalLinkSuggestions,
+  RN_RATIONALE_TAG_KEYS,
+  RN_RATIONALE_TAGS,
+  rnRationaleTagLabel,
+} from './goalLinkHelper.js';
+export {
   SNAPSHOT_STATUS,
   SNAPSHOT_LAYERS,
   SNAPSHOT_FIELD_KEYS,
@@ -76,6 +88,18 @@ export {
   SESSION_PREFERENCE_STATUS,
   validateSessionSelections,
 } from './sessionPreferences.js';
+export { DASHBOARD_ACTIONS, DASHBOARD_ACTION_KEYS } from './dashboard.js';
+export {
+  PARTICIPANT_LIBRARIES,
+  PARTICIPANT_LIBRARY_TABS,
+  PARTICIPANT_READING_STATUS,
+  PARTICIPANT_READINGS,
+  PARTICIPANT_READING_SLUGS,
+  PARTICIPANT_READING_AWAITING_NOTE,
+  participantReading,
+  participantReadingsIn,
+  participantReadingSection,
+} from './participantLibrary.js';
 export {
   ANSWER_VISIBILITY,
   PROFILE_SECTION_STATUS,

@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   LayoutDashboard,
   User,
   NotebookPen,
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { label: 'Daily Log', icon: NotebookPen, path: P.dailyLog },
   { label: 'Monthly Snapshot', icon: CalendarDays, path: P.snapshot },
   { label: 'Verified Workers', icon: Search, path: P.browseWorkers },
+  { label: 'Library', icon: BookOpen, path: P.library },
 ];
 
 const BOTTOM_ITEMS = [

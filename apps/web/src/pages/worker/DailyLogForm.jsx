@@ -24,6 +24,7 @@ import {
   DAILY_LOG_LIMITS,
 } from '@tmg180/shared';
 import DateField from '../../components/ui/DateField';
+import GoalLinkHelperFields from '../../components/dailyLog/GoalLinkHelperFields';
 import Select from '../../components/ui/Select';
 import TimeField from '../../components/ui/TimeField';
 import {
@@ -477,6 +478,16 @@ export default function DailyLogForm() {
                 })}
               </div>
               <FieldError message={errors.domainTags?.message} />
+            </section>
+
+            {/* ---------- goal link helper ---------- */}
+            <section className="bg-[#f8f9ff] rounded-4xl p-8">
+              <SectionTitle icon={Sparkles} sub="Link this support to an NDIS budget bucket; a functional grouping and rationale tags are optional.">
+                Goal Link Helper
+              </SectionTitle>
+              <div className="mt-5">
+                <GoalLinkHelperFields watch={watch} setValue={setValue} errors={errors} />
+              </div>
             </section>
 
             {/* ---------- the details ---------- */}

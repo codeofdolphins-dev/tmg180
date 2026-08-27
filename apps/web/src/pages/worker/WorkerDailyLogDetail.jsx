@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DAILY_LOG_STATUS, comparisonLabel, domainLabel, validateAddendum } from '@tmg180/shared';
+import GoalLinkSummary from '../../components/dailyLog/GoalLinkSummary';
 import Button from '../../components/ui/Button';
 import { formatLogDate, formatTimeRange, formatTimestamp } from '../../lib/dates';
 import { useAddWorkerAddendum, useWorkerDailyLog } from '../../hooks/worker/dailyLog';
@@ -288,6 +289,10 @@ export default function WorkerDailyLogDetail() {
                   {domainLabel(tag)}
                 </span>
               ))}
+            </div>
+
+            <div className="mt-5">
+              <GoalLinkSummary log={log} />
             </div>
           </div>
 

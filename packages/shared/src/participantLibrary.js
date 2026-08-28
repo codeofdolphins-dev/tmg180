@@ -16,6 +16,19 @@
  * (the source's bullet or line list, items verbatim).
  */
 
+import {
+  AI_GOVERNANCE_BODY,
+  EVIDENCE_TEMPLATES_BODY,
+  GOAL_MAPPING_BODY,
+  GOVERNANCE_ARCHITECTURE_BODY,
+  MONTHLY_SNAPSHOT_PURPOSE_BODY,
+  POLICY_10_BODY,
+  POLICY_2_BODY,
+  POLICY_3_BODY,
+  POLICY_4_BODY,
+  POLICY_5_BODY,
+} from './participantLibraryContent.js';
+
 export const PARTICIPANT_LIBRARIES = {
   CORE: 'core',
   OPTIONAL: 'optional',
@@ -25,6 +38,22 @@ export const PARTICIPANT_LIBRARY_TABS = [
   { key: PARTICIPANT_LIBRARIES.CORE, label: 'Core Library' },
   { key: PARTICIPANT_LIBRARIES.OPTIONAL, label: 'Optional Reading' },
 ];
+
+/**
+ * Topic pages — Instructions.pdf `library_information_architecture`
+ * `topic_pages`, kept to the ones the delivered documents can fill. "Practice
+ * Standards", "Support Interpretation" and "Relational Discipline" are in the
+ * IA but their manuals have not been delivered; they are not listed as empty
+ * shelves.
+ */
+export const PARTICIPANT_LIBRARY_TOPICS = [
+  { key: 'mandatory_policies', label: 'Mandatory Policies' },
+  { key: 'evidence', label: 'Templates & How-to Guides' },
+  { key: 'rights', label: 'Rights & Information' },
+  { key: 'governance', label: 'How TMG180 is governed' },
+];
+
+export const PARTICIPANT_LIBRARY_TOPIC_KEYS = PARTICIPANT_LIBRARY_TOPICS.map((topic) => topic.key);
 
 export const PARTICIPANT_READING_STATUS = {
   PUBLISHED: 'published',
@@ -180,10 +209,25 @@ const RELATIONAL_EVIDENCE_NOTES_BODY = [
   p('The system gradually builds a clearer picture over time.'),
 ];
 
+const policy = (number, slug, title, summary, body) => ({
+  slug,
+  library: PARTICIPANT_LIBRARIES.CORE,
+  topic: 'mandatory_policies',
+  status: PARTICIPANT_READING_STATUS.PUBLISHED,
+  title,
+  subtitle: `Mandatory Policy ${number}`,
+  source: 'TMG180 Mandatory Policies Governance Controlled Manual v1.0 (21 June 2026)',
+  summary,
+  body,
+  /** The manual's own status; said on the reading, not silently rewritten. */
+  draft: true,
+});
+
 export const PARTICIPANT_READINGS = [
   {
     slug: 'relational-evidence-notes',
     library: PARTICIPANT_LIBRARIES.CORE,
+    topic: 'evidence',
     status: PARTICIPANT_READING_STATUS.PUBLISHED,
     title: 'TMG180 — Relational Evidence Notes',
     subtitle: 'Participant-Owned Longitudinal Support Mapping',
@@ -193,36 +237,110 @@ export const PARTICIPANT_READINGS = [
     body: RELATIONAL_EVIDENCE_NOTES_BODY,
   },
   {
-    slug: 'participant-information-and-rights',
+    slug: 'how-the-evidence-templates-work',
     library: PARTICIPANT_LIBRARIES.CORE,
-    status: PARTICIPANT_READING_STATUS.AWAITING_CONTENT,
-    title: 'Participant and Public Information and Rights Statement',
-    subtitle: 'Mandatory Policy 5',
-    source: 'TMG180 Mandatory Policies Governance Controlled Manual v1.0 (21 June 2026)',
+    topic: 'evidence',
+    status: PARTICIPANT_READING_STATUS.PUBLISHED,
+    title: 'How the evidence templates work',
+    subtitle: 'Support Event Log · Participant Check-in · Monthly Snapshot',
+    source: 'TMG180 Longitudinal Evidence Templates v2.0',
     summary:
-      'What TMG180 is, what it is not, and what rights and limits apply to participants and the public.',
-    body: null,
+      'Three templates that work together to build participant-owned longitudinal evidence over time — and the tone rules that are non-negotiable.',
+    body: EVIDENCE_TEMPLATES_BODY,
   },
   {
-    slug: 'consent-and-information-handling',
+    slug: 'monthly-snapshot-purpose',
     library: PARTICIPANT_LIBRARIES.CORE,
-    status: PARTICIPANT_READING_STATUS.AWAITING_CONTENT,
-    title: 'Consent and Information Handling',
-    subtitle: 'Mandatory Policy 4',
-    source: 'TMG180 Mandatory Policies Governance Controlled Manual v1.0 (21 June 2026)',
+    topic: 'evidence',
+    status: PARTICIPANT_READING_STATUS.PUBLISHED,
+    title: 'What the Monthly Snapshot is for',
+    subtitle: 'Monthly Relational Longitudinal Snapshot',
+    source: 'TMG180 Monthly Relational Longitudinal Snapshot (canonical monthly summary template)',
+    summary: 'A harder month does not mean failure. Fluctuation does not automatically mean regression.',
+    body: MONTHLY_SNAPSHOT_PURPOSE_BODY,
+  },
+  policy(
+    5,
+    'participant-information-and-rights',
+    'Participant and Public Information and Rights Statement',
+    'What TMG180 is, what it is not, and what rights and limits apply to participants and the public.',
+    POLICY_5_BODY
+  ),
+  policy(
+    4,
+    'consent-and-information-handling',
+    'Consent and Information Handling',
+    'How consent is obtained, recorded, respected and withdrawn, and how information is handled.',
+    POLICY_4_BODY
+  ),
+  policy(
+    2,
+    'complaints-concerns-and-feedback',
+    'Complaints, Concerns and Feedback',
+    'Safe, non-retaliatory and proportionate pathways for feedback and complaints without turning every concern into punishment.',
+    POLICY_2_BODY
+  ),
+  policy(
+    3,
+    'incident-management',
+    'Incident Management',
+    'How incidents are recognised, responded to, documented and escalated — and what stays with the worker.',
+    POLICY_3_BODY
+  ),
+  policy(
+    10,
+    'anti-discrimination-equity-and-inclusive-practice',
+    'Anti-discrimination, Equity and Inclusive Practice',
+    'Non-discrimination, equity, cultural safety, inclusion and response pathways for bias or discriminatory conduct.',
+    POLICY_10_BODY
+  ),
+  {
+    slug: 'goal-mapping-examples',
+    library: PARTICIPANT_LIBRARIES.OPTIONAL,
+    topic: 'evidence',
+    status: PARTICIPANT_READING_STATUS.PUBLISHED,
+    title: 'Mapping Support to Goals and Legislation',
+    subtitle: 'Goal mapping examples',
+    source: 'TMG Section 1: Mapping Support to Goals and Legislation (goal mapping examples)',
     summary:
-      'How consent is obtained, recorded, respected and withdrawn, and how information is handled.',
-    body: null,
+      'How supports connect to goals and to the six NDIS functional domains — with worked examples and the evidence phrases workers use.',
+    body: GOAL_MAPPING_BODY,
+  },
+  {
+    slug: 'ai-governance-register',
+    library: PARTICIPANT_LIBRARIES.OPTIONAL,
+    topic: 'governance',
+    status: PARTICIPANT_READING_STATUS.PUBLISHED,
+    title: 'AI Governance Register',
+    subtitle: 'What AI may and may not do in TMG180',
+    source: 'TMG180 AI Governance Register v1.0',
+    summary: 'TMG180 utilises AI as assistive infrastructure. AI systems do not replace participant autonomy.',
+    body: AI_GOVERNANCE_BODY,
+  },
+  {
+    slug: 'governance-architecture',
+    library: PARTICIPANT_LIBRARIES.OPTIONAL,
+    topic: 'governance',
+    status: PARTICIPANT_READING_STATUS.PUBLISHED,
+    title: 'TMG180 Governance Architecture',
+    subtitle: 'The six volumes of the governance suite',
+    source: 'TMG180 Governance Architecture v1.0 (draft governance suite structure)',
+    summary: 'The structure of the TMG180 governance suite and the purpose of each core governance document.',
+    body: GOVERNANCE_ARCHITECTURE_BODY,
   },
 ];
 
 /**
- * Why two readings wait: the Mandatory Policies manual's own control block
- * says "Working Governance Draft — requires legal review, terminology review
- * and source-currency review before formal adoption", and its text uses a
- * term the Final Override bans from the interface. It is shown here once a
- * participant-facing edition is signed off, not before.
+ * Said on every Mandatory Policy reading. The manual's own control block:
+ * "Governance controlled working version. Requires legal review, terminology
+ * review and source-currency review before formal adoption." Published as
+ * written (Jiten, 28 Aug 2026: build to the document) with that status
+ * visible, rather than held back or quietly edited.
  */
+export const PARTICIPANT_READING_DRAFT_NOTE =
+  'This policy is published from the TMG180 Mandatory Policies manual as written. The manual is a governance-controlled working draft that requires legal review, terminology review and source-currency review before formal adoption.';
+
+/** Kept for readings that may be added before their participant-facing edition exists. */
 export const PARTICIPANT_READING_AWAITING_NOTE =
   'This document is part of the TMG180 governance manual. Its participant-facing edition is being finalised and will appear here once it is signed off.';
 
@@ -248,3 +366,14 @@ export function participantReadingSection(slug, heading) {
   const end = rest.findIndex((block) => block.kind === 'h2');
   return end < 0 ? rest : rest.slice(0, end);
 }
+
+export const participantReadingsByTopic = (library) =>
+  PARTICIPANT_LIBRARY_TOPICS.map((topic) => ({
+    topic,
+    readings: PARTICIPANT_READINGS.filter(
+      (reading) => reading.library === library && reading.topic === topic.key
+    ),
+  })).filter((group) => group.readings.length > 0);
+
+export const participantLibraryTopic = (key) =>
+  PARTICIPANT_LIBRARY_TOPICS.find((topic) => topic.key === key) ?? null;

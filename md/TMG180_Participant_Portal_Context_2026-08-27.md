@@ -144,7 +144,7 @@ Nothing in this table depends on Figma. Everything marked with a ruling waits.
 3. **Worker Profile Spec & Review** (7 Aug) + `WorkerProfile.jsx` + `tokens.css` — the directory read model depends on its data contract.
 4. **NDIS Act Review — Developer Implications** (23 Aug) — the L-series items.
 5. **Canonical Technical Pack, Master Map docs 14–20** — README v2, Canonical Schemas Bundle v2/2.2/2.3 (incl. `fca_intake_v6`), Config Master Seeds Postgres v1, Banned Terms & Replacements v1, Improvement Markers v1, Intake→CaseNotes Linking Spec, Participant Snapshot vs Confidential Worker Notes Spec. Never received; the register's "Canonical pack" row still points at them.
-6. **MONTHLY CASENOTES** template (Master Map #13) — the set said "daily/monthly note set"; only the daily arrived.
+6. ~~**MONTHLY CASENOTES** template (Master Map #13) — the set said "daily/monthly note set"; only the daily arrived.~~ **Arrived 28 Aug 2026**, with the Longitudinal Evidence Templates v2.0 that specify the check-in — see §9.
 7. *Optional:* Goal Link Helper Table v1 `.xlsx` / seed `.json` (the SQL already carries the 19 seed rows).
 
 **Assets:** the **Lovable build** — URL, export, or full-page screenshots of every participant screen. Still the only way to compare structure page by page.
@@ -163,7 +163,7 @@ How each open row in §3 resolved by the documents' own rules, and what changed.
 | --- | --- | --- |
 | 1 Profile content | The client's set carries Support Needs Tool v4; the 25 Aug package is not in it (Jiten: focus this set) | `packages/shared/src/profile.js`: Overview intro = v4 *Before You Begin* verbatim; new **Basic Details** group (10 fields incl. a `date` type); the v4 *Consent, Ownership…* copy verbatim in four groups; group titles → v4 headings ("About You", "Your Personal Care and Body", "Household Tasks…", "…and Nervous System"); one option reworded ("…when my support needs change"); **Participant Goals** four-column table (`rows` type) replaces aspiration + steps; **Worker / Support Network Overview** five-column table homed in Decision Making (Build Guide). `goals.controller.ts` derives goals from the table's *Goal* cells first, legacy answers after (nothing stored stops resolving). Renderer: `rows` and `date` question types, group `outro` lines. |
 | 2 Daily/monthly forms | Same reasoning | Built log kept (it already carries the 11-section note's hooks: goals, functional impact, baseline comparison) and extended with the Goal Link Helper (below). Monthly stays the three-layer snapshot with the new bucket roll-up. |
-| 3 Participant daily object | Every governance document names it a **check-in** | **Blocked, not built:** the check-in's option sets ("what showed up", "what helped", "recovery cost") come from MONTHLY CASENOTES.docx (Gaps Analysis), which has not arrived — inventing them would break the rule. The participant-authored full log stays as built and is flagged (no document asks for it; no document asks to remove it). Dashboard action 2 now carries the seed label only. |
+| 3 Participant daily object | Every governance document names it a **check-in** | **Unblocked 28 Aug — see §9.** As at 27 Aug: **blocked, not built:** the check-in's option sets ("what showed up", "what helped", "recovery cost") come from MONTHLY CASENOTES.docx (Gaps Analysis), which has not arrived — inventing them would break the rule. The participant-authored full log stays as built and is flagged (no document asks for it; no document asks to remove it). Dashboard action 2 now carries the seed label only. |
 | 5 Domain list | Learning Hub M4 "which NDIS functional areas (1–3)"; goal mapping pdf: the six NDIS domains | `FUNCTIONAL_DOMAINS` = Mobility · Communication · Social interaction · Learning · Self-care · Self-management. Dev scripts re-keyed. |
 | 6 "Functional Capacity Assessment" in v4 copy | Handoff §7: deviation logged with a reason | **Deviation logged here:** v4's *Before You Begin* says "This is not a clinical Functional Capacity Assessment…" and "Forms, reviews, assessments, provider intake processes…" — rendered verbatim (P1-04's zero-hits grep would flag it; the source is the client's own participant copy). |
 | 7 Directory strings | Register: Drift-Fix strings overruled, "strings come from the Aug docs only" | Built (Build Guide) strings kept. Banned words fixed: "match these filters" ×2 → "for these filters"; "not a booking" → removed. |
@@ -178,4 +178,110 @@ Also built from the documents:
 - **Library** — `packages/shared/src/participantLibrary.js`: Core / Optional tabs (Instructions.pdf IA); *TMG180 — Relational Evidence Notes* (Case Note Introduction Instructions) published verbatim; Policy 4 and Policy 5 listed as awaiting their participant-facing edition. Route `/participant/library/:slug`, sidebar entry, `ReadingBlocks` renderer. **Note screens**: `NoteIntroduction` puts the document's *Purpose of These Notes* section at the top of the log form, collapsed (Master Map #10).
 - **Goal Link Helper** (pack v1.1) — `packages/shared/src/goalLinkHelper.js` (the 19 seed rows verbatim, buckets, rationale tags); Prisma migration `20260827151917_goal_link_helper` (`tmg_goal_link_helper` + three columns on `tmg_daily_note_structured`, bucket CHECKs as the pack's SQL declares); `prisma/seedGoalLinkHelper.ts` (runs in `db:seed`, 19 rows in place); validation: bucket **required to submit**, grouping/tags optional and validated; both log APIs read/write the fields; `GoalLinkHelperFields` on the participant **and** worker forms (grouping prefills bucket + tags, override kept); `GoalLinkSummary` on both read views; `snapshotStats.buckets` + `SupportsByBucket` ("Supports used this month": per bucket the top goal links, the chosen groupings' functional-barrier phrases, rationale-tag counts) on the participant review, the locked summary and the worker's view. Rationale sentence stems are **not** generated — the pack gives no wording.
 
-Still open after this round: the check-in (needs MONTHLY CASENOTES), Sue's two queued rulings, the missing authority documents in §5, the Lovable build for a page-by-page comparison, and the 25 Aug package's status relative to this set.
+Still open after this round: the check-in (needs MONTHLY CASENOTES — **delivered 28 Aug, built, §9**), Sue's two queued rulings, the missing authority documents in §5, the Lovable build for a page-by-page comparison, and the 25 Aug package's status relative to this set.
+
+## 8. The Personal Profile: eleven sections and a closing step (settled 28 Aug 2026)
+
+Sequence, for the record: fourteen sections were built first, from Sue's "PERSONAL PROFILE IMPORTANT CHANGES" letter — the only document that lays out a fourteen-step flow. Jiten then sent the Lovable participant-profile route, which builds **eleven**, and ruled: **keep eleven**, keep our design, take Lovable's content where we can get it.
+
+**Where it landed**
+
+- **Eleven sections**, exactly the Final Override seed's, with their groups back where they were: *Household Tasks…* in Daily Living, *My Home and Environment* in Safety & Support Preferences.
+- **Learning & Employment is gone.** It had no questions in any document; it was never more than a name.
+- **Review & Submit survives as a closing step, not a twelfth section** — `PROFILE_REVIEW_STEP` in the contract, opened and saved exactly like a section but outside `PROFILE_SECTIONS`, so progress still reads *N of 11*. It holds the Support Needs Tool v4 block that closes that document (You Own Your Personal Profile · Support Evidence Notes · Why Documentation Matters · How the System Works · Your Choice) and lists the eleven with their status. Lovable ends its page on a review-and-submit panel too, so both builds agree on the shape.
+
+**Two documented gaps closed in the same pass**, both found by reading the Lovable route against our build:
+
+| Built | Document behind it |
+| --- | --- |
+| **Per-answer visibility** — *Only me · Workers I allow · Monthly Snapshot only* under every answer, plus "set every answer in this section to…" | **Final Override P1-03.** The column and the private default existed; nothing read or wrote them, and there was no control. Now on the wire (`PATCH …/sections/:key` takes a `visibility` map, `GET` returns one), validated server-side, and private unless chosen. |
+| **Download a copy of the profile** — `/participant/profile/print`, every answered question in its own words, saved through the browser's print dialog | Support Needs Tool v4: "You choose: who sees it · who you share it with · whether you update it · **whether you download it**". Same mechanism as the Monthly Snapshot export, so the file is made on the participant's device and sent nowhere. |
+
+**Not taken from Lovable:** its design (ours stands), its submit-and-lock with typed-name consent (the three consent statements appear in no document), and its PDF watermark/password options (invented). Its per-section "X of Y answered" counter is a fair idea and is still open.
+
+**Wants Sue's sign-off:** the three visibility labels and notes are ours — P1-03 fixes only the enum values and the private default. In particular whether `snapshot_only` means *instead of* the profile (the reading built) or *as well as*.
+
+**Still wanted from Lovable:** `@/content/profile-tool` — their `profileChapters` / `chapterBlocks` / `chapterFields` / `profileIntro`. What was shared is the page shell; the eleven sections' actual question wording lives in that module, and it is the only way to compare their content against ours rather than guess at it.
+
+## 9. The 28 Aug 2026 delivery: the check-in unblocked, the monthly template built
+
+Two documents arrived that were not in the 27 Aug set (`new doc/`, 28 Aug). Six others in the same folder were duplicates of documents already held and were removed after a line-level diff; `FCA_INTAKE_FINAL.docx` was the superseded predecessor of Support Needs Tool v4 (same section set, still using the "Functional Capacity Form" framing v4 replaced) and went with them.
+
+**What arrived** — mirrored verbatim in [sources-2026-08-28/](sources-2026-08-28/):
+
+| Document | What it settles |
+| --- | --- |
+| **Longitudinal Evidence Templates v2.0** | The three templates as one system: **A** Support Event Log (worker, per session), **B** **Participant Check-in** — the option sets §7 row 3 was blocked on — and **C** Monthly Snapshot Summary, C1–C9, generated from A and B, participant-approved, exportable. Plus the non-negotiable tone rules and the append-only rule. |
+| **Monthly Relational Longitudinal Snapshot** | The monthly template from §5 item 6. Eleven sections, checkbox-led: participant reflection, participation trends, ongoing barriers, support-mediated functioning, fluctuation and context, recovery and sustainability, goal and participation mapping, quality-of-life outcomes, the non-linear functioning statement, participant voice and approval, plus worker guidance and developer instructions. |
+
+**The check-in, built.** `tmg_participant_checkin` was created from the earlier DB pack and matches Template B field for field, so this needed no migration — only the vocabularies the table's untyped columns were waiting for.
+
+- `packages/shared/src/checkIn.js` — B1 periods · B2 twelve impact tags (pick 1–3) · B3 the 0–4 intensity scale with the template's wording · B4 twelve "what helped" tags · B5 four recovery levels · B6 own words · B7 five goal tags; `validateCheckInFields`, `canSubmitCheckIn`, `isCheckInLocked`, label helpers.
+- **No draft state and no PATCH.** `is_locked` defaults true: a check-in is the record the moment it saves, and a later thought is a later check-in. `POST /participant/check-ins`, `GET` list (`?month=`), `GET /:id`, `GET /check-ins/summary` — participant-only in middleware, because the template rules out a worker completing one.
+- Web: `/participant/check-ins` (list), `/new` (the seven blocks in the template's order and wording), `/:id` (read-only; empty blocks are not drawn). Sidebar entry added. **Not** a fifth dashboard card — Final Override P2-01 allows exactly four.
+- Only B1 and B2 are required to save. Everything the template marks optional stays optional: "there are no right or wrong answers", "takes 30–60 seconds".
+
+**Template C, completed against columns that already existed.** The snapshot contract had C2, part of C3 and two of C7's fields; the rest were columns nothing read or wrote.
+
+- `SNAPSHOT_LAYERS` now runs C2 → C3 → **C4 the six NDIS functional domains** → **C5 outcome highlights** → C7 (with **impairment category** added). The perspective tabs wrap rather than sitting in a fixed three-column grid.
+- Two tag banks are now on the wire and editable: **C3 participation areas** (`participation_domains` — the participant's own selection; generation no longer overwrites it, and the counted NDIS-domain version was always separately available as `stats.domains`) and **C5 outcome tags** (`outcome_tags`). Both render on the locked snapshot.
+- Snapshots now compile from **logs *and* check-ins** (`generated_from_checkins`, populated; the "Check-ins" tile shows the real count). `canApproveSnapshot` accepts either as evidence — Template C is "generated from Template A and B logs", so a participant who wrote check-ins through a month nobody else recorded still has a month worth approving.
+
+**The Monthly Relational Longitudinal Snapshot, built as the template specifies** (Jiten, 28 Aug: build to the document; where no document backs something, say so on the page rather than invent it).
+
+It is **not** a second artefact. Its own Developer Instructions describe this record — "aggregate patterns from daily notes, preserve participant voice, track sustainability and recovery cost, support reassessment evidence" — and its section 2 asks Template C2's five questions in different words, its section 10 is C6 and its section 11 is C8. What it adds is sections 3–9. So it extends the one monthly record:
+
+| Template section | Where it went |
+| --- | --- |
+| 1 Summary details | `participant_involvement` (new). Month, version and prepared-by already existed. |
+| 2 Participant reflection | The existing C2 fields — the same five questions. Mapping recorded in `snapshot.js`. |
+| 3 Participation and everyday life trends | `participation_trend_tags` (15) + `participation_trends_summary` |
+| 4 Ongoing functional barriers | `barrier_tags` (13) + `barriers_summary` |
+| 5 Support-mediated functioning | `support_mediated_tags` (14) + `support_mediated_summary` |
+| 6 Fluctuation and context | `fluctuation_level` (4) + `fluctuation_influence_tags` (13) + `fluctuation_summary` |
+| 7 Recovery and sustainability trends | `recovery_trend_tags` (11) + `recovery_trends_summary` |
+| 8 Goal and participation mapping | `goal_mapping_tags` (13) + `goal_mapping_summary` |
+| 9 Quality of life outcomes | `quality_of_life_tags` (12) + `quality_of_life_summary` |
+| 10 Non-linear functioning statement | The existing `nonlinear_statement` (C6). |
+| 11 Participant voice and approval | `approval_statements` (5), beside the existing approval and addendum. |
+
+- Migration `20260828080149_monthly_relational_snapshot` — 17 additive nullable columns, no data touched.
+- `SNAPSHOT_RELATIONAL_SECTIONS` in `packages/shared/src/snapshot.js` carries each section verbatim, including its **examples** and its **`note`** — the template's own reason for the section existing. Both render; they are what keeps the wording from drifting clinical.
+- `RelationalSections.jsx` renders them on the snapshot review and, read-only, on the locked snapshot. A section nobody used is not drawn on the locked view.
+- Validation is shared: each bank only accepts its own keys (a barrier tag in the fluctuation bank is a 400), and the single-choice fields only their own four.
+
+**Verified end to end** with a throw-away participant account through the real sign-up API — check-in create/list/filter/read, its validation rules, the missing PATCH, cross-account 404s; then a snapshot compiled from check-ins alone, every Template C and relational field saved and read back, wrong-bank and duplicate options refused, recompile leaving the participant's words and selections intact, approval locking it, and the locked record refusing edits. Account and all its rows removed afterwards (`apps/api/scripts/cleanup-verify-account.ts`).
+
+## 10. The three gaps, built (28 Aug 2026, afternoon)
+
+Jiten's ruling for the round: build to the documents; where no document backs a piece, say so on the page rather than invent it. Lovable's `routeTree.gen.ts` (28 Aug) gave the route map but no page content — it confirmed `/participant/check-ins` (same path as ours), `/participant/concerns`, `/participant/support-fit`, that **Mandatory Policies** is `/library/policies` (a Library topic, not a screen) and that **Improvement & goal mapping** has no route at all on their side.
+
+### 10.1 External access layer — snapshot share links (Template C9)
+
+The last purely-engineering gap. Template C9: "exported as a PDF and shared with: NDIS planner or LAC · Support coordinator · Allied health professional · Tribunal or review process · Kept private … Sharing requires explicit participant consent. The participant controls who receives this document. TMG180 cannot share this document without participant approval."
+
+- **`tmg_snapshot_share_links`** (migration `20260828083553_share_links_and_concerns`): one row per link — snapshot, participant, SHA-256 of the token, C9 audience, allow-download, status, expiry, open count. The token is shown once, in the URL, at creation; it is not stored and cannot be shown again.
+- **Rules:** only a locked snapshot; only while the `allow_share_links` preference is on (it was stored-not-acted-on since 19 Aug; now acted on, and its `pending` flag is gone); "Kept private" is refused as a link; 7/30/90 days, default 7 (the preference's own copy). Revocation is final; a new link is a new row.
+- **Every open is recorded** — `snapshot_link_opened` in `tmg_audit_log` with no actor, plus `snapshot_link_created` / `_revoked` under the participant (both now on the Privacy & Sharing audit log). The participant reads them back as the **Access Log** on Snapshot Exports.
+- **Public end:** `GET /api/v1/public/snapshot-share/:token` — the only unauthenticated route under `/api/v1`. A link that never existed, one that expired and one that was revoked all get the same 404 with the same words. Web: `/share/snapshot/:token` (`SharedSnapshot.jsx`, no chrome) — the participant's name, the month, who the link was for, the counts, areas of daily life, Goal Link Helper roll-up, every Template C layer and the relational sections, the non-linear statement, addenda; Download only if the participant allowed it.
+- **Participant end:** `shareLink.controller.ts` + `shareLink.route.ts`; `SnapshotExports.jsx` rewritten — the panel is live (audience, expiry, download toggle, create → URL shown once with Copy, active links with Revoke, past links), `?snapshot=` preselects, "Link active" badge is now true when it says so; the locked snapshot's two dead buttons open Exports at that month; Privacy & Sharing's rail lists the open links.
+- `services/snapshotRead.ts` now holds the wire↔column maps for all three snapshot readers (participant, share link, and — unchanged — the consented worker), so a Template C field is added once.
+
+### 10.2 Raise a concern (Mandatory Policy 2, M-05 participant side)
+
+The admin "Incidents" screen was a mock with hard-coded numbers; nothing in the API knew the word. Built from Policy 2 ("Complaint ticket; response record; referral/escalation record"), with Policy 3's incident vocabulary and Policy 10's report pathway:
+
+- **`tmg_concerns` + `tmg_concern_responses`** — append-only. The raised ticket is never edited; everything after it is a stamped response row. Kind (concern / complaint / feedback — Policy 2's definitions verbatim), category (Policy 2's "expected to raise" list + discrimination + information handling), relates-to (platform / support delivery / not sure — the boundary check is governance's, not the form's), optional "about", the words, optional "what would help". Status: received → acknowledged → being looked at → responded → referred on → closed, from "How Complaints Are Handled".
+- **Participant:** `/participant/concerns` list, `/new` form, `/:id` thread with a follow-up box while open. The no-retaliation lines and the three external bodies are on every one of the three screens, verbatim, never behind the form — Policy 5: "does not discourage or restrict external complaints".
+- **Governance API:** `GET/PATCH /admin/concerns` — respond, move status, refer, close; first acknowledgement and closure stamped once. **The admin UI is still the mock** — the endpoints exist for it, the screen has not been rewired.
+- **Said on the page, not built:** response timeframes. The register puts "taxonomy + statutory clocks" before M-05 and neither has arrived; the form says the timeframes "are set by governance and have not yet been published".
+
+### 10.3 Autonomy & support fit check
+
+Named in the 23 Aug register as a Core Library tool; no question set exists in any document. `/participant/support-fit` says what the check is for — from the Governance Manual ("A worker may be competent and still not the right relational fit"; the §7 choice-and-control definition), the Legislative Alignment Map (s 4 "worker fit tools", s 17A "fit and reflection standards") and Policy 5's rights list — says plainly that the questions have not been delivered, and points at the four parts of the portal that already do some of this (About You, Safety & Support Preferences, the directory's relational fields, Raise a concern). No questions invented.
+
+### 10.4 Library — filled from the documents
+
+Ruling #8 (Governance Administration wording in policy text) was resolved by the 28 Aug ruling: publish as written, say what it is. **Mandatory Policies 2, 3, 4, 5 and 10** are published verbatim (`participantLibraryContent.js`; each drops only the audit-controls table and the two header cells) with a **Working draft** chip and the manual's own status line on the reading — "Requires legal review, terminology review and source-currency review before formal adoption". The Library now groups by the Instructions.pdf topic pages that the delivered documents can fill — Mandatory Policies · Templates & How-to Guides · How TMG180 is governed — with `?topic=` for the sidebar's **Mandatory Policies** entry. New readings: *How the evidence templates work* (Longitudinal Evidence Templates v2.0 front matter, tone rules, C9), *What the Monthly Snapshot is for* (the monthly template's Purpose + non-linear statement), and in Optional Reading the goal mapping examples (Master Map #9), the AI Governance Register and the Governance Architecture. Practice Standards, Support Interpretation and Relational Discipline are in the IA but their manuals are not on disk; they are not listed as empty shelves.
+
+**Verified** with two throw-away accounts through the real API (34 checks): share before approval 400, preference-off 403, private audience and bad expiry 400, create 201 with a 43-character token, two public opens 200 with the participant's words, malformed/bogus/expired-or-revoked tokens all the same 404, double revoke 409, foreign ids 404, no token 401; concern validation 400s, raise 201, follow-up 201, governance respond/refer/close with the stamps, follow-up on closed 409, participant on `/admin` 403. Both accounts and every row they owned removed afterwards.

@@ -84,7 +84,7 @@ function StepCard({ number, title, desc, icon: Icon, status, statusTone, iconTon
         </div>
         <span
           className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-            statusTone === 'brand' ? 'bg-purple-100 text-brand-700' : 'bg-slate-100 text-slate-500'
+            statusTone === 'brand' ? 'bg-brand-100 text-brand-700' : 'bg-slate-100 text-slate-500'
           }`}
         >
           {status}
@@ -112,7 +112,7 @@ export default function WorkerOnboarding() {
     <div className="max-w-238 mx-auto flex flex-col gap-6">
       <div className="max-w-5xl w-full mx-auto flex flex-col gap-6 flex-1">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 bg-purple-100 px-3 py-1 rounded-full mb-4">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-4">
             <Flag size={11} />
             WELCOME
           </span>
@@ -143,7 +143,7 @@ export default function WorkerOnboarding() {
                   cy="18"
                   r="15.5"
                   fill="none"
-                  stroke="#6b21a8"
+                  stroke="#00563a"
                   strokeWidth="3"
                   strokeDasharray={`${2 * Math.PI * 15.5}`}
                   strokeDashoffset={`${2 * Math.PI * 15.5 * (1 - 0.15)}`}

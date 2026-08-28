@@ -276,7 +276,7 @@ export default function WorkerDailyLogDetail() {
             <div className="flex flex-wrap gap-2 mb-5">
               {(log.goals ?? []).length === 0 && <span className="text-sm text-slate-400">None linked</span>}
               {(log.goals ?? []).map((goal) => (
-                <span key={goal.id} className="text-sm font-medium text-brand-700 bg-purple-50 px-3 py-1.5 rounded-full">
+                <span key={goal.id} className="text-sm font-medium text-brand-700 bg-brand-50 px-3 py-1.5 rounded-full">
                   {goal.text}
                 </span>
               ))}
@@ -335,9 +335,9 @@ export default function WorkerDailyLogDetail() {
 
         <div className="flex flex-col gap-4">
           {log.participantVoice && (
-            <div className="relative overflow-hidden bg-linear-to-br from-purple-200 via-purple-100 to-white rounded-2xl p-5">
+            <div className="relative overflow-hidden bg-linear-to-br from-brand-200 via-brand-100 to-white rounded-2xl p-5">
               <Quote size={80} strokeWidth={1} className="absolute -top-3 -right-3 text-white/40" />
-              <h3 className="text-base relative font-semibold text-fuchsia-700 mb-3">Participant voice</h3>
+              <h3 className="text-base relative font-semibold text-brand-600 mb-3">Participant voice</h3>
               <div className="relative bg-white rounded-xl rounded-tl-none p-4 text-sm text-slate-700 italic whitespace-pre-wrap">
                 {log.participantVoice}
               </div>
@@ -386,7 +386,7 @@ export default function WorkerDailyLogDetail() {
               <div className="absolute left-1 top-1.5 bottom-0 w-px bg-slate-200" />
               {log.addenda.map((addendum) => (
                 <div key={addendum.id} className="relative flex flex-col gap-1">
-                  <div className="absolute -left-4 top-1 w-2.5 h-2.5 rounded-full bg-brand-600 ring-4 ring-purple-100" />
+                  <div className="absolute -left-4 top-1 w-2.5 h-2.5 rounded-full bg-brand-600 ring-4 ring-brand-100" />
                   <p className="text-xs text-slate-400">{formatTimestamp(addendum.createdAt)}</p>
                   {addendum.reason && <p className="text-xs font-semibold text-brand-600">Reason: {addendum.reason}</p>}
                   <div className="bg-slate-50 rounded-lg px-3.5 py-3 text-sm text-slate-600 mt-1 leading-relaxed whitespace-pre-wrap">

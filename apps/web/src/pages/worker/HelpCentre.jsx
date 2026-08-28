@@ -14,7 +14,7 @@ const TOPICS = [
     title: 'Worker Workspace',
     desc: 'Navigating your dashboard, settings, and general workspace features.',
     icon: Monitor,
-    tone: 'bg-violet-600',
+    tone: 'bg-brand-600',
   },
   {
     title: 'Daily Support Evidence Logs',
@@ -32,7 +32,7 @@ const TOPICS = [
     title: 'Monthly Snapshots',
     desc: 'Generating and reviewing monthly summaries and outcome tracking.',
     icon: BarChart2,
-    tone: 'bg-violet-500',
+    tone: 'bg-brand-500',
   },
   {
     title: 'Governance Standing',
@@ -44,7 +44,7 @@ const TOPICS = [
     title: 'Resources and Learning Hub',
     desc: 'Accessing training materials, templates, and professional development.',
     icon: GraduationCap,
-    tone: 'bg-purple-600',
+    tone: 'bg-brand-600',
   },
 ];
 

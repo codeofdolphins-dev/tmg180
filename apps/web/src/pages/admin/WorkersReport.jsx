@@ -247,11 +247,11 @@ export default function WorkersReport() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard label="Active workers" value={v(stats.active)} icon={Users} tone="bg-purple-100 text-brand-600" />
+        <StatCard label="Active workers" value={v(stats.active)} icon={Users} tone="bg-brand-100 text-brand-600" />
         <StatCard label="Profiles published" value={v(stats.published)} icon={BadgeCheck} tone="bg-sky-100 text-sky-600" />
         <StatCard label="Fully acknowledged" value={v(stats.acknowledged)} icon={ShieldCheck} tone="bg-emerald-100 text-emerald-600" />
         <StatCard label="Credentials awaiting verification" value={v(stats.awaiting)} icon={AlertTriangle} tone="bg-rose-100 text-rose-600" />
-        <StatCard label="Credentials verified" value={v(stats.verified)} icon={CircleCheck} tone="bg-violet-100 text-violet-600" />
+        <StatCard label="Credentials verified" value={v(stats.verified)} icon={CircleCheck} tone="bg-brand-100 text-brand-600" />
       </div>
 
       <div className={`${CARD} p-5`}>

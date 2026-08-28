@@ -1,14 +1,14 @@
 const VARIANTS = {
   primary:
-    'bg-brand-600 hover:bg-brand-800 text-white shadow-md shadow-purple-900/10',
+    'bg-brand-600 hover:bg-brand-800 text-white shadow-md shadow-brand-900/10',
   secondary: 'bg-slate-200/80 hover:bg-slate-300/80 text-slate-700',
   outline: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700',
   ghost: 'bg-white border border-slate-200 hover:bg-slate-50 text-brand-600',
   gradient:
-    'bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 text-white shadow-md shadow-purple-900/10',
+    'bg-linear-to-r from-brand-600 to-brand-400 hover:opacity-90 text-white shadow-md shadow-brand-900/10',
   muted: 'bg-transparent text-slate-400 cursor-not-allowed',
   contact: 'bg-slate-200/70 hover:bg-slate-300/70 text-brand-600',
-  'tint-purple': 'bg-purple-100/70 hover:bg-purple-200/70 text-brand-700',
+  'tint-purple': 'bg-brand-100/70 hover:bg-brand-200/70 text-brand-700',
   'tint-red': 'bg-rose-100/70 hover:bg-rose-200/70 text-rose-700',
 };
 

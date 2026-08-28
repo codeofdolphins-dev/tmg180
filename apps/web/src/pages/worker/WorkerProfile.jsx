@@ -459,7 +459,7 @@ export default function WorkerProfile() {
           <section className={CARD}>
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Directory preview</p>
             <div className="flex items-start gap-3 mt-3">
-              <div className="w-11 h-11 rounded-full bg-purple-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
+              <div className="w-11 h-11 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
                 {previewName
                   .split(' ')
                   .filter(Boolean)
@@ -482,7 +482,7 @@ export default function WorkerProfile() {
                 {previewAreas.map((area) => (
                   <span
                     key={area.key}
-                    className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-brand-700"
+                    className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-100 text-brand-700"
                   >
                     {area.label}
                   </span>
@@ -529,7 +529,7 @@ export default function WorkerProfile() {
               <input
                 type="checkbox"
                 {...register('optIn')}
-                className="mt-0.5 w-4 h-4 accent-[#7c3aed]"
+                className="mt-0.5 w-4 h-4 accent-[#0a7a52]"
               />
               <span className="text-sm text-slate-700">
                 List my profile in the participant directory

@@ -33,7 +33,7 @@ export default function WorkerTopBar() {
       >
         <Settings size={20} />
       </button>
-      <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-purple-400 ring-2 ring-white shadow flex items-center justify-center text-white text-sm font-bold">
+      <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-600 to-brand-400 ring-2 ring-white shadow flex items-center justify-center text-white text-sm font-bold">
         {initials(user?.name)}
       </div>
     </header>

@@ -37,7 +37,7 @@ import { WORKER_PATHS, workerSnapshotPath } from '../../routes/paths';
 
 /** Stable per person, so the same participant keeps the same colour between visits. */
 const AVATAR_TONES = [
-  'bg-purple-100 text-brand-700',
+  'bg-brand-100 text-brand-700',
   'bg-sky-100 text-sky-700',
   'bg-emerald-100 text-emerald-700',
   'bg-amber-100 text-amber-700',
@@ -133,7 +133,7 @@ function SnapshotCard({ snapshot, onOpen }) {
 
       <button
         onClick={onOpen}
-        className="mt-5 w-full flex items-center justify-center gap-2 bg-purple-50 text-brand-700 text-sm font-medium rounded-full py-3 hover:bg-purple-100 transition-colors"
+        className="mt-5 w-full flex items-center justify-center gap-2 bg-brand-50 text-brand-700 text-sm font-medium rounded-full py-3 hover:bg-brand-100 transition-colors"
       >
         <Eye size={16} />
         View snapshot
@@ -253,7 +253,7 @@ export default function ApprovedSnapshots() {
           {hasFilter && (
             <button
               onClick={clearFilters}
-              className="ml-auto inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full bg-purple-100 text-brand-700 hover:bg-purple-200 transition-colors"
+              className="ml-auto inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors"
             >
               Clear filters
               <X size={13} />
@@ -281,7 +281,7 @@ export default function ApprovedSnapshots() {
 
       {!isLoading && !error && snapshots.length === 0 && (
         <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             {hasFilter ? <CalendarRange size={26} /> : <NotebookPen size={26} />}
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mt-6">

@@ -210,6 +210,69 @@ export declare function validateAddendum(addendum?: {
 export declare function domainLabel(key: string): string;
 export declare function comparisonLabel(key: string): string | null;
 
+// --- checkIn.js ---
+
+export type CheckInPeriod = 'this_week' | 'today' | 'after_support';
+
+export declare const CHECKIN_PERIODS: readonly { key: CheckInPeriod; label: string }[];
+export declare const CHECKIN_PERIOD_KEYS: readonly string[];
+
+export declare const CHECKIN_IMPACT_TAGS: readonly { key: string; label: string }[];
+export declare const CHECKIN_IMPACT_TAG_KEYS: readonly string[];
+
+export declare const CHECKIN_INTENSITY_SCALE: readonly { value: number; label: string }[];
+export declare const CHECKIN_INTENSITY_MIN: number;
+export declare const CHECKIN_INTENSITY_MAX: number;
+
+export declare const CHECKIN_HELPED_TAGS: readonly { key: string; label: string }[];
+export declare const CHECKIN_HELPED_TAG_KEYS: readonly string[];
+
+export declare const CHECKIN_RECOVERY_LEVELS: readonly { key: string; label: string }[];
+export declare const CHECKIN_RECOVERY_LEVEL_KEYS: readonly string[];
+
+export declare const CHECKIN_GOAL_TAGS: readonly { key: string; label: string }[];
+export declare const CHECKIN_GOAL_TAG_KEYS: readonly string[];
+
+export declare const CHECKIN_OWN_WORDS_PROMPT: string;
+
+export declare const CHECKIN_LIMITS: {
+  readonly minImpactTags: number;
+  readonly maxImpactTags: number;
+  readonly maxNotes: number;
+};
+
+export interface CheckInFields {
+  period?: string | null;
+  checkinDate?: string | null;
+  impactTags?: readonly string[];
+  impactNotes?: string | null;
+  intensityRating?: number | null;
+  helpedTags?: readonly string[];
+  helpedNotes?: string | null;
+  recoveryLevel?: string | null;
+  recoveryNotes?: string | null;
+  ownWords?: string | null;
+  goalsTags?: readonly string[];
+  goalsNotes?: string | null;
+}
+
+export declare function validateCheckInFields(fields?: CheckInFields): Record<string, string>;
+
+export declare function canSubmitCheckIn(checkIn?: CheckInFields): {
+  ok: boolean;
+  errors: Record<string, string>;
+};
+
+/** Saved check-ins are locked; `is_locked` defaults true, so does this. */
+export declare function isCheckInLocked(checkIn?: { isLocked?: boolean }): boolean;
+
+export declare function checkInPeriodLabel(key: string): string;
+export declare function checkInImpactLabel(key: string): string;
+export declare function checkInHelpedLabel(key: string): string;
+export declare function checkInRecoveryLabel(key: string): string;
+export declare function checkInGoalLabel(key: string): string;
+export declare function checkInIntensityLabel(value?: number | null): string;
+
 // --- snapshot.js ---
 
 export type SnapshotStatus = 'generating' | 'draft' | 'locked';
@@ -237,8 +300,67 @@ export interface SnapshotLayer {
 }
 
 export declare const SNAPSHOT_LAYERS: readonly SnapshotLayer[];
+/** The layers' free-text fields only; `SNAPSHOT_FIELD_KEYS` also has the relational summaries. */
+export declare const SNAPSHOT_LAYER_FIELD_KEYS: readonly string[];
 export declare const SNAPSHOT_FIELD_KEYS: readonly string[];
 export declare const SNAPSHOT_ADDENDUM_REASONS: readonly string[];
+
+/** C3 — the participant's own "participation affected most in", not the six NDIS domains. */
+export declare const SNAPSHOT_PARTICIPATION_AREAS: readonly { key: string; label: string }[];
+export declare const SNAPSHOT_PARTICIPATION_AREA_KEYS: readonly string[];
+/** C5 — outcome highlights. */
+export declare const SNAPSHOT_OUTCOME_TAGS: readonly { key: string; label: string }[];
+export declare const SNAPSHOT_OUTCOME_TAG_KEYS: readonly string[];
+/** The array-valued wire fields, each mapped to the keys it accepts. */
+export declare const SNAPSHOT_TAG_FIELDS: Record<string, readonly string[]>;
+export declare const SNAPSHOT_TAG_FIELD_KEYS: readonly string[];
+/** C9 — recorded with an export; the platform never sends anything itself. */
+export declare const SNAPSHOT_SHARE_AUDIENCES: readonly { key: string; label: string }[];
+export declare const SNAPSHOT_SHARE_AUDIENCE_KEYS: readonly string[];
+
+export declare function participationAreaLabel(key: string): string;
+export declare function outcomeTagLabel(key: string): string;
+export declare function shareAudienceLabel(key: string): string;
+
+// Monthly Relational Longitudinal Snapshot — the same record, checkbox-led.
+
+export interface SnapshotRelationalSection {
+  key: string;
+  /** The section number in the template (3–9). */
+  number: number;
+  title: string;
+  question: string;
+  instruction?: string;
+  /** Section 6 alone asks a single-choice question before its bank. */
+  choiceField?: string;
+  choiceLabel?: string;
+  choiceOptions?: readonly { key: string; label: string }[];
+  tagField: string;
+  summaryField: string;
+  summaryLabel: string;
+  options: readonly { key: string; label: string }[];
+  examples?: readonly string[];
+  /** The template's own reason for the section existing. */
+  note?: string;
+}
+
+export declare const SNAPSHOT_RELATIONAL_SECTIONS: readonly SnapshotRelationalSection[];
+export declare const SNAPSHOT_RELATIONAL_SECTION_KEYS: readonly string[];
+export declare const SNAPSHOT_RELATIONAL_TEXT_KEYS: readonly string[];
+
+export declare const SNAPSHOT_PARTICIPANT_INVOLVEMENT: readonly { key: string; label: string }[];
+export declare const SNAPSHOT_FLUCTUATION_LEVELS: readonly { key: string; label: string }[];
+export declare const SNAPSHOT_APPROVAL_STATEMENTS: readonly { key: string; label: string }[];
+
+/** Single-choice wire fields, each mapped to the keys it accepts. */
+export declare const SNAPSHOT_CHOICE_FIELDS: Record<string, readonly string[]>;
+export declare const SNAPSHOT_CHOICE_FIELD_KEYS: readonly string[];
+
+export declare function participantInvolvementLabel(key: string): string;
+export declare function fluctuationLevelLabel(key: string): string;
+export declare function approvalStatementLabel(key: string): string;
+export declare function relationalTagLabel(sectionKey: string, key: string): string;
+export declare function relationalSection(key: string): SnapshotRelationalSection | null;
 
 export declare const SNAPSHOT_LIMITS: {
   readonly maxText: number;
@@ -258,6 +380,7 @@ export declare function canApproveSnapshot(snapshot?: {
   status?: string;
   nonlinearStatement?: string | null;
   sourceLogIds?: readonly number[];
+  sourceCheckInIds?: readonly number[];
 }): { ok: boolean; errors: string[] };
 
 export declare function isAddendumOnly(record?: { status?: string }): boolean;
@@ -284,6 +407,110 @@ export declare function snapshotAccessLevel(permissions?: {
 
 export declare function snapshotAccessLabel(level?: string | null): string;
 export declare function showsNarrative(level?: string | null): boolean;
+
+// --- snapshotShare.js ---
+
+export type ShareLinkStatus = 'active' | 'revoked' | 'expired';
+
+export declare const SHARE_LINK_STATUS: {
+  readonly ACTIVE: 'active';
+  readonly REVOKED: 'revoked';
+  readonly EXPIRED: 'expired';
+};
+
+export declare const SHARE_LINK_STATUS_LABELS: Record<ShareLinkStatus, string>;
+export declare const SHARE_LINK_EXPIRY_OPTIONS: readonly { days: number; label: string }[];
+export declare const SHARE_LINK_EXPIRY_DAYS: readonly number[];
+export declare const SHARE_LINK_DEFAULT_EXPIRY_DAYS: number;
+export declare const SHARE_LINK_AUDIT_ACTIONS: Record<string, { label: string; tone: string }>;
+export declare const SHARE_LINK_AUDIT_ACTION_KEYS: readonly string[];
+
+export declare function shareLinkStatus(
+  link?: { status?: string; expiresAt?: string | Date | null } | null,
+  now?: Date
+): ShareLinkStatus | null;
+export declare function isShareLinkOpen(
+  link?: { status?: string; expiresAt?: string | Date | null } | null,
+  now?: Date
+): boolean;
+export declare function shareLinkStatusLabel(status?: string | null): string;
+
+export declare function validateShareLinkFields(fields?: {
+  expiresInDays?: number | string;
+  audience?: string | null;
+  allowDownload?: boolean;
+}): Record<string, string>;
+
+// --- concerns.js ---
+
+export type ConcernKind = 'concern' | 'complaint' | 'feedback';
+export type ConcernRelatesTo = 'platform' | 'service' | 'unsure';
+export type ConcernStatus =
+  | 'received'
+  | 'acknowledged'
+  | 'in_review'
+  | 'responded'
+  | 'referred'
+  | 'closed';
+
+export declare const CONCERN_KINDS: readonly { key: ConcernKind; label: string; description: string }[];
+export declare const CONCERN_KIND_KEYS: readonly string[];
+export declare const CONCERN_CATEGORIES: readonly { key: string; label: string }[];
+export declare const CONCERN_CATEGORY_KEYS: readonly string[];
+export declare const CONCERN_RELATES_TO: readonly {
+  key: ConcernRelatesTo;
+  label: string;
+  description: string;
+}[];
+export declare const CONCERN_RELATES_TO_KEYS: readonly string[];
+
+export declare const CONCERN_STATUS: {
+  readonly RECEIVED: 'received';
+  readonly ACKNOWLEDGED: 'acknowledged';
+  readonly IN_REVIEW: 'in_review';
+  readonly RESPONDED: 'responded';
+  readonly REFERRED: 'referred';
+  readonly CLOSED: 'closed';
+};
+export declare const CONCERN_STATUS_LABELS: Record<ConcernStatus, string>;
+export declare const CONCERN_STATUS_KEYS: readonly string[];
+export declare const CONCERN_OPEN_STATUSES: readonly string[];
+
+export declare const CONCERN_EXTERNAL_BODIES: readonly string[];
+export declare const CONCERN_HANDLING_STEPS: readonly string[];
+export declare const CONCERN_PRINCIPLES: readonly string[];
+export declare const CONCERN_NO_RETALIATION: readonly string[];
+export declare const CONCERN_PLATFORM_LIMITS: readonly string[];
+
+export declare const CONCERN_LIMITS: {
+  readonly maxAbout: number;
+  readonly maxText: number;
+};
+
+export interface ConcernFields {
+  kind?: string | null;
+  category?: string | null;
+  relatesTo?: string | null;
+  about?: string | null;
+  description?: string | null;
+  whatWouldHelp?: string | null;
+}
+
+export declare function validateConcernFields(fields?: ConcernFields): Record<string, string>;
+export declare function canSubmitConcern(concern?: ConcernFields): {
+  ok: boolean;
+  errors: Record<string, string>;
+};
+export declare function validateConcernResponse(
+  response?: { text?: string | null },
+  concern?: { status?: string }
+): Record<string, string>;
+export declare function isConcernOpen(concern?: { status?: string } | null): boolean;
+
+export declare function concernKindLabel(key: string): string;
+export declare function concernCategoryLabel(key: string): string;
+export declare function concernRelatesToLabel(key: string): string;
+export declare function concernStatusLabel(key: string): string;
 
 // --- privacy.js ---
 
@@ -354,6 +581,18 @@ export declare const ANSWER_VISIBILITY: {
 };
 
 export type ProfileSectionStatus = 'not_started' | 'in_progress' | 'complete';
+export declare const ANSWER_VISIBILITY_VALUES: readonly AnswerVisibility[];
+export declare const VISIBILITY_OPTIONS: readonly {
+  value: AnswerVisibility;
+  label: string;
+  note: string;
+}[];
+export declare function isAnswerVisibility(value: unknown): boolean;
+export declare function visibilityLabel(value: string): string | null;
+export declare function validateSectionVisibility(
+  section: ProfileSection,
+  visibility?: Record<string, string>
+): Record<string, string>;
 
 export declare const PROFILE_SECTION_STATUS: {
   readonly NOT_STARTED: 'not_started';
@@ -407,6 +646,8 @@ export interface ProfileSection {
   description: string;
   intro?: readonly string[];
   groups: readonly ProfileSectionGroup[];
+  /** The closing step: lists every section with its status. */
+  review?: boolean;
   /** Flat view of every group's questions — what validation reads. */
   questions: readonly ProfileQuestion[];
 }
@@ -422,6 +663,8 @@ export type ProfileAnswerValue =
 export declare const PROFILE_SECTIONS: readonly ProfileSection[];
 
 export declare const PROFILE_TOTAL_SECTIONS: number;
+export declare const PROFILE_REVIEW_STEP: ProfileSection;
+export declare const PROFILE_STEPS: readonly ProfileSection[];
 
 export declare function profileSection(key: string): ProfileSection | undefined;
 
@@ -431,6 +674,7 @@ export declare function profileSectionSlug(key: string): string;
 export declare function profileSectionBySlug(slug: string): ProfileSection | undefined;
 
 export declare function nextProfileSection(key: string): ProfileSection | null;
+export declare function previousProfileSection(key: string): ProfileSection | null;
 
 export declare function isEmptyAnswer(value: unknown): boolean;
 
@@ -750,3 +994,45 @@ export declare function validateLearningProgress(fields?: {
   saved?: unknown;
   completed?: unknown;
 }): Record<string, string>;
+
+// --- participantLibrary.js ---
+
+export interface ParticipantReadingBlock {
+  kind: 'h2' | 'p' | 'list';
+  text?: string;
+  items?: readonly string[];
+}
+
+export interface ParticipantReading {
+  slug: string;
+  library: string;
+  topic: string;
+  status: 'published' | 'awaiting_content';
+  title: string;
+  subtitle?: string;
+  source: string;
+  summary: string;
+  body: readonly ParticipantReadingBlock[] | null;
+  /** Published from a governance working draft; said on the reading. */
+  draft?: boolean;
+}
+
+export declare const PARTICIPANT_LIBRARIES: { readonly CORE: 'core'; readonly OPTIONAL: 'optional' };
+export declare const PARTICIPANT_LIBRARY_TABS: readonly { key: string; label: string }[];
+export declare const PARTICIPANT_LIBRARY_TOPICS: readonly { key: string; label: string }[];
+export declare const PARTICIPANT_LIBRARY_TOPIC_KEYS: readonly string[];
+export declare const PARTICIPANT_READING_STATUS: {
+  readonly PUBLISHED: 'published';
+  readonly AWAITING_CONTENT: 'awaiting_content';
+};
+export declare const PARTICIPANT_READINGS: readonly ParticipantReading[];
+export declare const PARTICIPANT_READING_SLUGS: readonly string[];
+export declare const PARTICIPANT_READING_AWAITING_NOTE: string;
+export declare const PARTICIPANT_READING_DRAFT_NOTE: string;
+export declare function participantReading(slug: string): ParticipantReading | null;
+export declare function participantReadingsIn(library: string): ParticipantReading[];
+export declare function participantReadingSection(slug: string, heading: string): ParticipantReadingBlock[];
+export declare function participantReadingsByTopic(
+  library: string
+): { topic: { key: string; label: string }; readings: ParticipantReading[] }[];
+export declare function participantLibraryTopic(key: string): { key: string; label: string } | null;

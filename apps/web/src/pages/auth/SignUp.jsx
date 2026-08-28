@@ -75,7 +75,7 @@ export default function SignUp() {
   const busy = isSubmitting;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex items-center justify-center px-6 py-12 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-brand-50 flex items-center justify-center px-6 py-12 font-sans text-slate-800">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_20px_60px_rgb(0,0,0,0.08)] p-8">
         <h1 className="text-2xl font-bold text-brand-600 text-center">TMG180</h1>
         <p className="text-sm text-slate-500 text-center mt-1 mb-7">
@@ -250,7 +250,7 @@ export default function SignUp() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full py-3.5 mt-2 transition-opacity"
+            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-brand-400 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full py-3.5 mt-2 transition-opacity"
           >
             {busy && <LoaderCircle size={16} className="animate-spin" />}
             {busy ? 'Creating account…' : 'Create Account'}

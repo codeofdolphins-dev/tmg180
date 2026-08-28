@@ -29,7 +29,7 @@ export default function IconTile({
 
   if (variant === 'circle') {
     return (
-      <div className="w-16 h-16 rounded-full bg-purple-100/70 flex items-center justify-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-brand-100/70 flex items-center justify-center mb-6">
         <Icon className={TONES[tone]} size={s.icon} />
       </div>
     );
@@ -37,10 +37,10 @@ export default function IconTile({
 
   return (
     <div
-      className={`${s.outer} rounded-full bg-purple-100/70 flex items-center justify-center mb-6 shadow-inner`}
+      className={`${s.outer} rounded-full bg-brand-100/70 flex items-center justify-center mb-6 shadow-inner`}
     >
       <div
-        className={`${s.inner} bg-[#e0d6ed] flex items-center justify-center shadow-sm`}
+        className={`${s.inner} bg-[#d5e9dd] flex items-center justify-center shadow-sm`}
       >
         <Icon className={TONES[tone]} size={s.icon} />
       </div>

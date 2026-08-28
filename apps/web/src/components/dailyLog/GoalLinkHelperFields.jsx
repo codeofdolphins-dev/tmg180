@@ -102,7 +102,7 @@ export default function GoalLinkHelperFields({ watch, setValue, errors = {} }) {
                 onClick={() => setValue('ndisBucket', option.key, { shouldDirty: true })}
                 className={`px-4 py-2.25 rounded-full text-sm transition-colors ${
                   selected
-                    ? 'bg-[#7800ce] text-white shadow-sm'
+                    ? 'bg-[#005f40] text-white shadow-sm'
                     : 'bg-[#e5eeff] text-[#0b1c30] hover:bg-[#d7e4ff]'
                 }`}
               >

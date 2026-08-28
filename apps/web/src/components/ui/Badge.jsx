@@ -3,7 +3,7 @@ const VARIANTS = {
   warning: 'bg-amber-50 text-amber-700 border-amber-100',
   danger: 'bg-rose-50 text-rose-700 border-rose-100',
   neutral: 'bg-slate-100 text-slate-600 border-slate-200',
-  brand: 'bg-purple-50 text-brand-600 border-purple-100',
+  brand: 'bg-brand-50 text-brand-600 border-brand-100',
   info: 'bg-sky-50 text-sky-700 border-sky-100',
 };
 

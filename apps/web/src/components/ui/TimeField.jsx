@@ -46,7 +46,7 @@ function Cell({ selected, onClick, innerRef, children }) {
       className={`shrink-0 rounded-full py-1.5 text-sm text-center transition-colors ${
         selected
           ? 'bg-brand-600 text-white font-semibold'
-          : 'text-[#0b1c30] hover:bg-purple-50'
+          : 'text-[#0b1c30] hover:bg-brand-50'
       }`}
     >
       {children}
@@ -212,7 +212,7 @@ export default function TimeField({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-xs font-semibold text-brand-600 hover:text-brand-700 px-3 py-1 rounded-full hover:bg-purple-50"
+              className="text-xs font-semibold text-brand-600 hover:text-brand-700 px-3 py-1 rounded-full hover:bg-brand-50"
             >
               Done
             </button>

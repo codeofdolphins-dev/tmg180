@@ -51,7 +51,7 @@ const MODULE_STYLE = {
   mandatory_policies: { icon: ScrollText, tile: 'bg-[#ffdad6] text-[#a80710]' },
   practice_standards: { icon: BadgeCheck, tile: 'bg-[#007a53] text-white' },
   support_interpretation: { icon: Handshake, tile: 'bg-[#2170e4] text-white' },
-  relational_discipline: { icon: Users, tile: 'bg-[#861fdd] text-white' },
+  relational_discipline: { icon: Users, tile: 'bg-[#00734c] text-white' },
   templates_how_to: { icon: FolderOpen, tile: 'bg-[#cbdbf5] text-[#2170e4]' },
 };
 
@@ -84,7 +84,7 @@ function ReadingRow({ reading, onOpen }) {
       disabled={!available}
       title={available ? undefined : 'Not published yet'}
       className={`w-full flex items-center justify-between gap-3 rounded-full px-4 py-3.5 text-left transition-colors ${
-        available ? 'bg-[#f8f9ff] hover:bg-purple-50' : 'bg-[#f8f9ff]/60 cursor-not-allowed'
+        available ? 'bg-[#f8f9ff] hover:bg-brand-50' : 'bg-[#f8f9ff]/60 cursor-not-allowed'
       }`}
     >
       <span className="flex items-center gap-3 min-w-0">
@@ -197,7 +197,7 @@ export default function LearningHub() {
             </button>
           ))}
         </div>
-        <span className="inline-flex items-center gap-2 bg-purple-50 rounded-full px-3.5 py-1.5">
+        <span className="inline-flex items-center gap-2 bg-brand-50 rounded-full px-3.5 py-1.5">
           <Sparkles size={13} className="text-brand-600" />
           <span className="text-xs font-semibold text-brand-700">
             AI search uses Core Library only.
@@ -223,7 +223,7 @@ export default function LearningHub() {
 
       {data && inLibrary.length === 0 && (
         <div className={`${CARD} text-center py-12`}>
-          <div className="w-14 h-14 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-14 h-14 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <BookOpen size={24} />
           </div>
           <h2 className="text-lg font-semibold text-slate-900 mt-4">Nothing in Optional Reading yet</h2>

@@ -27,7 +27,7 @@ export default function CheckYourEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-purple-50 flex flex-col font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-50 to-brand-50 flex flex-col font-sans text-slate-800">
       <div className="p-6">
         <span className="text-xl font-bold text-brand-600">TMG180</span>
       </div>
@@ -57,7 +57,7 @@ export default function CheckYourEmail() {
 
           <button
             onClick={() => navigate(PUBLIC_PATHS.signIn)}
-            className="w-full bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 text-white text-sm font-semibold rounded-full py-3.5 transition-opacity"
+            className="w-full bg-linear-to-r from-brand-600 to-brand-400 hover:opacity-90 text-white text-sm font-semibold rounded-full py-3.5 transition-opacity"
           >
             Return to Sign In
           </button>

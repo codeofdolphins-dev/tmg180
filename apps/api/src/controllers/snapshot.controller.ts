@@ -12,6 +12,15 @@ import {
   validateSnapshotFields,
 } from '@tmg180/shared';
 import { prisma } from '../config/prisma.js';
+import {
+  SNAPSHOT_CHOICE_COLUMNS,
+  SNAPSHOT_FIELD_COLUMNS,
+  SNAPSHOT_TAG_COLUMNS,
+  snapshotFields,
+  type SnapshotChoiceField,
+  type SnapshotTagField,
+  type SnapshotWireField,
+} from '../services/snapshotRead.js';
 import { statsForSourceLogs, type SnapshotStats } from '../services/snapshotStats.js';
 import { ApiError, ApiResponse, catchResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -45,24 +54,14 @@ type SnapshotRow = NonNullable<Awaited<ReturnType<typeof prisma.monthlySnapshot.
   }[];
 };
 
-/** Wire field -> column. The only place the two spellings meet. */
-const FIELD_COLUMNS = {
-  participantStory: 'participant_story',
-  whatMattered: 'what_mattered',
-  whatGotInWay: 'what_got_in_way',
-  whatHelped: 'what_helped',
-  recoveryCost: 'recovery_cost',
-  nextMonthIntentions: 'next_month_intentions',
-  mainFunctionalImpacts: 'main_functional_impacts',
-  frequencyPattern: 'frequency_pattern',
-  recoveryCostTrend: 'recovery_cost_trend',
-  supportsThatHelped: 'supports_that_helped',
-  whenSupportUnavailable: 'when_support_unavailable',
-  impairmentLinkage: 'impairment_linkage',
-  goalLinkage: 'goal_linkage',
-} as const;
+/** The column maps live in services/snapshotRead.ts — shared with the share-link reader. */
+const FIELD_COLUMNS = SNAPSHOT_FIELD_COLUMNS;
+const TAG_COLUMNS = SNAPSHOT_TAG_COLUMNS;
+const CHOICE_COLUMNS = SNAPSHOT_CHOICE_COLUMNS;
 
-type WireField = keyof typeof FIELD_COLUMNS;
+type WireField = SnapshotWireField;
+type TagField = SnapshotTagField;
+type ChoiceField = SnapshotChoiceField;
 
 const toDay = (value: Date | null | undefined) =>
   value ? value.toISOString().slice(0, 10) : null;
@@ -85,6 +84,7 @@ function toSummary(row: SnapshotRow) {
     status: row.status,
     version: row.version,
     sourceLogIds: row.generated_from_notes,
+    sourceCheckInIds: row.generated_from_checkins,
     generatedAt: row.generated_at,
     approvedAt: row.participant_approved_at,
     lockedAt: row.locked_at,
@@ -95,17 +95,9 @@ function toSummary(row: SnapshotRow) {
 }
 
 function toDetail(row: SnapshotRow, stats: SnapshotStats) {
-  const fields = Object.fromEntries(
-    (Object.entries(FIELD_COLUMNS) as [WireField, string][]).map(([wire, column]) => [
-      wire,
-      (row as unknown as Record<string, string | null>)[column] ?? '',
-    ])
-  );
-
   return {
     ...toSummary(row),
-    ...fields,
-    participationDomains: row.participation_domains,
+    ...snapshotFields(row),
     nonlinearStatement: row.nonlinear_statement,
     stats,
     addenda: (row.addenda ?? []).map((addendum) => ({
@@ -167,6 +159,19 @@ function loadMonthLogs(participantId: number, monthKey: string) {
   });
 }
 
+/**
+ * The month's check-ins — the other half of what Template C is generated from.
+ * Every check-in is locked on save, so there is no draft to exclude.
+ */
+function loadMonthCheckIns(participantId: number, monthKey: string) {
+  const { from, to } = monthRange(monthKey);
+  return prisma.participantCheckin.findMany({
+    where: { participant_id: participantId, checkin_date: { gte: from, lte: to } },
+    orderBy: { checkin_date: 'desc' },
+    select: { id: true },
+  });
+}
+
 const detailFor = async (row: SnapshotRow) =>
   toDetail(row, await statsForSourceLogs(row.generated_from_notes));
 
@@ -176,11 +181,19 @@ function readFields(body: unknown) {
   if (Object.keys(errors).length > 0) {
     throw new ApiError(400, 'Some parts of this snapshot need another look.', errors);
   }
-  return Object.fromEntries(
-    (Object.entries(fields) as [WireField, string][])
-      .filter(([key]) => key in FIELD_COLUMNS)
-      .map(([key, value]) => [FIELD_COLUMNS[key], value ?? null])
-  );
+  const text = (Object.entries(fields) as [WireField, string][])
+    .filter(([key]) => key in FIELD_COLUMNS)
+    .map(([key, value]) => [FIELD_COLUMNS[key], value ?? null] as const);
+
+  const tags = (Object.entries(fields) as [TagField, string[]][])
+    .filter(([key]) => key in TAG_COLUMNS)
+    .map(([key, value]) => [TAG_COLUMNS[key], value ?? []] as const);
+
+  const choices = (Object.entries(fields) as [ChoiceField, string][])
+    .filter(([key]) => key in CHOICE_COLUMNS)
+    .map(([key, value]) => [CHOICE_COLUMNS[key], value || null] as const);
+
+  return Object.fromEntries([...text, ...tags, ...choices]);
 }
 
 /** GET /participant/snapshots — newest month first. */
@@ -275,20 +288,24 @@ export const generateSnapshot = asyncHandler(async (req, res) => {
       );
     }
 
-    const logs = await loadMonthLogs(participantId, monthYear!);
-    if (logs.length === 0) {
+    const [logs, checkIns] = await Promise.all([
+      loadMonthLogs(participantId, monthYear!),
+      loadMonthCheckIns(participantId, monthYear!),
+    ]);
+    if (logs.length === 0 && checkIns.length === 0) {
       throw new ApiError(
         400,
-        `There are no submitted daily logs for ${monthLabel(monthYear!)} yet. A snapshot is built from your logs, so there is nothing to compile.`
+        `There are no daily logs or check-ins for ${monthLabel(monthYear!)} yet. A snapshot is built from those, so there is nothing to compile.`
       );
     }
 
+    // The source ids and the timestamp are all generation touches — the tag
+    // banks and every narrative field stay the participant's, so recompiling a
+    // month never costs someone what they already said about it.
     const generated = {
       generated_from_notes: logs.map((log) => log.id),
-      // Check-ins (M-04) are not built yet; when they are, they join here.
-      generated_from_checkins: [],
+      generated_from_checkins: checkIns.map((checkIn) => checkIn.id),
       generated_at: new Date(),
-      participation_domains: [...new Set(logs.flatMap((log) => log.domain_tags))],
       status: SNAPSHOT_STATUS.DRAFT,
     };
 
@@ -367,6 +384,7 @@ export const approveSnapshot = asyncHandler(async (req, res) => {
       status: existing.status ?? undefined,
       nonlinearStatement: existing.nonlinear_statement,
       sourceLogIds: existing.generated_from_notes,
+      sourceCheckInIds: existing.generated_from_checkins,
     });
     if (!ok) throw new ApiError(existing.status === SNAPSHOT_STATUS.LOCKED ? 409 : 400, errors[0]!);
 
@@ -387,7 +405,11 @@ export const approveSnapshot = asyncHandler(async (req, res) => {
       actorId: participantId,
       action: 'snapshot_approved',
       targetId: locked.id,
-      details: { monthYear: locked.month_year, sourceLogs: locked.generated_from_notes.length },
+      details: {
+        monthYear: locked.month_year,
+        sourceLogs: locked.generated_from_notes.length,
+        sourceCheckIns: locked.generated_from_checkins.length,
+      },
     });
 
     res.json(new ApiResponse(200, 'snapshot approved and locked', await detailFor(locked)));

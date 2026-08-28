@@ -93,7 +93,7 @@ function LogRow({ log, onOpen }) {
       {log.domainTags?.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-4">
           {log.domainTags.map((tag) => (
-            <span key={tag} className="text-xs font-medium text-brand-700 bg-purple-50 px-3 py-1 rounded-full">
+            <span key={tag} className="text-xs font-medium text-brand-700 bg-brand-50 px-3 py-1 rounded-full">
               {domainLabel(tag)}
             </span>
           ))}
@@ -179,7 +179,7 @@ export default function WorkerDailyLogList() {
         {participantId && (
           <button
             onClick={() => setSearchParams({})}
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full bg-purple-100 text-brand-700 hover:bg-purple-200 transition-colors ml-auto"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors ml-auto"
             title="Show logs for everyone"
           >
             {filteredPerson?.name ?? 'One participant'}
@@ -207,7 +207,7 @@ export default function WorkerDailyLogList() {
 
       {logs?.length === 0 && (
         <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <NotebookPen size={26} />
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mt-6">

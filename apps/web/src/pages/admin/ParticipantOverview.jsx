@@ -30,8 +30,8 @@ const AGGREGATION = [
 
 function DonutChart() {
   const segments = [
-    { value: 70, color: '#6b21a8' },
-    { value: 20, color: '#c4b5fd' },
+    { value: 70, color: '#00563a' },
+    { value: 20, color: '#b3ddc8' },
     { value: 10, color: '#f1f0fa' },
   ];
   let acc = 0;
@@ -125,8 +125,8 @@ export default function ParticipantOverview() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className={`relative overflow-hidden ${CARD} p-5`}>
-          <div className="absolute -top-6 -right-2 w-20 h-20 rounded-full bg-purple-200/70" />
-          <div className="absolute -top-8 right-6 w-16 h-16 rounded-full bg-pink-200/70" />
+          <div className="absolute -top-6 -right-2 w-20 h-20 rounded-full bg-brand-200/70" />
+          <div className="absolute -top-8 right-6 w-16 h-16 rounded-full bg-brand-200/70" />
           <p className="relative text-[10px] uppercase tracking-wide text-slate-400 mb-2">
             Total Active Participants
           </p>
@@ -158,7 +158,7 @@ export default function ParticipantOverview() {
               <p className="text-[10px] uppercase tracking-wide text-slate-400 max-w-27.5">
                 Personal Profile (FCA baseline) In Progress
               </p>
-              <div className="w-9 h-9 rounded-full bg-purple-100 text-brand-600 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0">
                 <Hourglass size={15} />
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function ParticipantOverview() {
         </div>
 
         <div className={`relative overflow-hidden ${CARD} p-5 flex items-center gap-4`}>
-          <div className="w-10 h-10 rounded-full bg-purple-100 text-brand-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0">
             <Upload size={17} />
           </div>
           <div>
@@ -200,7 +200,7 @@ export default function ParticipantOverview() {
             <p className="text-3xl font-bold text-slate-900">890</p>
             <p className="text-xs text-slate-400">generated this month</p>
           </div>
-          <Download size={72} className="absolute -bottom-4 right-4 text-purple-200" />
+          <Download size={72} className="absolute -bottom-4 right-4 text-brand-200" />
         </div>
       </div>
 
@@ -219,7 +219,7 @@ export default function ParticipantOverview() {
               Completed
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-purple-300" />
+              <span className="w-2 h-2 rounded-full bg-brand-300" />
               In Progress
             </div>
             <div className="flex items-center gap-1.5">
@@ -234,7 +234,7 @@ export default function ParticipantOverview() {
             <h3 className="text-sm font-bold text-slate-900">
               Snapshot Approval Trend
             </h3>
-            <span className="text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-medium text-brand-700 bg-brand-100 px-2.5 py-1 rounded-full">
               Last 6 Months
             </span>
           </div>
@@ -264,7 +264,7 @@ export default function ParticipantOverview() {
           <h3 className="text-sm font-bold text-slate-900 mb-4">
             Directory Usage Trend
           </h3>
-          <LineChart data={[1200, 1000, 1300, 1250, 1500, 1700]} color="#a855f7" dashed />
+          <LineChart data={[1200, 1000, 1300, 1250, 1500, 1700]} color="#12a06d" dashed />
           <div className="flex justify-between text-[10px] text-slate-400 mt-1">
             {months.map((m) => (
               <span key={m}>{m}</span>

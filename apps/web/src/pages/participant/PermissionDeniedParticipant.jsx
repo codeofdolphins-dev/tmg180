@@ -25,7 +25,7 @@ export default function PermissionDeniedParticipant() {
             the correct permission.
           </p>
 
-          <div className="inline-flex items-center gap-2 bg-purple-50/80 border border-purple-100 text-brand-600 pl-1.5 pr-4 py-1.5 rounded-full text-xs font-medium mb-8">
+          <div className="inline-flex items-center gap-2 bg-brand-50/80 border border-brand-100 text-brand-600 pl-1.5 pr-4 py-1.5 rounded-full text-xs font-medium mb-8">
             <span className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
               <ShieldCheck size={12} className="text-white" />
             </span>

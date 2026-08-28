@@ -191,7 +191,10 @@ export function useDailyLogForm(id) {
     /** Save Draft — stays on the form, moving to the saved log's own URL. */
     saveDraft: async () => {
       const saved = await run({ submit: false });
-      if (saved && !id) navigate(participantDailyLogPath.edit(saved.id), { replace: true });
+      // keepScroll: the form has not moved, only its URL — see ScrollToTop.
+      if (saved && !id) {
+        navigate(participantDailyLogPath.edit(saved.id), { replace: true, state: { keepScroll: true } });
+      }
       return saved;
     },
 

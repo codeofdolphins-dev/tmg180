@@ -37,9 +37,9 @@ const selectClassNames = (look = 'pill') => ({
   placeholder: () => 'text-[#6b7280]',
   singleValue: () => 'text-[#0b1c30]',
   input: () => 'text-[#0b1c30]',
-  multiValue: () => 'flex items-center gap-2 bg-[#9333ea]/20 rounded-full pl-3 pr-2 py-1',
-  multiValueLabel: () => 'text-xs font-bold text-[#2c0051]',
-  multiValueRemove: () => 'text-[#2c0051] hover:opacity-70',
+  multiValue: () => 'flex items-center gap-2 bg-[#007a53]/20 rounded-full pl-3 pr-2 py-1',
+  multiValueLabel: () => 'text-xs font-bold text-[#00291b]',
+  multiValueRemove: () => 'text-[#00291b] hover:opacity-70',
   indicatorsContainer: () => 'flex items-center gap-1 text-slate-500',
   indicatorSeparator: () => 'hidden',
   menu: () =>
@@ -48,7 +48,7 @@ const selectClassNames = (look = 'pill') => ({
   option: ({ isFocused, isSelected }) =>
     [
       'px-4 py-2.5 text-base cursor-pointer transition-colors',
-      isSelected ? 'bg-brand-600 text-white' : isFocused ? 'bg-purple-50 text-[#0b1c30]' : 'text-[#0b1c30]',
+      isSelected ? 'bg-brand-600 text-white' : isFocused ? 'bg-brand-50 text-[#0b1c30]' : 'text-[#0b1c30]',
     ].join(' '),
   noOptionsMessage: () => 'px-4 py-3 text-sm text-slate-500',
   loadingMessage: () => 'px-4 py-3 text-sm text-slate-500',

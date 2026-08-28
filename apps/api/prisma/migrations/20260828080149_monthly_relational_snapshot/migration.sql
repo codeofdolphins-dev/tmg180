@@ -1,0 +1,18 @@
+-- AlterTable
+ALTER TABLE "tmg_monthly_snapshot" ADD COLUMN     "approval_statements" TEXT[],
+ADD COLUMN     "barrier_tags" TEXT[],
+ADD COLUMN     "barriers_summary" TEXT,
+ADD COLUMN     "fluctuation_influence_tags" TEXT[],
+ADD COLUMN     "fluctuation_level" VARCHAR(50),
+ADD COLUMN     "fluctuation_summary" TEXT,
+ADD COLUMN     "goal_mapping_summary" TEXT,
+ADD COLUMN     "goal_mapping_tags" TEXT[],
+ADD COLUMN     "participant_involvement" VARCHAR(50),
+ADD COLUMN     "participation_trend_tags" TEXT[],
+ADD COLUMN     "participation_trends_summary" TEXT,
+ADD COLUMN     "quality_of_life_summary" TEXT,
+ADD COLUMN     "quality_of_life_tags" TEXT[],
+ADD COLUMN     "recovery_trend_tags" TEXT[],
+ADD COLUMN     "recovery_trends_summary" TEXT,
+ADD COLUMN     "support_mediated_summary" TEXT,
+ADD COLUMN     "support_mediated_tags" TEXT[];

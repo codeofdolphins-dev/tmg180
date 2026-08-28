@@ -2,7 +2,7 @@ const ICON_BG = {
   success: 'bg-emerald-50 text-emerald-600',
   warning: 'bg-amber-50 text-amber-600',
   neutral: 'bg-slate-100 text-slate-500',
-  brand: 'bg-purple-50 text-brand-600',
+  brand: 'bg-brand-50 text-brand-600',
 };
 
 export default function StatTile({ icon: Icon, value, label, tone = 'neutral' }) {

@@ -17,17 +17,23 @@ export const PUBLIC_PATHS = {
   chooseWorkspace: '/choose-workspace',
   linkExpired: '/link-expired',
   error: '/error',
+  /** A snapshot share link — the only signed-out page that shows a record. */
+  snapshotShare: '/share/snapshot/:token',
 };
 
 export const PARTICIPANT_PATHS = {
   root: '/participant',
   dashboard: '/participant/dashboard',
   profile: '/participant/profile',
+  profilePrint: '/participant/profile/print',
   profileSection: '/participant/profile/:sectionSlug',
   dailyLog: '/participant/daily-log',
   dailyLogNew: '/participant/daily-log/new',
   dailyLogDetail: '/participant/daily-log/:id',
   dailyLogEdit: '/participant/daily-log/:id/edit',
+  checkIns: '/participant/check-ins',
+  checkInNew: '/participant/check-ins/new',
+  checkInDetail: '/participant/check-ins/:id',
   snapshot: '/participant/snapshot',
   snapshotExports: '/participant/snapshot/exports',
   snapshotDetail: '/participant/snapshot/:id',
@@ -36,6 +42,10 @@ export const PARTICIPANT_PATHS = {
   browseWorkersProfile: '/participant/browse-workers/:workerId',
   library: '/participant/library',
   libraryReading: '/participant/library/:slug',
+  concerns: '/participant/concerns',
+  concernNew: '/participant/concerns/new',
+  concernDetail: '/participant/concerns/:id',
+  supportFit: '/participant/support-fit',
   privacySharing: '/participant/privacy-sharing',
   help: '/participant/help',
   permissionDenied: '/participant/permission-denied',
@@ -97,6 +107,15 @@ export const participantDailyLogPath = {
   new: () => PARTICIPANT_PATHS.dailyLogNew,
 };
 
+/**
+ * A check-in has two URLs, not three: it is locked the moment it saves, so
+ * there is no edit state to route to.
+ */
+export const participantCheckInPath = {
+  detail: (id) => `/participant/check-ins/${id}`,
+  new: () => PARTICIPANT_PATHS.checkInNew,
+};
+
 /** The worker layer has the same three URLs per log. */
 export const workerDailyLogPath = {
   detail: (id) => `/worker/daily-log/${id}`,
@@ -124,6 +143,12 @@ export const workerLearningPath = {
     fromItem
       ? `/worker/learning-hub/resource/${slug}?from=${encodeURIComponent(fromItem)}`
       : `/worker/learning-hub/resource/${slug}`,
+};
+
+/** A raised concern has a read URL; there is no edit URL because it is never edited. */
+export const participantConcernPath = {
+  detail: (id) => `/participant/concerns/${id}`,
+  new: () => PARTICIPANT_PATHS.concernNew,
 };
 
 /** Library → one reading; the slug is a PARTICIPANT_READING_SLUGS value. */

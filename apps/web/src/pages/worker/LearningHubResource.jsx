@@ -94,11 +94,11 @@ export default function LearningHubResource() {
 
       {resource && (
         <>
-          <section className="bg-purple-50/60 rounded-xl p-6">
+          <section className="bg-brand-50/60 rounded-xl p-6">
             <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 bg-brand-100 px-2.5 py-1 rounded-full">
                     <Bookmark size={11} />
                     {learningKindLabel(resource.kind)}
                   </span>
@@ -133,7 +133,7 @@ export default function LearningHubResource() {
                   disabled={progress.isPending}
                   className={`inline-flex items-center gap-2 text-sm rounded-full px-4 py-2.5 border transition-colors disabled:opacity-60 ${
                     saved
-                      ? 'bg-purple-100 border-purple-200 text-brand-700'
+                      ? 'bg-brand-100 border-brand-200 text-brand-700'
                       : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                   }`}
                 >
@@ -176,7 +176,7 @@ export default function LearningHubResource() {
                   <div className="flex flex-col gap-4 mt-4">
                     {body.steps.map((step, index) => (
                       <div key={step.title} className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-purple-100 text-brand-700 text-xs font-bold flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center shrink-0">
                           {index + 1}
                         </div>
                         <div>
@@ -218,7 +218,7 @@ export default function LearningHubResource() {
                   here rather than leaving the worker to find their way back. */}
               {fromItem && (
                 <section className={`${CARD} text-center`}>
-                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                  <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                     <ShieldCheck size={19} />
                   </div>
                   <h2 className="text-lg font-semibold text-slate-900 mt-3">
@@ -239,7 +239,7 @@ export default function LearningHubResource() {
 
               {actionPath && (
                 <section className={`${CARD} text-center`}>
-                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                  <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                     <ArrowRight size={19} />
                   </div>
                   <h2 className="text-lg font-semibold text-slate-900 mt-3">Put it to use</h2>
@@ -294,7 +294,7 @@ export default function LearningHubResource() {
                     className="bg-white/80 rounded-xl p-5 text-left shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-brand-700">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-50 text-brand-700">
                         {learningKindLabel(other.kind)}
                       </span>
                       <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-500 flex items-center justify-center">

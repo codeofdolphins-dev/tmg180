@@ -6,7 +6,7 @@ export default function PasswordUpdated() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-100 via-indigo-50 to-sky-100 flex items-center justify-center px-6 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-brand-100 via-indigo-50 to-sky-100 flex items-center justify-center px-6 font-sans text-slate-800">
       <div className="w-full max-w-sm bg-white rounded-3xl shadow-[0_20px_60px_rgb(0,0,0,0.08)] p-8 text-center">
         <div className="relative w-20 h-20 mx-auto mb-6">
           <div className="absolute inset-0 rounded-full bg-emerald-400 blur-xl opacity-40" />

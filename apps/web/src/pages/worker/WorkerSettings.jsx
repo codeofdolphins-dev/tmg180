@@ -185,7 +185,7 @@ function ProfileCard() {
     <section className={CARD}>
       <CardHeader
         icon={UserRound}
-        tone="bg-purple-50 text-brand-600"
+        tone="bg-brand-50 text-brand-600"
         title="Your directory profile"
         sub="What participants can read about you, and whether it is listed."
       />
@@ -355,7 +355,7 @@ export default function WorkerSettings() {
       <section className={CARD}>
         <CardHeader
           icon={Bell}
-          tone="bg-purple-50 text-brand-600"
+          tone="bg-brand-50 text-brand-600"
           title="Notifications"
           sub="TMG180 doesn't send any of these yet — the settings arrive with them."
         />

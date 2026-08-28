@@ -130,7 +130,7 @@ export default function TicketDetail() {
               governance database and the local facility security system.
             </p>
 
-            <div className="bg-purple-50/70 border-l-4 border-brand-600 rounded-r-lg p-4">
+            <div className="bg-brand-50/70 border-l-4 border-brand-600 rounded-r-lg p-4">
               <p className="text-sm font-semibold text-slate-800 mb-1">
                 Impact Statement
               </p>

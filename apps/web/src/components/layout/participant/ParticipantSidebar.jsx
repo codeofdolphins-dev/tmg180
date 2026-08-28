@@ -1,10 +1,14 @@
 import {
   BookOpen,
+  ShieldCheck,
   LayoutDashboard,
   User,
   NotebookPen,
+  MessageSquareQuote,
   CalendarDays,
   Search,
+  MessageSquareWarning,
+  Compass,
   HelpCircle,
   Lock,
   LogOut,
@@ -24,9 +28,14 @@ const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard, path: P.dashboard },
   { label: 'My Profile', icon: User, path: P.profile },
   { label: 'Daily Log', icon: NotebookPen, path: P.dailyLog },
+  { label: 'Check-ins', icon: MessageSquareQuote, path: P.checkIns },
   { label: 'Monthly Snapshot', icon: CalendarDays, path: P.snapshot },
   { label: 'Verified Workers', icon: Search, path: P.browseWorkers },
   { label: 'Library', icon: BookOpen, path: P.library },
+  // A topic page of the Library, not a screen of its own (Instructions.pdf IA).
+  { label: 'Mandatory Policies', icon: ShieldCheck, path: `${P.library}?topic=mandatory_policies`, match: [] },
+  { label: 'Raise a concern', icon: MessageSquareWarning, path: P.concerns },
+  { label: 'Support fit check', icon: Compass, path: P.supportFit },
 ];
 
 const BOTTOM_ITEMS = [
@@ -46,8 +55,8 @@ function NavItem({ icon: Icon, label, active, wide, onClick }) {
         wide ? 'text-base' : 'text-sm'
       } ${
         active
-          ? 'bg-purple-600/30 text-brand-700 font-semibold'
-          : 'text-slate-600 hover:bg-slate-100'
+          ? 'bg-brand-600/30 text-brand-700 font-semibold'
+          : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
       }`}
     >
       <Icon size={17} className="shrink-0" />

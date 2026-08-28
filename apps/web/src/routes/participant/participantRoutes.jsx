@@ -1,9 +1,13 @@
 import ParticipantDashboard from '../../pages/participant/ParticipantDashboard';
 import MyPersonalProfile from '../../pages/participant/MyPersonalProfile';
+import ProfilePrint from '../../pages/participant/ProfilePrint';
 import ProfileSection from '../../pages/participant/ProfileSection';
 import DailyLogList from '../../pages/participant/DailyLogList';
 import ParticipantDailyLog from '../../pages/participant/ParticipantDailyLog';
 import DailySupportEvidenceLog from '../../pages/participant/DailySupportEvidenceLog';
+import CheckInList from '../../pages/participant/CheckInList';
+import CheckInForm from '../../pages/participant/CheckInForm';
+import CheckInDetail from '../../pages/participant/CheckInDetail';
 import MonthlySnapshotList from '../../pages/participant/MonthlySnapshotList';
 import MonthlySnapshotReview from '../../pages/participant/MonthlySnapshotReview';
 import MonthlySnapshotSummary from '../../pages/participant/MonthlySnapshotSummary';
@@ -12,6 +16,10 @@ import BrowseVerifiedWorkers from '../../pages/participant/BrowseVerifiedWorkers
 import RelationalWorkerProfile from '../../pages/participant/RelationalWorkerProfile';
 import Library from '../../pages/participant/Library';
 import LibraryReading from '../../pages/participant/LibraryReading';
+import ConcernList from '../../pages/participant/ConcernList';
+import ConcernForm from '../../pages/participant/ConcernForm';
+import ConcernDetail from '../../pages/participant/ConcernDetail';
+import SupportFitCheck from '../../pages/participant/SupportFitCheck';
 import PrivacySharing from '../../pages/participant/PrivacySharing';
 import ParticipantHelpCentre from '../../pages/participant/ParticipantHelpCentre';
 import PermissionDeniedParticipant from '../../pages/participant/PermissionDeniedParticipant';
@@ -27,11 +35,15 @@ import { PARTICIPANT_PATHS as P, rel } from '../paths';
 export const participantRoutes = [
   { path: rel(P.dashboard), element: <ParticipantDashboard /> },
   { path: rel(P.profile), element: <MyPersonalProfile /> },
+  { path: rel(P.profilePrint), element: <ProfilePrint /> },
   { path: rel(P.profileSection), element: <ProfileSection /> },
   { path: rel(P.dailyLog), element: <DailyLogList /> },
   { path: rel(P.dailyLogNew), element: <ParticipantDailyLog /> },
   { path: rel(P.dailyLogEdit), element: <ParticipantDailyLog /> },
   { path: rel(P.dailyLogDetail), element: <DailySupportEvidenceLog /> },
+  { path: rel(P.checkIns), element: <CheckInList /> },
+  { path: rel(P.checkInNew), element: <CheckInForm /> },
+  { path: rel(P.checkInDetail), element: <CheckInDetail /> },
   { path: rel(P.snapshot), element: <MonthlySnapshotList /> },
   { path: rel(P.snapshotExports), element: <SnapshotExports /> },
   { path: rel(P.snapshotReview), element: <MonthlySnapshotReview /> },
@@ -40,6 +52,10 @@ export const participantRoutes = [
   { path: rel(P.browseWorkersProfile), element: <RelationalWorkerProfile /> },
   { path: rel(P.library), element: <Library /> },
   { path: rel(P.libraryReading), element: <LibraryReading /> },
+  { path: rel(P.concerns), element: <ConcernList /> },
+  { path: rel(P.concernNew), element: <ConcernForm /> },
+  { path: rel(P.concernDetail), element: <ConcernDetail /> },
+  { path: rel(P.supportFit), element: <SupportFitCheck /> },
   { path: rel(P.privacySharing), element: <PrivacySharing /> },
   { path: rel(P.help), element: <ParticipantHelpCentre /> },
 ];

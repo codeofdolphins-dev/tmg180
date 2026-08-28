@@ -83,7 +83,7 @@ function Labelled({ label, htmlFor, hint, error, children }) {
   );
 }
 
-function SectionTitle({ icon: Icon, tone = 'text-[#7800ce]', children, sub }) {
+function SectionTitle({ icon: Icon, tone = 'text-[#005f40]', children, sub }) {
   return (
     <div>
       <div className="flex items-center gap-3">
@@ -442,10 +442,10 @@ export default function DailyLogForm() {
                 )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {goalIds.map((goalId) => (
-                    <span key={goalId} className="inline-flex items-center gap-2 bg-[#9333ea]/20 rounded-full px-4 py-1.5">
-                      <span className="text-xs font-bold text-[#2c0051]">{goalById.get(goalId)?.text ?? 'Goal'}</span>
+                    <span key={goalId} className="inline-flex items-center gap-2 bg-[#007a53]/20 rounded-full px-4 py-1.5">
+                      <span className="text-xs font-bold text-[#00291b]">{goalById.get(goalId)?.text ?? 'Goal'}</span>
                       <button type="button" aria-label="Remove goal" onClick={() => removeGoal(goalId)}>
-                        <X size={13} className="text-[#2c0051]" />
+                        <X size={13} className="text-[#00291b]" />
                       </button>
                     </span>
                   ))}
@@ -469,7 +469,7 @@ export default function DailyLogForm() {
                       aria-pressed={selected}
                       onClick={() => setValue('domainTags', toggleInList(domainTags, domain.key), { shouldDirty: true })}
                       className={`px-4 py-2.25 rounded-full text-sm transition-colors ${
-                        selected ? 'bg-[#ddb8ff] text-[#2c0051] font-semibold' : 'bg-white text-[#0b1c30] hover:bg-[#efe6ff]'
+                        selected ? 'bg-[#b3e8ce] text-[#00291b] font-semibold' : 'bg-white text-[#0b1c30] hover:bg-[#e4f4eb]'
                       }`}
                     >
                       {domain.label}
@@ -523,8 +523,8 @@ export default function DailyLogForm() {
                     onClick={() => setValue('comparison', comparison === option.key ? '' : option.key, { shouldDirty: true })}
                     className={`rounded-full px-3 py-3 text-sm text-center leading-tight transition-colors ${
                       comparison === option.key
-                        ? 'bg-[#7800ce] text-white font-semibold shadow-sm'
-                        : 'bg-white text-[#0b1c30] hover:bg-[#efe6ff]'
+                        ? 'bg-[#005f40] text-white font-semibold shadow-sm'
+                        : 'bg-white text-[#0b1c30] hover:bg-[#e4f4eb]'
                     }`}
                   >
                     {option.label}
@@ -580,12 +580,12 @@ export default function DailyLogForm() {
 
           {/* ---------- rail ---------- */}
           <div className="w-80 shrink-0 hidden xl:flex flex-col gap-4 sticky top-22">
-            <div className="relative overflow-hidden bg-[#7800ce]/5 rounded-4xl p-6">
-              <div className="absolute -top-10 -right-2 w-32 h-32 rounded-full bg-[#7800ce]/20 blur-2xl pointer-events-none" />
+            <div className="relative overflow-hidden bg-[#005f40]/5 rounded-4xl p-6">
+              <div className="absolute -top-10 -right-2 w-32 h-32 rounded-full bg-[#005f40]/20 blur-2xl pointer-events-none" />
               <div className="relative">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-full bg-[#7800ce] text-white flex items-center justify-center">
+                    <span className="w-9 h-9 rounded-full bg-[#005f40] text-white flex items-center justify-center">
                       <Sparkles size={17} />
                     </span>
                     <h3 className="text-base font-semibold text-[#0b1c30]">Help me write this</h3>
@@ -602,7 +602,7 @@ export default function DailyLogForm() {
                       key={label}
                       type="button"
                       disabled
-                      className="w-full rounded-full bg-white border border-purple-200 py-2.5 text-sm text-[#0b1c30] opacity-60 cursor-not-allowed"
+                      className="w-full rounded-full bg-white border border-brand-200 py-2.5 text-sm text-[#0b1c30] opacity-60 cursor-not-allowed"
                     >
                       {label}
                     </button>
@@ -610,7 +610,7 @@ export default function DailyLogForm() {
                   <button
                     type="button"
                     disabled
-                    className="w-full rounded-full bg-[#e5eeff] py-2.5 text-sm font-semibold text-[#7800ce] opacity-60 cursor-not-allowed"
+                    className="w-full rounded-full bg-[#e5eeff] py-2.5 text-sm font-semibold text-[#005f40] opacity-60 cursor-not-allowed"
                   >
                     Generate Draft
                   </button>
@@ -625,7 +625,7 @@ export default function DailyLogForm() {
               type="button"
               onClick={daily.submit}
               disabled={isSaving || !canWrite}
-              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#7800ce] py-3.5 text-sm font-semibold text-white shadow-md disabled:opacity-50 transition-opacity"
+              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#005f40] py-3.5 text-sm font-semibold text-white shadow-md disabled:opacity-50 transition-opacity"
             >
               {isSaving ? <LoaderCircle size={14} className="animate-spin" /> : <SendHorizontal size={14} />}
               Submit Log
@@ -656,10 +656,10 @@ export default function DailyLogForm() {
             Cancel
           </button>
           <div className="flex items-center gap-4">
-            <button type="button" onClick={daily.saveDraft} disabled={isSaving || !canWrite} className="px-6 py-2.5 rounded-full bg-white border border-purple-100 text-sm text-[#7800ce] disabled:opacity-50 transition-opacity">
+            <button type="button" onClick={daily.saveDraft} disabled={isSaving || !canWrite} className="px-6 py-2.5 rounded-full bg-white border border-brand-100 text-sm text-[#005f40] disabled:opacity-50 transition-opacity">
               Save Draft
             </button>
-            <button type="button" onClick={daily.submit} disabled={isSaving || !canWrite} className="flex items-center gap-2 px-8 py-2.5 rounded-full bg-[#7800ce] text-sm text-white disabled:opacity-50 transition-opacity">
+            <button type="button" onClick={daily.submit} disabled={isSaving || !canWrite} className="flex items-center gap-2 px-8 py-2.5 rounded-full bg-[#005f40] text-sm text-white disabled:opacity-50 transition-opacity">
               {isSaving ? <LoaderCircle size={14} className="animate-spin" /> : null}
               Submit Log
               <SendHorizontal size={14} />

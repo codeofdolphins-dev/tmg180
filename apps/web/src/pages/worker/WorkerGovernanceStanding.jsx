@@ -50,7 +50,7 @@ import { workerGovernancePath } from '../../routes/paths';
 const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
 
 const GROUP_STYLE = {
-  acknowledgement: { icon: BookOpenCheck, tile: 'bg-purple-50 text-brand-600' },
+  acknowledgement: { icon: BookOpenCheck, tile: 'bg-brand-50 text-brand-600' },
   document: { icon: FolderCheck, tile: 'bg-[#dce9ff] text-[#2170e4]' },
   readiness: { icon: UserRoundCheck, tile: 'bg-emerald-50 text-[#005f40]' },
 };
@@ -430,7 +430,7 @@ export default function WorkerGovernanceStanding() {
 
               {data.items.length === 0 && (
                 <div className={`${CARD} text-center py-12`}>
-                  <div className="w-14 h-14 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                     <NotebookPen size={24} />
                   </div>
                   <h2 className="text-lg font-semibold text-slate-900 mt-4">

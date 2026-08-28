@@ -3,6 +3,8 @@ import {
   Accessibility,
   BookOpenText,
   Check,
+  ClipboardCheck,
+  Download,
   Flag,
   Heart,
   HeartPulse,
@@ -15,8 +17,9 @@ import {
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { PROFILE_SECTIONS, PROFILE_SECTION_STATUS } from '@tmg180/shared';
+import { PROFILE_REVIEW_STEP, PROFILE_SECTIONS, PROFILE_SECTION_STATUS } from '@tmg180/shared';
 import { FIRST_SECTION_PATH, SECTION_PATHS, useProfile } from '../../hooks/participant/profile';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
 
 /**
  * My Personal Profile — the hub of the one living profile (Final Override P1).
@@ -67,7 +70,7 @@ function StatusBadge({ status }) {
   if (status === PROFILE_SECTION_STATUS.IN_PROGRESS) {
     return (
       <div className="mt-auto pt-4">
-        <span className="text-[10px] font-bold tracking-wide text-[#7800ce] bg-purple-600/10 rounded px-2 py-1">
+        <span className="text-[10px] font-bold tracking-wide text-[#005f40] bg-brand-600/10 rounded px-2 py-1">
           IN PROGRESS
         </span>
       </div>
@@ -83,7 +86,7 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
         onClick={onOpen}
         className="col-span-2 row-span-2 flex flex-col bg-white/80 border border-slate-200 rounded-xl p-5 shadow-sm cursor-pointer"
       >
-        <div className="w-16 h-16 rounded-2xl bg-[#7800ce] flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-[#005f40] flex items-center justify-center mb-4">
           <Icon size={24} className="text-white" />
         </div>
         <h3 className="text-base font-semibold text-[#0b1c30] mb-3">{title}</h3>
@@ -99,8 +102,8 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
         onClick={onOpen}
         className="col-span-2 flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm cursor-pointer"
       >
-        <div className="w-14 h-14 rounded-full bg-purple-600/8 flex items-center justify-center shrink-0">
-          <Icon size={22} className="text-[#7800ce]" />
+        <div className="w-14 h-14 rounded-full bg-brand-600/8 flex items-center justify-center shrink-0">
+          <Icon size={22} className="text-[#005f40]" />
         </div>
         <div className="flex flex-col gap-1 flex-1">
           <h3 className="text-base font-semibold text-[#0b1c30]">{title}</h3>
@@ -116,7 +119,7 @@ function SectionCard({ variant, title, description, icon: Icon, status, onOpen }
       onClick={onOpen}
       className="flex flex-col bg-white border border-slate-200 rounded-xl p-5 shadow-sm cursor-pointer"
     >
-      <Icon size={20} className="text-[#7800ce] mb-3" />
+      <Icon size={20} className="text-[#005f40] mb-3" />
       <h3 className="text-base font-semibold text-[#0b1c30] mb-3">{title}</h3>
       <p className="text-sm text-[#434655]">{description}</p>
       <StatusBadge status={status} />
@@ -162,12 +165,19 @@ export default function MyPersonalProfile() {
           <span className="text-sm text-[#434655]">
             {completed} of {total} sections completed
           </span>
+          <button
+            onClick={() => navigate(PARTICIPANT_PATHS.profilePrint)}
+            className="flex items-center gap-2 text-sm font-semibold text-[#005f40] hover:text-brand-700 transition-colors"
+          >
+            <Download size={15} />
+            Download a copy
+          </button>
         </div>
       </div>
 
       {/* Once every section is complete there is nothing to continue — hide the card. */}
       {!isComplete && (
-      <div className="flex items-center gap-10 rounded-3xl bg-linear-to-br from-[#ece5fb] via-[#e9e4fa] to-[#e2e2f9] shadow-[0_18px_40px_rgb(120,0,206,0.12)] p-8">
+      <div className="flex items-center gap-10 rounded-3xl bg-linear-to-br from-[#e1f2e9] via-[#dff0e7] to-[#d8eee3] shadow-[0_18px_40px_rgb(0,95,64,0.12)] p-8">
         <div className="flex-1 flex flex-col gap-3">
           {/* Handoff Mapping v1.1 §3: the profile's own primary action is "Continue My
               Profile"; the dashboard's (§5) is "Continue My Personal Profile". */}
@@ -212,6 +222,22 @@ export default function MyPersonalProfile() {
             />
           ))}
         </div>
+
+        <button
+          onClick={() => navigate(SECTION_PATHS[PROFILE_REVIEW_STEP.key])}
+          className="flex items-center gap-5 bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-left hover:bg-slate-50 transition-colors"
+        >
+          <span className="w-14 h-14 rounded-full bg-brand-600/8 flex items-center justify-center shrink-0">
+            <ClipboardCheck size={22} className="text-[#005f40]" />
+          </span>
+          <span className="flex flex-col gap-1 flex-1">
+            <span className="text-base font-semibold text-[#0b1c30]">
+              {PROFILE_REVIEW_STEP.title}
+            </span>
+            <span className="text-sm text-[#434655]">{PROFILE_REVIEW_STEP.description}</span>
+          </span>
+          <ArrowRight size={18} className="text-[#005f40] shrink-0" />
+        </button>
       </div>
     </div>
   );

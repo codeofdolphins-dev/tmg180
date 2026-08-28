@@ -99,7 +99,7 @@ function ParticipantCard({ person, onNewLog, onViewLogs }) {
                 Consent limited
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-brand-700">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-brand-100 text-brand-700">
                 <BadgeCheck size={11} />
                 Consent active
               </span>
@@ -170,7 +170,7 @@ function RecentLogRow({ log, onOpen }) {
     >
       <span
         className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-          draft ? 'bg-purple-50 text-brand-600' : 'bg-emerald-50 text-emerald-600'
+          draft ? 'bg-brand-50 text-brand-600' : 'bg-emerald-50 text-emerald-600'
         }`}
       >
         {draft ? <PenLine size={16} /> : <Lock size={16} />}
@@ -218,7 +218,7 @@ export default function ParticipantsISupport() {
         {/* ---------- main column ---------- */}
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatTile icon={ShieldCheck} tone="bg-purple-50 text-brand-600" label="Total active consents" value={isLoading ? '…' : stats.active} />
+            <StatTile icon={ShieldCheck} tone="bg-brand-50 text-brand-600" label="Total active consents" value={isLoading ? '…' : stats.active} />
             <StatTile icon={EyeOff} tone="bg-[#dce9ff] text-[#2170e4]" label="Limited access" value={isLoading ? '…' : stats.limited} />
             <StatTile icon={UserPlus} tone="bg-emerald-50 text-emerald-700" label="Recently granted" value={isLoading ? '…' : stats.recent} />
           </div>
@@ -243,7 +243,7 @@ export default function ParticipantsISupport() {
             )}
             {people?.length === 0 && (
               <div className={`${CARD} text-center py-12`}>
-                <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                   <UserRound size={26} />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mt-6">No participant has given you consent yet</h3>

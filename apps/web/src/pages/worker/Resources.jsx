@@ -3,7 +3,7 @@ import { Search, Clock, ArrowRight } from 'lucide-react';
 const FILTERS = ['All', 'Templates', 'How-to guides', 'Policy', 'Evidence Language'];
 
 const TAG_STYLES = {
-  Templates: 'bg-purple-100 text-brand-700',
+  Templates: 'bg-brand-100 text-brand-700',
   'How-to guides': 'bg-sky-100 text-sky-700',
   Policy: 'bg-emerald-100 text-emerald-700',
   Privacy: 'bg-rose-100 text-rose-700',

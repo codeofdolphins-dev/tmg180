@@ -1,5 +1,5 @@
 const TONE_BG = {
-  purple: 'bg-purple-100/70',
+  purple: 'bg-brand-100/70',
   blue: 'bg-sky-100/60',
   green: 'bg-emerald-100/70',
   gray: 'bg-slate-200/50',

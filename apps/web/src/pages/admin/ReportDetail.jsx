@@ -76,7 +76,7 @@ export default function ReportDetail() {
         </div>
       </div>
 
-      <div className="bg-purple-50/60 rounded-2xl p-6">
+      <div className="bg-brand-50/60 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-slate-800 mb-2">
           Executive Summary
         </h2>

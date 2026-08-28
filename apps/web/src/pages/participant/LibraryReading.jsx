@@ -1,7 +1,8 @@
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, FileClock } from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import {
   PARTICIPANT_READING_AWAITING_NOTE,
+  PARTICIPANT_READING_DRAFT_NOTE,
   PARTICIPANT_READING_STATUS,
   participantReading,
 } from '@tmg180/shared';
@@ -50,6 +51,12 @@ export default function LibraryReading() {
         </section>
       ) : (
         <section className={CARD}>
+          {reading.draft && (
+            <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6">
+              <FileClock size={16} className="text-slate-500 shrink-0 mt-0.5" />
+              <p className="text-sm text-slate-600 leading-relaxed">{PARTICIPANT_READING_DRAFT_NOTE}</p>
+            </div>
+          )}
           <ReadingBlocks blocks={reading.body} />
           <p className="text-xs text-slate-500 mt-8">Source: {reading.source}</p>
         </section>

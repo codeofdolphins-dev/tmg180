@@ -72,8 +72,8 @@ function NavItem({ icon: Icon, label, active, wide, onClick }) {
         wide ? 'text-base' : 'text-sm'
       } ${
         active
-          ? 'bg-purple-600/30 text-brand-700 font-semibold'
-          : 'text-slate-600 hover:bg-slate-100'
+          ? 'bg-brand-600/30 text-brand-700 font-semibold'
+          : 'text-slate-600 hover:bg-slate-100 cursor-pointer'
       }`}
     >
       <Icon size={17} className="shrink-0" />

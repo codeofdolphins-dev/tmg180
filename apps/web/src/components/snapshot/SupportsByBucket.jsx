@@ -12,7 +12,7 @@ export default function SupportsByBucket({ buckets = [], className = '' }) {
   return (
     <section className={`bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${className}`}>
       <div className="flex items-center gap-3">
-        <Layers size={19} className="text-[#7800ce]" />
+        <Layers size={19} className="text-[#005f40]" />
         <h2 className="text-lg font-semibold text-slate-900">Supports used this month</h2>
       </div>
       {buckets.length === 0 ? (

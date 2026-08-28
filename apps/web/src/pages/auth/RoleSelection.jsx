@@ -11,10 +11,10 @@ const ROLES = [
       'Use your free portal to build your Personal Profile and track support evidence over time.',
     linkLabel: 'Enter Portal',
     icon: User,
-    iconBg: 'bg-purple-600',
+    iconBg: 'bg-brand-600',
     iconColor: 'text-white',
     accent: 'text-brand-600',
-    blob: 'bg-[#ddb8ff]',
+    blob: 'bg-[#b3e8ce]',
   },
   {
     role: APP_ROLES.WORKER,
@@ -60,7 +60,7 @@ export default function RoleSelection() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-16 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-brand-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-16 font-sans text-slate-800">
       <h1 className="text-5xl font-bold text-brand-600 mb-4 text-center">
         Welcome to TMG180
       </h1>

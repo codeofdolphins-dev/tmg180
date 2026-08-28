@@ -6,6 +6,7 @@ import {
   isSectionComplete,
   profileSection,
   validateSectionAnswers,
+  validateSectionVisibility,
   type ProfileAnswerValue,
 } from '@tmg180/shared';
 import { prisma } from '../config/prisma.js';
@@ -40,6 +41,10 @@ function toPayload(profile: LoadedProfile) {
       answers: Object.fromEntries(
         section.answers.map((answer) => [answer.question_key, answer.value])
       ),
+      // P1-03: every answer carries its own visibility, private by default.
+      visibility: Object.fromEntries(
+        section.answers.map((answer) => [answer.question_key, answer.visibility])
+      ),
     };
   }
   return {
@@ -65,7 +70,7 @@ export const getProfile = asyncHandler(async (req, res) => {
   await prisma.participantProfile.upsert({
     where: { participant_id: req.user.id },
     create: { participant_id: req.user.id, total_sections: PROFILE_TOTAL_SECTIONS },
-    update: {},
+    update: { total_sections: PROFILE_TOTAL_SECTIONS },
     select: { id: true },
   });
 
@@ -88,12 +93,21 @@ export const saveSection = asyncHandler(async (req, res) => {
   const section = profileSection(req.params.sectionKey as string);
   if (!section) throw notFoundError('No such profile section.');
 
-  const { answers } = (req.body ?? {}) as { answers?: Record<string, ProfileAnswerValue> };
+  const { answers, visibility } = (req.body ?? {}) as {
+    answers?: Record<string, ProfileAnswerValue>;
+    visibility?: Record<string, string>;
+  };
   if (!answers || typeof answers !== 'object' || Array.isArray(answers)) {
     throw badRequest('An answers object is required.');
   }
+  if (visibility !== undefined && (typeof visibility !== 'object' || visibility === null || Array.isArray(visibility))) {
+    throw badRequest('Visibility must be an object of question keys.');
+  }
 
-  const errors = validateSectionAnswers(section, answers);
+  const errors = {
+    ...validateSectionAnswers(section, answers),
+    ...validateSectionVisibility(section, visibility ?? {}),
+  };
   if (Object.keys(errors).length > 0) {
     throw badRequest('Some answers are invalid.', errors);
   }
@@ -102,7 +116,7 @@ export const saveSection = asyncHandler(async (req, res) => {
     const profile = await tx.participantProfile.upsert({
       where: { participant_id: participantId },
       create: { participant_id: participantId, total_sections: PROFILE_TOTAL_SECTIONS },
-      update: {},
+      update: { total_sections: PROFILE_TOTAL_SECTIONS },
       select: { id: true },
     });
 
@@ -122,12 +136,21 @@ export const saveSection = asyncHandler(async (req, res) => {
           where: { section_id: sectionRow.id, question_key: questionKey },
         });
       } else {
+        // Visibility rides with the answer it belongs to: an answer that is
+        // being cleared has no visibility to keep, and a visibility with no
+        // answer behind it has nothing to protect.
+        const chosen = visibility?.[questionKey];
         await tx.participantProfileAnswer.upsert({
           where: {
             section_id_question_key: { section_id: sectionRow.id, question_key: questionKey },
           },
-          create: { section_id: sectionRow.id, question_key: questionKey, value },
-          update: { value },
+          create: {
+            section_id: sectionRow.id,
+            question_key: questionKey,
+            value,
+            ...(chosen ? { visibility: chosen } : {}),
+          },
+          update: { value, ...(chosen ? { visibility: chosen } : {}) },
         });
       }
     }

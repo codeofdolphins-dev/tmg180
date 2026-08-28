@@ -13,7 +13,7 @@ export default function TopBar() {
         <button className="hover:text-brand-700 transition-colors">
           <Settings size={20} />
         </button>
-        <div className="w-9 h-9 rounded-full overflow-hidden border border-purple-300">
+        <div className="w-9 h-9 rounded-full overflow-hidden border border-brand-300">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
             alt="User Avatar"

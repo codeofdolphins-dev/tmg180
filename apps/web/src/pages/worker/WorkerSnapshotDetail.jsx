@@ -199,7 +199,7 @@ export default function WorkerSnapshotDetail() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <Panel icon={Activity} tone="bg-purple-50 text-brand-600" title="Core engagement">
+        <Panel icon={Activity} tone="bg-brand-50 text-brand-600" title="Core engagement">
           <div className="mt-6 flex flex-col gap-5">
             <Metric label="Total hours logged" value={hours} unit="hrs" />
             <Metric
@@ -292,7 +292,7 @@ export default function WorkerSnapshotDetail() {
         )}
       </Panel>
 
-      <div className="bg-purple-50 rounded-xl p-6 flex items-start gap-4">
+      <div className="bg-brand-50 rounded-xl p-6 flex items-start gap-4">
         <div className="w-11 h-11 rounded-xl bg-white text-brand-600 flex items-center justify-center shrink-0">
           <ShieldCheck size={19} />
         </div>

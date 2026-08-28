@@ -113,7 +113,7 @@ function isUpcoming(log, today, nowClock) {
 
 function SessionChip({ upcoming }) {
   return upcoming ? (
-    <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-purple-50 text-brand-700 shrink-0">
+    <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-brand-50 text-brand-700 shrink-0">
       Upcoming
     </span>
   ) : (
@@ -133,7 +133,7 @@ function SessionCard({ log, upcoming, onOpen }) {
     ? 'bg-brand-600 text-white shadow-md hover:bg-brand-700'
     : submitted
       ? 'bg-slate-50 text-slate-700 hover:bg-slate-100'
-      : 'bg-white border border-slate-200 text-brand-700 hover:bg-purple-50';
+      : 'bg-white border border-slate-200 text-brand-700 hover:bg-brand-50';
 
   return (
     <div className={`${CARD} ${submitted ? 'border-l-4 border-emerald-400' : ''}`}>
@@ -218,9 +218,9 @@ function MonthGrid({ cursor, selected, today, logsByDay, onSelect }) {
               aria-label={`${formatShortDate(day)}${logs.length ? `, ${logs.length} session${logs.length === 1 ? '' : 's'}` : ''}`}
               className={`aspect-square rounded-xl p-2 flex flex-col items-start justify-between border transition-colors ${
                 isSelected
-                  ? 'border-brand-600 bg-purple-50'
+                  ? 'border-brand-600 bg-brand-50'
                   : isToday
-                    ? 'border-brand-200 bg-white hover:bg-purple-50/60'
+                    ? 'border-brand-200 bg-white hover:bg-brand-50/60'
                     : 'border-slate-100 bg-white/70 hover:bg-slate-50'
               } ${inMonth ? '' : 'opacity-40'}`}
             >
@@ -264,7 +264,7 @@ function WeekStrip({ selected, today, logsByDay, onSelect }) {
             aria-pressed={isSelected}
             className={`min-h-40 rounded-xl p-2 flex flex-col gap-2 border text-left transition-colors ${
               isSelected
-                ? 'border-brand-600 bg-purple-50'
+                ? 'border-brand-600 bg-brand-50'
                 : isToday
                   ? 'border-brand-200 bg-white'
                   : 'border-slate-100 bg-white/70 hover:bg-slate-50'
@@ -282,7 +282,7 @@ function WeekStrip({ selected, today, logsByDay, onSelect }) {
                 className={`block text-[11px] leading-tight rounded-lg px-2 py-1 ${
                   log.status === DAILY_LOG_STATUS.SUBMITTED
                     ? 'bg-emerald-50 text-emerald-800'
-                    : 'bg-purple-100 text-brand-800'
+                    : 'bg-brand-100 text-brand-800'
                 }`}
                 title={`${log.participant.name}${log.startTime ? ` · ${formatTimeRange(log.startTime, log.endTime)}` : ''}`}
               >
@@ -407,7 +407,7 @@ export default function Calendar() {
             <div className="flex items-center gap-3">
               <button
                 onClick={goToday}
-                className="text-sm font-medium text-brand-700 border border-purple-200 rounded-full px-4 py-1.5 hover:bg-purple-50 transition-colors"
+                className="text-sm font-medium text-brand-700 border border-brand-200 rounded-full px-4 py-1.5 hover:bg-brand-50 transition-colors"
               >
                 Today
               </button>
@@ -504,14 +504,14 @@ export default function Calendar() {
 
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-slate-900">Agenda</h2>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-brand-700">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-brand-100 text-brand-700">
               {selected === today ? 'Today' : formatShortDate(selected)}
             </span>
           </div>
 
           {agenda.length === 0 && !isLoading && (
             <div className={`${CARD} text-center py-8`}>
-              <div className="w-12 h-12 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                 <NotebookPen size={20} />
               </div>
               <p className="text-sm font-semibold text-slate-900 mt-3">

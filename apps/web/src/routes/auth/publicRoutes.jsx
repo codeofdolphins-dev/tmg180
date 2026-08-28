@@ -9,6 +9,7 @@ import RoleSelection from '../../pages/auth/RoleSelection';
 import ChooseWorkspace from '../../pages/auth/ChooseWorkspace';
 import LinkExpired from '../../pages/auth/LinkExpired';
 import SomethingWentWrong from '../../pages/auth/SomethingWentWrong';
+import SharedSnapshot from '../../pages/public/SharedSnapshot';
 import { PUBLIC_PATHS as P } from '../paths';
 
 /** Auth flow + share-link/system states. No session required. */
@@ -22,6 +23,8 @@ export const publicRoutes = [
   { path: P.passwordUpdated, element: <PasswordUpdated /> },
   { path: P.linkExpired, element: <LinkExpired /> },
   { path: P.error, element: <SomethingWentWrong /> },
+  // A snapshot share link: the token is the credential, so no session.
+  { path: P.snapshotShare, element: <SharedSnapshot /> },
 ];
 
 /**

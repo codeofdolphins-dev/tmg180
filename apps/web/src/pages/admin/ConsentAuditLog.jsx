@@ -70,7 +70,7 @@ function FilterField({ icon: Icon, label, filled, dropdown }) {
     <button
       className={`flex items-center gap-2 text-sm px-4 py-2.5 rounded-full border transition-colors shrink-0 ${
         filled
-          ? 'bg-purple-50 border-purple-100 text-slate-700'
+          ? 'bg-brand-50 border-brand-100 text-slate-700'
           : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
       }`}
     >
@@ -111,7 +111,7 @@ export default function ConsentAuditLog() {
           <FilterField icon={Tag} label="Worker ID" />
           <FilterField label="Action type" dropdown />
           <FilterField label="Status" dropdown />
-          <button className="w-9 h-9 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center hover:bg-purple-100 transition-colors shrink-0">
+          <button className="w-9 h-9 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center hover:bg-brand-100 transition-colors shrink-0">
             <Filter size={15} />
           </button>
         </div>

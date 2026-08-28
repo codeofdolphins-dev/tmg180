@@ -2,11 +2,15 @@ import { Router } from 'express';
 import { health } from '../controllers/health.controller.js';
 import { adminRoutes } from './admin.route.js';
 import { authRoutes } from './auth.route.js';
+import { checkInRoutes } from './checkIn.route.js';
+import { concernRoutes } from './concern.route.js';
 import { dailyLogRoutes } from './dailyLog.route.js';
 import { directoryRoutes } from './directory.route.js';
 import { privacyRoutes } from './privacy.route.js';
 import { profileRoutes } from './profile.route.js';
+import { publicRoutes } from './public.route.js';
 import { sessionPreferencesRoutes } from './sessionPreferences.route.js';
+import { shareLinkRoutes } from './shareLink.route.js';
 import { snapshotRoutes } from './snapshot.route.js';
 import { terminologyRoutes } from './terminology.route.js';
 import { workerCredentialsRoutes } from './workerCredentials.route.js';
@@ -26,9 +30,14 @@ export const v1Routes = Router();
 v1Routes.get('/health', health);
 v1Routes.use('/auth', authRoutes);
 v1Routes.use('/terminology', terminologyRoutes);
+// The one unauthenticated surface: opening a snapshot share link.
+v1Routes.use('/public', publicRoutes);
 v1Routes.use('/participant', profileRoutes);
 v1Routes.use('/participant', dailyLogRoutes);
+v1Routes.use('/participant', checkInRoutes);
 v1Routes.use('/participant', snapshotRoutes);
+v1Routes.use('/participant', shareLinkRoutes);
+v1Routes.use('/participant', concernRoutes);
 v1Routes.use('/participant', privacyRoutes);
 v1Routes.use('/participant', sessionPreferencesRoutes);
 v1Routes.use('/participant', directoryRoutes);
@@ -42,5 +51,4 @@ v1Routes.use('/worker', workerSnapshotRoutes);
 v1Routes.use('/admin', adminRoutes);
 
 // Still to build (22-item register): the worker authoring screen over
-// /worker/profile, participant check-ins (M-04), consent granting,
-// notifications, audit.
+// /worker/profile, notifications.

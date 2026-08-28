@@ -101,7 +101,7 @@ export default function PlatformGovernanceDashboard() {
           value={v(data?.workers.active)}
           valueColor="text-brand-600"
           icon={Users}
-          iconBg="bg-purple-100 text-brand-600"
+          iconBg="bg-brand-100 text-brand-600"
           note={loading ? '' : `${data.workers.published} directory ${data.workers.published === 1 ? 'profile' : 'profiles'} published`}
         />
         <StatCard
@@ -149,7 +149,7 @@ export default function PlatformGovernanceDashboard() {
           value={v(data?.snapshots.locked)}
           valueColor="text-brand-600"
           icon={CalendarCheck2}
-          iconBg="bg-purple-100 text-brand-600"
+          iconBg="bg-brand-100 text-brand-600"
           progress={snapshotPct}
           progressColor="bg-brand-600"
           note={

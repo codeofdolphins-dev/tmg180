@@ -29,7 +29,7 @@ const TONE_BG = {
   blue: 'bg-sky-100 text-sky-600',
   green: 'bg-emerald-100 text-emerald-600',
   amber: 'bg-amber-100 text-amber-600',
-  purple: 'bg-purple-100 text-brand-600',
+  purple: 'bg-brand-100 text-brand-600',
   teal: 'bg-teal-100 text-teal-600',
 };
 
@@ -88,7 +88,7 @@ const POLICIES = [
 const STATUS_STYLES = {
   Completed: 'bg-emerald-100 text-emerald-700',
   'Needs Review': 'bg-amber-100 text-amber-700',
-  'Due Soon': 'bg-purple-100 text-brand-700',
+  'Due Soon': 'bg-brand-100 text-brand-700',
   'Not completed yet': 'bg-sky-100 text-sky-700',
 };
 
@@ -180,8 +180,8 @@ function VersionAdoptionChart() {
     <svg viewBox={`0 0 ${width} ${height + 14}`} className="w-full h-44">
       <defs>
         <linearGradient id="adoptionFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.05" />
+          <stop offset="0%" stopColor="#6fc3a0" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#6fc3a0" stopOpacity="0.05" />
         </linearGradient>
       </defs>
 
@@ -197,7 +197,7 @@ function VersionAdoptionChart() {
       <path
         d={linePath}
         fill="none"
-        stroke="#7c3aed"
+        stroke="#0a7a52"
         strokeWidth="2"
         strokeDasharray="4 3"
       />

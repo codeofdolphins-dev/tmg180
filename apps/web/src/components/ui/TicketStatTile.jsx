@@ -1,6 +1,6 @@
 const TONE_BG = {
   blue: 'bg-sky-50 text-sky-600',
-  purple: 'bg-purple-50 text-brand-600',
+  purple: 'bg-brand-50 text-brand-600',
   neutral: 'bg-slate-100 text-slate-500',
 };
 

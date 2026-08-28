@@ -42,7 +42,7 @@ export default function ResetPassword() {
   const busy = isSubmitting || isSaving;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-100 via-indigo-50 to-sky-100 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-brand-100 via-indigo-50 to-sky-100 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
       <h1 className="text-3xl font-bold text-brand-600">TMG180</h1>
       <p className="text-sm text-slate-500 mt-1 mb-8">Participant Portal</p>
 
@@ -130,7 +130,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-fuchsia-600 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full py-3.5 mb-5 transition-opacity"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-brand-600 to-brand-400 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full py-3.5 mb-5 transition-opacity"
             >
               {busy && <LoaderCircle size={16} className="animate-spin" />}
               {busy ? 'Resetting…' : 'Reset Password'}

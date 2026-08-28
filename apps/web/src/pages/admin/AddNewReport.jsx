@@ -62,7 +62,7 @@ export default function AddNewReport() {
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-500" />
         <CardHeader
           icon={FileText}
-          iconTone="bg-purple-100 text-brand-600"
+          iconTone="bg-brand-100 text-brand-600"
           title="Report Details"
         />
         <div className="flex flex-col gap-4">
@@ -137,7 +137,7 @@ export default function AddNewReport() {
         <div className={CARD}>
           <CardHeader
             icon={ListChecks}
-            iconTone="bg-purple-100 text-brand-600"
+            iconTone="bg-brand-100 text-brand-600"
             title="Data Included"
           />
           <div className="flex flex-col gap-3">

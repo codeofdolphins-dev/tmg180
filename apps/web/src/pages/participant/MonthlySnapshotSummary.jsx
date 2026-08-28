@@ -19,9 +19,12 @@ import {
   SNAPSHOT_LAYERS,
   SNAPSHOT_STATUS,
   domainLabel,
+  outcomeTagLabel,
+  participationAreaLabel,
   validateSnapshotAddendum,
 } from '@tmg180/shared';
 import Select from '../../components/ui/Select';
+import RelationalSections from '../../components/snapshot/RelationalSections';
 import SupportsByBucket from '../../components/snapshot/SupportsByBucket';
 import { formatLogDate, formatShortDate, formatTimestamp } from '../../lib/dates';
 import {
@@ -40,9 +43,8 @@ import { PARTICIPANT_PATHS, participantSnapshotPath } from '../../routes/paths';
  * append to, so it redirects back to review.
  *
  * `print:` classes strip the chrome and the controls so "Download as PDF"
- * prints the snapshot itself. Share links and the access audit log belong to
- * the external access layer, which is unbuilt — those two actions render
- * disabled rather than being dropped from the layout.
+ * prints the snapshot itself. Share links and the access log live on Snapshot
+ * Exports; the two buttons here open that screen with this month selected.
  */
 
 function ReadOnlyTag() {
@@ -162,6 +164,41 @@ function AddendumPanel({ snapshotId, onDone }) {
   );
 }
 
+/**
+ * One layer of the approved snapshot: whatever the participant wrote in it,
+ * plus the layer's tag bank where it has one (C3 participation areas,
+ * C5 outcome highlights).
+ */
+function LayerCard({ layer, fields, tags, snapshot }) {
+  return (
+    <div className="bg-white rounded-2xl p-6">
+      <p className="text-xs font-bold uppercase tracking-wide text-brand-600">{layer.label}</p>
+      {tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag.key}
+              className="text-xs font-medium text-brand-700 bg-brand-50 px-3 py-1 rounded-full"
+            >
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="mt-4 flex flex-col gap-4">
+        {fields.map((field) => (
+          <div key={field.key}>
+            <p className="text-[10px] uppercase tracking-wide text-slate-400">{field.label}</p>
+            <p className="text-sm text-slate-700 leading-relaxed mt-1 whitespace-pre-wrap">
+              {snapshot[field.key]}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function MonthlySnapshotSummary() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -220,10 +257,18 @@ export default function MonthlySnapshotSummary() {
   const domainEntries = Object.entries(stats.domains ?? {}).sort(([, a], [, b]) => b - a);
   const domainTotal = domainEntries.reduce((sum, [, count]) => sum + count, 0) || 1;
   const hours = Math.round(((stats.totalMinutes ?? 0) / 60) * 10) / 10;
+  const layerTags = {
+    functional_meaning: (snapshot.participationDomains ?? []).map((key) => ({
+      key,
+      label: participationAreaLabel(key),
+    })),
+    outcomes: (snapshot.outcomeTags ?? []).map((key) => ({ key, label: outcomeTagLabel(key) })),
+  };
   const written = SNAPSHOT_LAYERS.map((layer) => ({
     layer,
     fields: layer.fields.filter((field) => snapshot[field.key]?.trim()),
-  })).filter((entry) => entry.fields.length > 0);
+    tags: layerTags[layer.key] ?? [],
+  })).filter((entry) => entry.fields.length > 0 || entry.tags.length > 0);
 
   return (
     <div className="max-w-238 mx-auto flex flex-col gap-6">
@@ -255,7 +300,7 @@ export default function MonthlySnapshotSummary() {
             onClick={() => setAddendumOpen((open) => !open)}
             className={`flex items-center gap-2 text-sm font-medium rounded-full px-5 py-2.5 transition-colors ${
               addendumOpen
-                ? 'bg-purple-100 text-brand-700'
+                ? 'bg-brand-100 text-brand-700'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
             }`}
           >
@@ -276,7 +321,7 @@ export default function MonthlySnapshotSummary() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="bg-white/70 rounded-3xl p-8">
           <div className="flex items-center gap-3">
-            <Activity size={19} className="text-[#7800ce]" />
+            <Activity size={19} className="text-[#005f40]" />
             <h2 className="text-xl font-semibold text-[#0b1c30]">Core Engagement</h2>
           </div>
           <div className="mt-6 flex flex-col gap-5">
@@ -349,7 +394,7 @@ export default function MonthlySnapshotSummary() {
 
       <div className="bg-white/70 rounded-3xl p-8">
         <div className="flex items-center gap-3">
-          <Quote size={19} className="text-[#9333ea]" />
+          <Quote size={19} className="text-[#007a53]" />
           <h2 className="text-xl font-semibold text-[#0b1c30]">Monthly Reflection</h2>
         </div>
         <div className="mt-5 bg-white/50 rounded-2xl p-6">
@@ -378,24 +423,8 @@ export default function MonthlySnapshotSummary() {
                 No written sections — this snapshot is the record of the logs behind it.
               </p>
             ) : (
-              written.map(({ layer, fields }) => (
-                <div key={layer.key} className="bg-white rounded-2xl p-6">
-                  <p className="text-xs font-bold uppercase tracking-wide text-brand-600">
-                    {layer.label}
-                  </p>
-                  <div className="mt-4 flex flex-col gap-4">
-                    {fields.map((field) => (
-                      <div key={field.key}>
-                        <p className="text-[10px] uppercase tracking-wide text-slate-400">
-                          {field.label}
-                        </p>
-                        <p className="text-sm text-slate-700 leading-relaxed mt-1 whitespace-pre-wrap">
-                          {snapshot[field.key]}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              written.map((entry) => (
+                <LayerCard key={entry.layer.key} {...entry} snapshot={snapshot} />
               ))
             )}
           </div>
@@ -409,28 +438,15 @@ export default function MonthlySnapshotSummary() {
               <ScrollText size={19} className="text-slate-500" />
               <h2 className="text-xl font-semibold text-[#0b1c30]">Snapshot Preview</h2>
             </div>
-            {written.map(({ layer, fields }) => (
-              <div key={layer.key} className="bg-white rounded-2xl p-6">
-                <p className="text-xs font-bold uppercase tracking-wide text-brand-600">
-                  {layer.label}
-                </p>
-                <div className="mt-4 flex flex-col gap-4">
-                  {fields.map((field) => (
-                    <div key={field.key}>
-                      <p className="text-[10px] uppercase tracking-wide text-slate-400">
-                        {field.label}
-                      </p>
-                      <p className="text-sm text-slate-700 leading-relaxed mt-1 whitespace-pre-wrap">
-                        {snapshot[field.key]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {written.map((entry) => (
+              <LayerCard key={entry.layer.key} {...entry} snapshot={snapshot} />
             ))}
           </div>
         )
       )}
+
+      {/* Monthly Relational Longitudinal Snapshot — only the sections used */}
+      <RelationalSections values={snapshot} readOnly />
 
       {snapshot.addenda?.length > 0 && (
         <div className="flex flex-col gap-4">
@@ -496,20 +512,18 @@ export default function MonthlySnapshotSummary() {
           </button>
           <button
             type="button"
-            disabled
-            title="Sharing links need the external access layer, which is not built yet."
-            className="flex items-center gap-2 bg-white border border-slate-200 text-slate-500 text-sm font-medium rounded-full px-5 py-2.5 opacity-60 cursor-not-allowed"
+            onClick={() => navigate(`${PARTICIPANT_PATHS.snapshotExports}?snapshot=${snapshot.id}`)}
+            className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-full px-5 py-2.5 hover:bg-slate-50 transition-colors"
           >
             <Share2 size={14} />
             Share time-limited link
           </button>
           <button
             type="button"
-            disabled
-            title="The access audit log arrives with sharing links."
-            className="text-sm text-slate-400 px-2 opacity-60 cursor-not-allowed"
+            onClick={() => navigate(`${PARTICIPANT_PATHS.snapshotExports}?snapshot=${snapshot.id}`)}
+            className="text-sm text-slate-600 hover:text-slate-900 px-2 transition-colors"
           >
-            View audit log
+            View access log
           </button>
         </div>
       </div>

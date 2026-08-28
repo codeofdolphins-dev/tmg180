@@ -8,7 +8,7 @@ export default function VersionTimeline({ items }) {
           <div className="flex flex-col items-center">
             <span
               className={`w-3 h-3 rounded-full shrink-0 mt-1 ${
-                item.current ? 'bg-brand-600 ring-4 ring-purple-100' : 'bg-slate-300'
+                item.current ? 'bg-brand-600 ring-4 ring-brand-100' : 'bg-slate-300'
               }`}
             />
             {idx < items.length - 1 && (

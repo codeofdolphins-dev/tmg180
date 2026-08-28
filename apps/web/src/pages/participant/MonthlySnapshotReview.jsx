@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import RelationalSections from '../../components/snapshot/RelationalSections';
 import SupportsByBucket from '../../components/snapshot/SupportsByBucket';
 import {
   Lock,
@@ -12,8 +13,15 @@ import {
   Scale,
 } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { SNAPSHOT_LAYERS, domainLabel, comparisonLabel } from '@tmg180/shared';
+import {
+  SNAPSHOT_LAYERS,
+  SNAPSHOT_OUTCOME_TAGS,
+  SNAPSHOT_PARTICIPATION_AREAS,
+  domainLabel,
+  comparisonLabel,
+} from '@tmg180/shared';
 import { formatShortDate, formatTimestamp } from '../../lib/dates';
+import { toggleInList } from '../../hooks/participant/dailyLog';
 import { useGenerateSnapshot, useSnapshotForm } from '../../hooks/participant/snapshot';
 import { PARTICIPANT_PATHS, participantSnapshotPath } from '../../routes/paths';
 
@@ -24,14 +32,16 @@ import { PARTICIPANT_PATHS, participantSnapshotPath } from '../../routes/paths';
  * 288px rail holding the non-linear statement, the writing helper and the
  * approval area.
  *
- * Two tiles the frame shows ("energy trend", "check-ins") need the M-04
- * check-in, which is unbuilt, and the writing helper is an unspecced AI
- * endpoint — all three render in place, visibly inactive, rather than being
- * dropped from the layout or filled with numbers nobody measured.
+ * The writing helper the frame shows is an unspecced AI endpoint, so it renders
+ * in place, visibly inactive, rather than being dropped from the layout.
  *
  * Three fields are edited in their own sections rather than in the language
  * tabs, because the frame gives them dedicated cards: the two "functioning with
  * support" fields and the participant's own words.
+ *
+ * The perspective tabs are Template C's layers (C2–C5, C7) and the two tag
+ * banks below them are C3 and C5 — added 28 Aug 2026 from Longitudinal
+ * Evidence Templates v2.0, against columns the DB pack already carried.
  */
 
 const SECTION_FIELDS = {
@@ -61,7 +71,7 @@ function StatTile({ value, label, unavailable, title }) {
     >
       <p
         className={`text-2xl font-bold leading-none ${
-          unavailable ? 'text-slate-400' : 'text-[#7800ce]'
+          unavailable ? 'text-slate-400' : 'text-[#005f40]'
         }`}
       >
         {value}
@@ -71,6 +81,35 @@ function StatTile({ value, label, unavailable, title }) {
       </p>
       {unavailable && <p className="text-[10px] text-slate-400 mt-1">Not available yet</p>}
     </div>
+  );
+}
+
+/** A multi-select bank of chips — C3 and C5 both are one. */
+function TagBank({ legend, options, selected, onToggle }) {
+  return (
+    <fieldset className="mt-6">
+      <legend className="text-sm font-bold text-[#0b1c30]">{legend}</legend>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const on = selected.includes(option.key);
+          return (
+            <button
+              key={option.key}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onToggle(option.key)}
+              className={`px-4 py-2 rounded-full text-sm text-left transition-colors ${
+                on
+                  ? 'bg-[#007a53] text-white shadow-sm'
+                  : 'bg-[#eff4ff] text-[#0b1c30] hover:bg-[#e0e9ff]'
+              }`}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
 
@@ -87,7 +126,7 @@ export default function MonthlySnapshotReview() {
 
   const review = useSnapshotForm(id);
   const { form, snapshot, isLoading, isSaving, error, isLocked } = review;
-  const { register, formState } = form;
+  const { register, setValue, watch, formState } = form;
   const errors = formState.errors;
 
   if (isLocked) return <Navigate to={participantSnapshotPath.detail(snapshot.id)} replace />;
@@ -102,6 +141,10 @@ export default function MonthlySnapshotReview() {
   }
 
   const { stats } = snapshot;
+  const values = watch();
+  const participationDomains = values.participationDomains ?? [];
+  const outcomeTags = values.outcomeTags ?? [];
+  const setField = (field, value) => setValue(field, value, { shouldDirty: true });
   const layer = SNAPSHOT_LAYERS.find((entry) => entry.key === layerKey) ?? SNAPSHOT_LAYERS[0];
   const layerFields = layer.fields.filter((field) => !OWNED_ELSEWHERE.includes(field.key));
   const domains = Object.entries(stats.domains ?? {}).sort(([, a], [, b]) => b - a);
@@ -154,7 +197,7 @@ export default function MonthlySnapshotReview() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_288px] gap-6 items-start">
         <div className="flex flex-col gap-6 min-w-0">
           {/* Section 5 — Monthly overview */}
-          <section className="relative overflow-hidden bg-linear-to-br from-[#f0dbff] via-[#efe6ff] to-[#d3e4fe] rounded-3xl p-8">
+          <section className="relative overflow-hidden bg-linear-to-br from-[#dcf2e6] via-[#e4f4eb] to-[#d3e4fe] rounded-3xl p-8">
             <h2 className="text-2xl font-semibold text-[#0b1c30]">
               {snapshot.monthLabel.split(' ')[0]} Overview
             </h2>
@@ -167,10 +210,9 @@ export default function MonthlySnapshotReview() {
               <StatTile value={stats.goals?.length ?? 0} label="Goals worked on" />
               <StatTile value={`${hours}`} label="Hours logged" />
               <StatTile
-                value="—"
+                value={snapshot.sourceCheckInIds?.length ?? 0}
                 label="Check-ins"
-                unavailable
-                title="Daily check-ins (M-04) are not built yet, so this month has none to count."
+                title="Your own check-ins for this month — this snapshot was compiled from them too."
               />
             </div>
           </section>
@@ -183,16 +225,17 @@ export default function MonthlySnapshotReview() {
               of it belongs to you.
             </p>
 
-            <div className="mt-6 bg-[#eff4ff] rounded-full p-1.25 grid grid-cols-3">
+            {/* Wraps rather than a fixed column count — Template C has five layers. */}
+            <div className="mt-6 bg-[#eff4ff] rounded-3xl p-1.25 flex flex-wrap gap-1">
               {SNAPSHOT_LAYERS.map((entry) => (
                 <button
                   key={entry.key}
                   type="button"
                   aria-pressed={entry.key === layerKey}
                   onClick={() => setLayerKey(entry.key)}
-                  className={`rounded-full px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
+                  className={`flex-1 min-w-28 rounded-full px-3 py-2.5 text-sm text-center leading-tight transition-colors ${
                     entry.key === layerKey
-                      ? 'bg-white shadow-sm font-bold text-[#7800ce]'
+                      ? 'bg-white shadow-sm font-bold text-[#005f40]'
                       : 'text-[#4d4354] hover:text-[#0b1c30]'
                   }`}
                 >
@@ -200,6 +243,32 @@ export default function MonthlySnapshotReview() {
                 </button>
               ))}
             </div>
+
+            <p className="mt-4 text-sm text-[#4d4354]">{layer.description}</p>
+
+            {/* C3 and C5 — each bank belongs to the layer that asks for it. */}
+            {layer.key === 'functional_meaning' && (
+              <TagBank
+                legend="Participation affected most in"
+                options={SNAPSHOT_PARTICIPATION_AREAS}
+                selected={participationDomains}
+                onToggle={(key) =>
+                  setValue('participationDomains', toggleInList(participationDomains, key), {
+                    shouldDirty: true,
+                  })
+                }
+              />
+            )}
+            {layer.key === 'outcomes' && (
+              <TagBank
+                legend="Outcome highlights"
+                options={SNAPSHOT_OUTCOME_TAGS}
+                selected={outcomeTags}
+                onToggle={(key) =>
+                  setValue('outcomeTags', toggleInList(outcomeTags, key), { shouldDirty: true })
+                }
+              />
+            )}
 
             <div className="mt-6 flex flex-col gap-5">
               {layerFields.map((field) => (
@@ -225,6 +294,9 @@ export default function MonthlySnapshotReview() {
           {/* Goal Link Helper roll-up — supports used this month, by NDIS budget bucket */}
           <SupportsByBucket buckets={stats.buckets ?? []} />
 
+          {/* Monthly Relational Longitudinal Snapshot, sections 1 + 3-9 + 11 */}
+          <RelationalSections values={values} onChange={setField} />
+
           {/* Section 6 — Goal progress summary */}
           {stats.goals?.length > 0 && (
             <Card>
@@ -242,7 +314,7 @@ export default function MonthlySnapshotReview() {
                           {goal.text}
                         </p>
                         {pattern && (
-                          <span className="text-[11px] font-semibold text-[#2c0051] bg-[#9333ea]/15 px-3 py-1 rounded-full shrink-0">
+                          <span className="text-[11px] font-semibold text-[#00291b] bg-[#007a53]/15 px-3 py-1 rounded-full shrink-0">
                             Mostly {pattern.toLowerCase()}
                           </span>
                         )}
@@ -260,7 +332,7 @@ export default function MonthlySnapshotReview() {
           {/* Sections 7 & 8 — Functioning with support, participant voice */}
           <Card>
             <div className="flex items-center gap-3">
-              <Scale size={20} className="text-[#7800ce]" />
+              <Scale size={20} className="text-[#005f40]" />
               <h3 className="text-xl font-semibold text-[#0b1c30]">Functioning with Support</h3>
             </div>
             <p className="text-sm text-[#4d4354] mt-1">
@@ -295,7 +367,7 @@ export default function MonthlySnapshotReview() {
             </div>
 
             <div className="mt-6 relative bg-[#f8f9ff] rounded-2xl p-5">
-              <Quote size={20} className="text-[#9333ea]/40 absolute top-4 right-4" />
+              <Quote size={20} className="text-[#007a53]/40 absolute top-4 right-4" />
               <label
                 className="block text-[10px] uppercase tracking-wide text-slate-400"
                 htmlFor={SECTION_FIELDS.voice}
@@ -309,7 +381,7 @@ export default function MonthlySnapshotReview() {
                 className="mt-2 w-full bg-white rounded-2xl px-4 py-3 text-base italic text-[#0b1c30] placeholder:text-[#6b7280] placeholder:not-italic outline-none resize-none focus:ring-2 focus:ring-brand-600/40"
                 {...register(SECTION_FIELDS.voice)}
               />
-              <p className="text-[11px] font-semibold text-[#7800ce] mt-2">Participant-authored</p>
+              <p className="text-[11px] font-semibold text-[#005f40] mt-2">Participant-authored</p>
             </div>
           </Card>
 
@@ -324,9 +396,9 @@ export default function MonthlySnapshotReview() {
                   return (
                     <div key={tag} className="flex flex-col items-center gap-2 w-24">
                       <div
-                        className="w-16 h-16 rounded-full flex items-center justify-center text-sm font-bold text-[#7800ce]"
+                        className="w-16 h-16 rounded-full flex items-center justify-center text-sm font-bold text-[#005f40]"
                         style={{
-                          background: `conic-gradient(#7800ce ${share}%, #ede9fe ${share}% 100%)`,
+                          background: `conic-gradient(#005f40 ${share}%, #e3f3ea ${share}% 100%)`,
                         }}
                       >
                         <span className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
@@ -406,7 +478,7 @@ export default function MonthlySnapshotReview() {
                   type="button"
                   onClick={review.approve}
                   disabled={isSaving}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#7800ce] text-sm text-white disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#005f40] text-sm text-white disabled:opacity-50"
                 >
                   {isSaving ? (
                     <LoaderCircle size={14} className="animate-spin" />
@@ -429,7 +501,7 @@ export default function MonthlySnapshotReview() {
                   type="button"
                   onClick={() => setConfirming(true)}
                   disabled={isSaving}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#7800ce] text-sm text-white disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-[#005f40] text-sm text-white disabled:opacity-50"
                 >
                   <Lock size={14} />
                   Approve and Lock
@@ -438,7 +510,7 @@ export default function MonthlySnapshotReview() {
                   type="button"
                   onClick={review.saveDraft}
                   disabled={isSaving}
-                  className="w-full py-2.5 rounded-full bg-white border border-purple-100 text-sm text-[#7800ce] disabled:opacity-50"
+                  className="w-full py-2.5 rounded-full bg-white border border-brand-100 text-sm text-[#005f40] disabled:opacity-50"
                 >
                   {isSaving ? 'Saving…' : 'Save as Draft'}
                 </button>

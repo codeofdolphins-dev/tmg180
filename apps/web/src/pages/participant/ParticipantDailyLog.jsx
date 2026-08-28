@@ -122,7 +122,7 @@ export default function ParticipantDailyLog() {
       <div className="flex flex-col gap-12 max-w-250 mx-auto pb-6">
         <div className="flex flex-col gap-4">
           <div className="inline-flex self-start items-center gap-2 bg-[#e5eeff] rounded-full pl-4 pr-5 py-2">
-            <CircleUserRound size={15} className="text-[#9333ea]" />
+            <CircleUserRound size={15} className="text-[#007a53]" />
             <span className="text-xs font-bold text-[#0b1c30]">{user?.name ?? 'My log'}</span>
           </div>
           <div>
@@ -153,7 +153,7 @@ export default function ParticipantDailyLog() {
           <div className="flex-1 min-w-0 flex flex-col gap-8">
             <section className="bg-[#f8f9ff] rounded-4xl p-8">
               <div className="flex items-center gap-3">
-                <Clock size={20} className="text-[#7800ce]" />
+                <Clock size={20} className="text-[#005f40]" />
                 <h2 className="text-xl font-semibold text-[#0b1c30]">Session Details</h2>
               </div>
               <div className="grid grid-cols-3 gap-6 mt-6">
@@ -258,9 +258,9 @@ export default function ParticipantDailyLog() {
                     {goalIds.map((goalId) => (
                       <span
                         key={goalId}
-                        className="inline-flex items-center gap-2 bg-[#9333ea]/20 rounded-full px-4 py-1.5"
+                        className="inline-flex items-center gap-2 bg-[#007a53]/20 rounded-full px-4 py-1.5"
                       >
-                        <span className="text-xs font-bold text-[#2c0051]">
+                        <span className="text-xs font-bold text-[#00291b]">
                           {goalById.get(goalId)?.text ?? 'Goal'}
                         </span>
                         <button
@@ -268,7 +268,7 @@ export default function ParticipantDailyLog() {
                           aria-label="Remove goal"
                           onClick={() => removeGoal(goalId)}
                         >
-                          <X size={13} className="text-[#2c0051]" />
+                          <X size={13} className="text-[#00291b]" />
                         </button>
                       </span>
                     ))}
@@ -319,7 +319,7 @@ export default function ParticipantDailyLog() {
 
             <section className="bg-[#f8f9ff] rounded-4xl p-8">
               <div className="flex items-center gap-3">
-                <PenLine size={19} className="text-[#7800ce]" />
+                <PenLine size={19} className="text-[#005f40]" />
                 <h2 className="text-xl font-semibold text-[#0b1c30]">The Details</h2>
               </div>
               <p className="mt-2 text-base text-[#4d4354]">
@@ -373,7 +373,7 @@ export default function ParticipantDailyLog() {
             </section>
 
             <section className="bg-[#f8f9ff] rounded-4xl p-8">
-              <BarChart2 size={20} className="text-[#7800ce]" />
+              <BarChart2 size={20} className="text-[#005f40]" />
               <p className="mt-2 text-base text-[#4d4354] max-w-109.5]">
                 Compared to your usual pattern, how did things go during this period?
               </p>
@@ -390,7 +390,7 @@ export default function ParticipantDailyLog() {
                     }
                     className={`rounded-md px-1 py-3 text-sm text-center leading-tight transition-colors ${
                       comparison === option.key
-                        ? 'bg-white shadow-sm font-bold text-[#7800ce]'
+                        ? 'bg-white shadow-sm font-bold text-[#005f40]'
                         : 'text-[#4d4354] hover:text-[#0b1c30]'
                     }`}
                   >
@@ -443,7 +443,7 @@ export default function ParticipantDailyLog() {
               type="button"
               onClick={daily.saveDraft}
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-full bg-white border border-purple-100 text-sm text-[#7800ce] disabled:opacity-50 transition-opacity"
+              className="px-6 py-2.5 rounded-full bg-white border border-brand-100 text-sm text-[#005f40] disabled:opacity-50 transition-opacity"
             >
               Save Draft
             </button>
@@ -451,7 +451,7 @@ export default function ParticipantDailyLog() {
               type="button"
               onClick={daily.submit}
               disabled={isSaving}
-              className="flex items-center gap-2 px-8 py-2.5 rounded-full bg-[#7800ce] text-sm text-white disabled:opacity-50 transition-opacity"
+              className="flex items-center gap-2 px-8 py-2.5 rounded-full bg-[#005f40] text-sm text-white disabled:opacity-50 transition-opacity"
             >
               {isSaving ? <LoaderCircle size={14} className="animate-spin" /> : null}
               Submit Log

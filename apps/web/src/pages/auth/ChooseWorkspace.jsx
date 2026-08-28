@@ -12,7 +12,7 @@ const WORKSPACES = [
     linkLabel: 'Enter Portal',
     icon: User,
     iconBg: 'bg-brand-600',
-    blob: 'bg-purple-300',
+    blob: 'bg-brand-300',
     accent: 'text-brand-600',
   },
   {
@@ -58,7 +58,7 @@ export default function ChooseWorkspace() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-sky-50 to-emerald-50 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-brand-50 via-sky-50 to-emerald-50 flex flex-col items-center px-6 py-16 font-sans text-slate-800">
       <h1 className="text-4xl font-bold text-brand-600 mb-2 text-center">
         Welcome to TMG180
       </h1>

@@ -120,7 +120,7 @@ export default function MonthlySnapshotList() {
 
       {months.data?.length === 0 && !isLoading && (
         <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <CalendarDays size={26} />
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mt-6">

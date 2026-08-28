@@ -64,6 +64,9 @@ model User {
   governance_acks          WorkerGovernanceAcknowledgement[] @relation("WorkerGovernanceAcknowledgements")
   governance_notes         WorkerGovernanceNote[]            @relation("WorkerGovernanceNotes")
   learning_progress        WorkerLearningProgress[]          @relation("WorkerLearningProgress")
+  share_links              SnapshotShareLink[]               @relation("ParticipantShareLinks")
+  concerns_raised          Concern[]                         @relation("ConcernsRaised")
+  concern_responses        ConcernResponse[]                 @relation("ConcernResponses")
 
   @@index([status])
   @@index([roles(ops: ArrayOps)], type: Gin)
@@ -503,6 +506,36 @@ model MonthlySnapshot {
   outcome_tags       String[]
   outcome_highlights String?
 
+  // Monthly Relational Longitudinal Snapshot (canonical monthly template,
+  // 28 Aug 2026): the same record in its checkbox-led relational form. Its
+  // section 2 is C2, its 10 is C6 and its 11 is C8 — sections 3-9 are the
+  // seven banks below, and section 1's "participant involved in review".
+  participant_involvement String? @db.VarChar(50)
+
+  participation_trend_tags     String[]
+  participation_trends_summary String?
+
+  barrier_tags     String[]
+  barriers_summary String?
+
+  support_mediated_tags    String[]
+  support_mediated_summary String?
+
+  fluctuation_level          String?  @db.VarChar(50)
+  fluctuation_influence_tags String[]
+  fluctuation_summary        String?
+
+  recovery_trend_tags     String[]
+  recovery_trends_summary String?
+
+  goal_mapping_tags    String[]
+  goal_mapping_summary String?
+
+  quality_of_life_tags    String[]
+  quality_of_life_summary String?
+
+  approval_statements String[]
+
   nonlinear_statement String @default("Capacity varied across the month, consistent with non-linear functioning. Participation improved with support scaffolding. This reflects supports working, not removal of impairment.")
 
   status                  String?   @default("draft") @db.VarChar(50)
@@ -517,8 +550,9 @@ model MonthlySnapshot {
   created_at DateTime @default(now()) @db.Timestamptz
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  participant User               @relation("ParticipantSnapshots", fields: [participant_id], references: [id])
+  participant User                @relation("ParticipantSnapshots", fields: [participant_id], references: [id])
   addenda     SnapshotAddendum[]
+  share_links SnapshotShareLink[]
 
   @@unique([participant_id, month_year, version], map: "idx_snapshot_unique")
   @@index([participant_id, month_year])
@@ -538,6 +572,86 @@ model SnapshotAddendum {
   snapshot MonthlySnapshot? @relation(fields: [snapshot_id], references: [id])
 
   @@map("tmg_snapshot_addendum")
+}
+
+// A time-limited link to one approved snapshot (Template C9, "Export and
+// Sharing": "exported as a PDF and shared with planners, LACs, or
+// coordinators … Sharing requires explicit participant consent. The
+// participant controls who receives this document."). Only the SHA-256 of the
+// token is stored — the token itself is shown to the participant once, at
+// creation, and the row is the sole authority on whether it still opens
+// anything. Opens are counted here and recorded in tmg_audit_log, which is
+// where the participant's access log comes from.
+model SnapshotShareLink {
+  id             Int       @id @default(autoincrement())
+  snapshot_id    Int
+  participant_id Int
+  token_hash     String    @unique @db.VarChar(64)
+  audience       String    @db.VarChar(50)
+  allow_download Boolean   @default(false)
+  status         String    @default("active") @db.VarChar(20)
+  expires_at     DateTime  @db.Timestamptz
+  created_at     DateTime  @default(now()) @db.Timestamptz
+  revoked_at     DateTime? @db.Timestamptz
+  last_opened_at DateTime? @db.Timestamptz
+  open_count     Int       @default(0)
+
+  snapshot    MonthlySnapshot @relation(fields: [snapshot_id], references: [id])
+  participant User            @relation("ParticipantShareLinks", fields: [participant_id], references: [id])
+
+  @@index([snapshot_id, status])
+  @@index([participant_id, status])
+  @@map("tmg_snapshot_share_links")
+}
+
+// ============================================================
+// SECTION 7: CONCERNS, COMPLAINTS AND FEEDBACK (Mandatory Policy 2)
+// ============================================================
+// The platform-level ticket Policy 2's evidence column names: "Complaint
+// ticket; response record; referral/escalation record". Append-only: the
+// original is never edited, and everything after it is a response row. The
+// boundary check ("platform-level, service-level, worker-controlled or
+// external regulator matter") is `relates_to` as the raiser saw it plus
+// `referred_to` when governance passes it on.
+model Concern {
+  id              Int       @id @default(autoincrement())
+  raised_by       Int
+  raised_by_role  String    @db.VarChar(50)
+  kind            String    @db.VarChar(20)
+  category        String    @db.VarChar(50)
+  relates_to      String    @db.VarChar(20)
+  about           String?   @db.VarChar(255)
+  description     String
+  what_would_help String?
+  status          String    @default("received") @db.VarChar(30)
+  acknowledged_at DateTime? @db.Timestamptz
+  referred_to     String?   @db.VarChar(255)
+  referred_at     DateTime? @db.Timestamptz
+  closed_at       DateTime? @db.Timestamptz
+  created_at      DateTime  @default(now()) @db.Timestamptz
+  updated_at      DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  author    User              @relation("ConcernsRaised", fields: [raised_by], references: [id])
+  responses ConcernResponse[]
+
+  @@index([raised_by, created_at])
+  @@index([status, created_at])
+  @@map("tmg_concerns")
+}
+
+model ConcernResponse {
+  id          Int      @id @default(autoincrement())
+  concern_id  Int
+  author_id   Int
+  author_role String   @db.VarChar(50)
+  text        String
+  created_at  DateTime @default(now()) @db.Timestamptz
+
+  concern Concern @relation(fields: [concern_id], references: [id])
+  author  User    @relation("ConcernResponses", fields: [author_id], references: [id])
+
+  @@index([concern_id, created_at])
+  @@map("tmg_concern_responses")
 }
 
 // ============================================================

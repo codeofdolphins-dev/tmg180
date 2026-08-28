@@ -52,7 +52,7 @@ function WorkerRow({ worker, onOpen }) {
   const secondary = [worker.location, ...worker.supportAreas.map((area) => area.label)].filter(Boolean);
   return (
     <article className={`${CARD} flex items-start gap-5`}>
-      <div className="w-14 h-14 rounded-full bg-purple-100 text-brand-700 flex items-center justify-center text-lg font-semibold shrink-0">
+      <div className="w-14 h-14 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-lg font-semibold shrink-0">
         {initialsOf(worker.name)}
       </div>
       <div className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ function WorkerRow({ worker, onOpen }) {
       </div>
       <button
         onClick={onOpen}
-        className="shrink-0 border border-brand-600 text-brand-600 text-sm font-semibold rounded-full px-5 py-2 hover:bg-purple-50 transition-colors"
+        className="shrink-0 border border-brand-600 text-brand-600 text-sm font-semibold rounded-full px-5 py-2 hover:bg-brand-50 transition-colors"
       >
         View profile
       </button>
@@ -213,7 +213,7 @@ export default function BrowseVerifiedWorkers() {
 
       {data && workers.length === 0 && (
         <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <Users size={26} />
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mt-6">
@@ -237,7 +237,7 @@ export default function BrowseVerifiedWorkers() {
       )}
 
       {data?.contactNotice && (
-        <div className="flex items-start gap-3 bg-purple-50 border border-purple-100 rounded-xl px-5 py-4">
+        <div className="flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-5 py-4">
           <Info size={16} className="text-brand-600 mt-0.5 shrink-0" />
           <p className="text-sm text-slate-600 leading-relaxed">{data.contactNotice}</p>
         </div>

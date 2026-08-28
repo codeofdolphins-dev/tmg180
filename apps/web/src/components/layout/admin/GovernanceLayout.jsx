@@ -15,7 +15,7 @@ export default function GovernanceLayout() {
   return (
     <div className="governance-portal min-h-screen bg-white font-sans text-slate-800">
       <div className="pointer-events-none fixed inset-0 overflow-hidden print:hidden">
-        <div className="absolute -top-24 -left-32 w-160 h-160 rounded-full bg-[#f0dbff] blur-3xl opacity-70" />
+        <div className="absolute -top-24 -left-32 w-160 h-160 rounded-full bg-[#dcf2e6] blur-3xl opacity-70" />
         <div className="absolute top-142 left-160 w-3xl h-192 rounded-full bg-[#d8e2ff] blur-3xl opacity-70" />
       </div>
 

@@ -52,7 +52,7 @@ const initialsOf = (name = '') =>
 
 function Chip({ children, tone = 'purple' }) {
   const tones = {
-    purple: 'bg-purple-100 text-brand-700',
+    purple: 'bg-brand-100 text-brand-700',
     slate: 'bg-slate-100 text-slate-700',
     green: 'bg-emerald-50 text-emerald-800',
   };
@@ -149,7 +149,7 @@ export default function RelationalWorkerProfile() {
       <div className="max-w-238 mx-auto flex flex-col gap-6">
         {back}
         <div className="bg-white/80 rounded-xl p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="w-16 h-16 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <UserX size={26} />
           </div>
           <h1 className="text-xl font-semibold text-slate-900 mt-6">This profile isn&rsquo;t listed</h1>
@@ -190,7 +190,7 @@ export default function RelationalWorkerProfile() {
 
       {/* identity */}
       <div className="flex flex-col sm:flex-row items-start gap-5">
-        <div className="w-20 h-20 rounded-full bg-purple-100 ring-4 ring-white text-brand-700 flex items-center justify-center text-2xl font-semibold shrink-0">
+        <div className="w-20 h-20 rounded-full bg-brand-100 ring-4 ring-white text-brand-700 flex items-center justify-center text-2xl font-semibold shrink-0">
           {initialsOf(worker.name)}
         </div>
         <div className="min-w-0">

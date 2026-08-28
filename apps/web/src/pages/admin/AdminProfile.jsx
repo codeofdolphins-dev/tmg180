@@ -103,7 +103,7 @@ export default function AdminProfile() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 items-start">
         <div className="flex flex-col gap-4">
-          <div className="bg-linear-to-br from-purple-50/70 to-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-linear-to-br from-brand-50/70 to-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <CardHeader icon={User} title="Profile Information" />
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="w-20 h-20 rounded-full overflow-hidden shrink-0">
@@ -164,7 +164,7 @@ export default function AdminProfile() {
               </div>
             </div>
             <div className="flex justify-end mt-4">
-              <button className="text-sm font-medium text-brand-700 bg-purple-100 hover:bg-purple-200 rounded-full px-5 py-2 transition-colors">
+              <button className="text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 rounded-full px-5 py-2 transition-colors">
                 Save Changes
               </button>
             </div>
@@ -191,7 +191,7 @@ export default function AdminProfile() {
                   <p className="text-sm font-medium text-slate-800">
                     Two-factor Authentication (2FA)
                   </p>
-                  <span className="text-[10px] font-medium text-brand-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full">
                     RECOMMENDED
                   </span>
                 </div>
@@ -246,12 +246,12 @@ export default function AdminProfile() {
             <ShieldCheck
               size={90}
               strokeWidth={1}
-              className="absolute -top-2 -right-4 text-purple-100"
+              className="absolute -top-2 -right-4 text-brand-100"
             />
             <h2 className="relative text-base font-bold text-slate-900 mb-2">
               Role &amp; Access
             </h2>
-            <span className="relative inline-block text-xs font-medium text-brand-700 bg-purple-100 px-2.5 py-1 rounded-full mb-3">
+            <span className="relative inline-block text-xs font-medium text-brand-700 bg-brand-100 px-2.5 py-1 rounded-full mb-3">
               Super Admin
             </span>
             <p className="relative text-sm text-slate-500 mb-4 leading-relaxed">

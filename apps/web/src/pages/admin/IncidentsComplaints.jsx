@@ -39,7 +39,7 @@ const STATS = [
     label: 'Resolved',
     value: '156',
     icon: CheckCircle2,
-    bg: 'bg-purple-800/10',
+    bg: 'bg-brand-800/10',
     iconBg: 'bg-white',
     iconColor: 'text-brand-600',
   },
@@ -57,7 +57,7 @@ const STATUS_STYLES = {
   'Needs review': 'bg-rose-100 text-rose-700',
   Open: 'bg-emerald-100 text-emerald-700',
   'In review': 'bg-sky-100 text-sky-700',
-  Resolved: 'bg-purple-100 text-brand-700',
+  Resolved: 'bg-brand-100 text-brand-700',
 };
 
 const TICKETS = [

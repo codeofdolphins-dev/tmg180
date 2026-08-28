@@ -33,7 +33,7 @@ const ICONS = {
 };
 
 const TINTS = {
-  continue_profile: 'bg-purple-100 text-brand-600',
+  continue_profile: 'bg-brand-100 text-brand-600',
   daily_log: 'bg-emerald-100 text-emerald-700',
   monthly_snapshot: 'bg-sky-100 text-sky-700',
   browse_workers: 'bg-rose-100 text-rose-700',
@@ -58,7 +58,7 @@ function ActionCard({ action, progress, onOpen }) {
       <div className="mt-auto pt-6">
         <button
           onClick={onOpen}
-          className="inline-flex items-center gap-2 border border-brand-600 text-brand-600 text-sm font-semibold rounded-full px-5 py-2 hover:bg-purple-50 transition-colors"
+          className="inline-flex items-center gap-2 border border-brand-600 text-brand-600 text-sm font-semibold rounded-full px-5 py-2 hover:bg-brand-50 transition-colors"
         >
           Open
           <ArrowRight size={16} />

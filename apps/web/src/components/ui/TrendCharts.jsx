@@ -20,7 +20,7 @@ export function IncidentRateChart() {
     <svg viewBox="0 0 200 96" className="w-full h-24" fill="none">
       <path
         d="M0 65 C 30 25, 60 25, 90 50 S 150 85, 200 35"
-        stroke="#7c3aed"
+        stroke="#0a7a52"
         strokeWidth="2.5"
         fill="none"
         strokeLinecap="round"

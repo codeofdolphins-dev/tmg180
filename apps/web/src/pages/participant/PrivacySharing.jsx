@@ -30,7 +30,11 @@ import {
   useSavePreferences,
   useUpdateConsent,
 } from '../../hooks/participant/privacy';
+import { useNavigate } from 'react-router-dom';
+import { isShareLinkOpen } from '@tmg180/shared';
 import { useDirectory } from '../../hooks/participant/directory';
+import { useShareLinks } from '../../hooks/participant/shareLinks';
+import { PARTICIPANT_PATHS } from '../../routes/paths';
 import { useSnapshots } from '../../hooks/participant/snapshot';
 import Select from '../../components/ui/Select';
 
@@ -43,7 +47,8 @@ import Select from '../../components/ui/Select';
  * (md/frontend/TMG180_Participant_UI_Scale.md).
  *
  * One part of the frame has nothing behind it yet and says so instead of
- * pretending: time-limited share links need the external access layer. Grant
+ * pretending — no longer: time-limited share links are live (28 Aug 2026),
+ * and the rail lists the open ones. Grant
  * Access is real (M-09, built 19 Aug): it names a worker from the published
  * directory and creates the consent record the worker's whole workspace
  * reads — participant-only, no acceptance step, because canon is that the
@@ -56,6 +61,42 @@ import Select from '../../components/ui/Select';
  */
 
 const CARD = 'bg-white/80 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
+
+/** The links that still open something, newest first; managed on Snapshot Exports. */
+function ActiveShareLinks() {
+  const navigate = useNavigate();
+  const { data: links } = useShareLinks();
+  const open = (links ?? []).filter((link) => isShareLinkOpen(link));
+
+  if (open.length === 0) {
+    return (
+      <p className="text-xs text-slate-500 mt-3">
+        No links are open right now. A snapshot leaves TMG180 only when you share or export it.
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3 mt-3">
+      {open.map((link) => (
+        <button
+          key={link.id}
+          onClick={() => navigate(`${PARTICIPANT_PATHS.snapshotExports}?snapshot=${link.snapshotId}`)}
+          className="text-left bg-white/60 rounded-lg px-4 py-3 hover:bg-white transition-colors"
+        >
+          <p className="text-sm text-slate-700">
+            {link.monthLabel} · {link.audienceLabel}
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Stops working {formatShortDate(link.expiresAt)}
+            {link.openCount > 0 &&
+              ` · opened ${link.openCount} ${link.openCount === 1 ? 'time' : 'times'}`}
+          </p>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 function Toggle({ checked, disabled, onChange, label }) {
   return (
@@ -85,7 +126,7 @@ function Initials({ name }) {
     .map((part) => part[0]?.toUpperCase())
     .join('');
   return (
-    <div className="w-9 h-9 rounded-full bg-purple-50 text-brand-700 text-xs font-bold flex items-center justify-center shrink-0">
+    <div className="w-9 h-9 rounded-full bg-brand-50 text-brand-700 text-xs font-bold flex items-center justify-center shrink-0">
       {initials || '?'}
     </div>
   );
@@ -448,7 +489,7 @@ export default function PrivacySharing() {
         </p>
       </div>
 
-      <div className={`${CARD} bg-linear-to-r from-purple-50 via-white/80 to-white/80`}>
+      <div className={`${CARD} bg-linear-to-r from-brand-50 via-white/80 to-white/80`}>
         <div className="flex items-start gap-4">
           <div className="w-11 h-11 rounded-xl bg-white text-brand-600 flex items-center justify-center shrink-0">
             <ShieldCheck size={20} />
@@ -621,12 +662,10 @@ export default function PrivacySharing() {
                 <h2 className="text-lg font-semibold text-slate-900">Active Share Links</h2>
               </div>
               <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                Time-limited links let someone read one snapshot without an account. They
-                aren&rsquo;t switched on yet.
+                Time-limited links let someone read one approved snapshot without an account.
+                You choose who each one is for and when it stops working.
               </p>
-              <p className="text-xs text-slate-500 mt-3">
-                For now a snapshot leaves TMG180 only when you export it yourself.
-              </p>
+              <ActiveShareLinks />
             </section>
 
             <section className={CARD}>

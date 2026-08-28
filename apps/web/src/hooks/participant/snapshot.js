@@ -1,7 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { SNAPSHOT_FIELD_KEYS, SNAPSHOT_STATUS } from '@tmg180/shared';
+import {
+  SNAPSHOT_CHOICE_FIELD_KEYS,
+  SNAPSHOT_FIELD_KEYS,
+  SNAPSHOT_STATUS,
+  SNAPSHOT_TAG_FIELD_KEYS,
+} from '@tmg180/shared';
 import { api } from '../../lib/apiClient';
 import { queryClient } from '../../lib/queryClient';
 import { participantSnapshotPath } from '../../routes/paths';
@@ -82,9 +87,12 @@ export function useExportSnapshot(id) {
   });
 }
 
-/** Only the narrative — the counts and the source logs belong to the server. */
-const toFields = (snapshot) =>
-  Object.fromEntries(SNAPSHOT_FIELD_KEYS.map((key) => [key, snapshot?.[key] ?? '']));
+/** Only what the participant writes — the counts and the source ids belong to the server. */
+const toFields = (snapshot) => ({
+  ...Object.fromEntries(SNAPSHOT_FIELD_KEYS.map((key) => [key, snapshot?.[key] ?? ''])),
+  ...Object.fromEntries(SNAPSHOT_TAG_FIELD_KEYS.map((key) => [key, snapshot?.[key] ?? []])),
+  ...Object.fromEntries(SNAPSHOT_CHOICE_FIELD_KEYS.map((key) => [key, snapshot?.[key] ?? ''])),
+});
 
 /**
  * The review screen's form: react-hook-form over the three layers, plus the two

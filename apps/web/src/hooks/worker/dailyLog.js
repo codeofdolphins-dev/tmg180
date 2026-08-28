@@ -223,7 +223,10 @@ export function useWorkerDailyLogForm(id, { participantId: presetParticipantId }
 
     saveDraft: async () => {
       const saved = await run({ submit: false });
-      if (saved && !id) navigate(workerDailyLogPath.edit(saved.id), { replace: true });
+      // keepScroll: the form has not moved, only its URL — see ScrollToTop.
+      if (saved && !id) {
+        navigate(workerDailyLogPath.edit(saved.id), { replace: true, state: { keepScroll: true } });
+      }
       return saved;
     },
 

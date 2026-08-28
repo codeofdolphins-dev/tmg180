@@ -47,7 +47,7 @@ const TOPICS = [
     title: 'Evidence & Snapshots',
     desc: 'Learn how to log daily support and track monthly progress.',
     icon: FilePen,
-    iconColor: 'text-[#7800ce]',
+    iconColor: 'text-[#005f40]',
     path: PARTICIPANT_PATHS.dailyLog,
   },
   {
@@ -206,7 +206,7 @@ export default function ParticipantHelpCentre() {
               onClick={() => navigate(PRIVACY_TOPIC.path)}
               className={`text-left relative bg-linear-to-r from-[#eff4ff] to-[#e5eeff] rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${CARD_HOVER} sm:col-span-2`}
             >
-              <span className="absolute top-6 right-6 text-xs font-semibold text-[#f6e6ff] bg-[#9333ea] px-3 py-1 rounded-full">
+              <span className="absolute top-6 right-6 text-xs font-semibold text-[#e8f7ef] bg-[#007a53] px-3 py-1 rounded-full">
                 Important
               </span>
               <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-[#0b1c30]">

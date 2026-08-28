@@ -5,11 +5,11 @@ import Button from '../../components/ui/Button';
 export default function SomethingWentWrong() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-100 flex items-center justify-center p-6 font-sans text-slate-800">
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-purple-200/40 rounded-full blur-3xl" />
-      <div className="absolute -bottom-24 -right-10 w-80 h-80 bg-purple-300/30 rounded-full blur-3xl" />
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-200/40 rounded-full blur-3xl" />
+      <div className="absolute -bottom-24 -right-10 w-80 h-80 bg-brand-300/30 rounded-full blur-3xl" />
 
       <div className="relative w-full max-w-md bg-slate-200/50 rounded-3xl shadow-lg p-10 flex flex-col items-center text-center overflow-hidden">
-        <div className="absolute top-0 left-6 right-6 h-1 rounded-full bg-linear-to-r from-brand-600 to-fuchsia-500" />
+        <div className="absolute top-0 left-6 right-6 h-1 rounded-full bg-linear-to-r from-brand-600 to-brand-400" />
 
         <ErrorIllustration />
 

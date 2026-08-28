@@ -30,8 +30,8 @@ export default function LinkExpired() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-100 flex flex-col items-center justify-center p-6 font-sans text-slate-800">
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-purple-200/40 rounded-full blur-3xl" />
-      <div className="absolute -bottom-24 -right-10 w-80 h-80 bg-purple-300/30 rounded-full blur-3xl" />
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-200/40 rounded-full blur-3xl" />
+      <div className="absolute -bottom-24 -right-10 w-80 h-80 bg-brand-300/30 rounded-full blur-3xl" />
       <div className="absolute top-1/3 right-1/4 w-40 h-40 bg-rose-200/30 rounded-full blur-3xl" />
 
       <div className="relative w-full max-w-sm bg-white/70 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl p-10 flex flex-col items-center text-center">

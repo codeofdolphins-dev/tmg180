@@ -75,7 +75,7 @@ export default function NoConsentAccess() {
         <ul className="flex flex-col gap-4">
           {SUGGESTIONS.map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-start gap-3">
-              <span className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
+              <span className="w-9 h-9 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
                 <Icon size={16} className="text-brand-600" />
               </span>
               <p className="text-sm text-slate-600 leading-snug">{text}</p>

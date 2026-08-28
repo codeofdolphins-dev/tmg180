@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { ROLES } from '@tmg180/shared';
 import { listWorkers, overview, verifyCredential } from '../controllers/adminWorkers.controller.js';
+import {
+  getConcernForGovernance,
+  listAllConcerns,
+  updateConcern,
+} from '../controllers/concern.controller.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
 /**
@@ -16,3 +21,8 @@ adminRoutes.use(requireAuth, requireRole(ROLES.ADMIN));
 adminRoutes.get('/overview', overview);
 adminRoutes.get('/workers', listWorkers);
 adminRoutes.patch('/workers/:workerId/credentials/:type', verifyCredential);
+
+// Mandatory Policy 2 tickets — governance reads, responds, refers, closes.
+adminRoutes.get('/concerns', listAllConcerns);
+adminRoutes.get('/concerns/:id', getConcernForGovernance);
+adminRoutes.patch('/concerns/:id', updateConcern);

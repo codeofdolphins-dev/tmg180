@@ -1,13 +1,27 @@
 @import "tailwindcss";
 
+/*
+ * The brand ramp. Green as of 28 Aug 2026 — every step is the hue swap of the
+ * purple it replaces at the same lightness, so the design keeps its weight and
+ * contrast and only its colour changes (brand-600 on white was 8.72:1, is now
+ * 8.78:1). The purple-family Tailwind palettes were folded into this ramp in
+ * the same pass, so a future theme change is this block and nothing else.
+ *
+ * 400, 500 and 900 are new: classes referenced them while nothing defined
+ * them, which in Tailwind v4 generates no utility at all — five elements were
+ * silently rendering with no colour.
+ */
 @theme {
-  --color-brand-50: #f5f0fa;
-  --color-brand-100: #e8e1f0;
-  --color-brand-200: #dcd2ec;
-  --color-brand-300: #c7b9e0;
-  --color-brand-600: #6b21a8;
-  --color-brand-700: #5b1988;
-  --color-brand-800: #581c87;
+  --color-brand-50: #eff7f2;
+  --color-brand-100: #dceee4;
+  --color-brand-200: #cbe6d8;
+  --color-brand-300: #aed7c2;
+  --color-brand-400: #6fbf99;
+  --color-brand-500: #2f9a6d;
+  --color-brand-600: #00563a;
+  --color-brand-700: #004a31;
+  --color-brand-800: #004029;
+  --color-brand-900: #00301f;
 }
 
 :root {
@@ -16,9 +30,9 @@
   --bg: #fff;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent: #00a06b;
+  --accent-bg: rgba(0, 160, 107, 0.1);
+  --accent-border: rgba(0, 160, 107, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
@@ -71,9 +85,9 @@
     --bg: #16171d;
     --border: #2e303a;
     --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
+    --accent: #6fc9a4;
+    --accent-bg: rgba(111, 201, 164, 0.15);
+    --accent-border: rgba(111, 201, 164, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
@@ -158,7 +172,7 @@ code {
   font-size: 0.8125rem;
   font-weight: 600;
   color: #0b1c30;
-  background: #f5f0fa;
+  background: #eff7f2;
   border: 1px solid transparent;
   border-radius: 999px;
   padding: 4px 10px;
@@ -169,13 +183,13 @@ code {
 
 .tmg-calendar .react-datepicker__month-select:hover,
 .tmg-calendar .react-datepicker__year-select:hover {
-  background: #ece2f7;
+  background: #e0f1e8;
 }
 
 .tmg-calendar .react-datepicker__month-select:focus-visible,
 .tmg-calendar .react-datepicker__year-select:focus-visible {
   outline: none;
-  border-color: #6b21a8;
+  border-color: #00563a;
 }
 
 /* The dropdowns carry the month and year, so the header's static line is noise. */
@@ -189,12 +203,12 @@ code {
 }
 
 .tmg-calendar .react-datepicker__day:hover {
-  background: #f5f0fa;
+  background: #eff7f2;
 }
 
 .tmg-calendar .react-datepicker__day--selected,
 .tmg-calendar .react-datepicker__day--keyboard-selected {
-  background: #6b21a8;
+  background: #00563a;
   color: #fff;
 }
 
@@ -214,5 +228,5 @@ code {
 /* The time picker's columns scroll a lot in a small space — keep the bar quiet. */
 .tmg-time-column {
   scrollbar-width: thin;
-  scrollbar-color: #dcd2ec transparent;
+  scrollbar-color: #cbe6d8 transparent;
 }

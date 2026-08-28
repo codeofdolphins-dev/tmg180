@@ -6,9 +6,12 @@
  * database stores answers as (question_key -> JSON value) rows — so changing a
  * section or question here is a seed edit, never a migration.
  *
- * Canon: the section list is the Final Override seed
- * (seed_bundle_final_override_v1.json, 11 sections — resolves ruling R-01);
- * titles, order and plain-language descriptions are verbatim from the seed.
+ * Canon: the eleven sections of the Final Override seed
+ * (seed_bundle_final_override_v1.json) — verbatim titles, order and
+ * plain-language descriptions. Sue's "PERSONAL PROFILE IMPORTANT CHANGES"
+ * letter ends the flow on a "Review & Submit" step, which is `PROFILE_REVIEW_STEP`
+ * below: a closing step after the eleven, not a twelfth section, holding the
+ * Support Needs Tool v4 copy that closes that document.
  * The question content inside each section is the Participant Personal Profile
  * Support Needs Tool v4 (client document set, 27 Aug 2026 — the FCA intake
  * questionnaire re-labelled, plus its Participant / Support Overview block:
@@ -43,6 +46,37 @@ export const ANSWER_VISIBILITY = {
   SHARE_WITH_CONSENT: 'share_with_consent',
   SNAPSHOT_ONLY: 'snapshot_only',
 };
+
+/**
+ * What each visibility means to the participant. P1-03 fixes the three values
+ * and the private default; the wording below is ours and wants Sue's sign-off
+ * — in particular whether `snapshot_only` means "instead of the profile" (the
+ * reading here) or "as well as".
+ */
+export const VISIBILITY_OPTIONS = [
+  {
+    value: ANSWER_VISIBILITY.PRIVATE,
+    label: 'Only me',
+    note: 'Nobody else can see this answer.',
+  },
+  {
+    value: ANSWER_VISIBILITY.SHARE_WITH_CONSENT,
+    label: 'Workers I allow',
+    note: 'A worker you have given access to can read it.',
+  },
+  {
+    value: ANSWER_VISIBILITY.SNAPSHOT_ONLY,
+    label: 'Monthly Snapshot only',
+    note: 'Kept off your profile, and available when you build a Monthly Snapshot.',
+  },
+];
+
+export const ANSWER_VISIBILITY_VALUES = VISIBILITY_OPTIONS.map((option) => option.value);
+
+export const isAnswerVisibility = (value) => ANSWER_VISIBILITY_VALUES.includes(value);
+
+export const visibilityLabel = (value) =>
+  VISIBILITY_OPTIONS.find((option) => option.value === value)?.label ?? null;
 
 export const PROFILE_SECTION_STATUS = {
   NOT_STARTED: 'not_started',
@@ -125,99 +159,6 @@ export const PROFILE_SECTIONS = [
             type: 'text',
             label: 'Primary language / communication needs',
           },
-        ],
-      },
-      // v4 "Consent, Ownership, and How Your Information Works on the TMG180 Platform", verbatim.
-      {
-        title: 'You Own Your Personal Profile',
-        intro: [
-          'This platform is participant-controlled. You choose whether to use it and what information you share.',
-          'By joining, you agree that your profile and support documentation are stored securely on your personal portal.',
-          'But you own your information.',
-          'Your profile belongs to you.',
-          'You choose:',
-          '• who sees it',
-          '• who you share it with',
-          '• whether you update it',
-          '• whether you download it',
-          'No one can access your profile unless you allow it. Sharing it with your chosen workers may help your support network understand your support needs and how you would like support delivered.',
-        ],
-        questions: [],
-      },
-      {
-        title: 'You Own Your Support Evidence Notes',
-        intro: [
-          'TMG180 support evidence notes are visible to you at all times.',
-          'You can:',
-          '• read them',
-          '• contribute to them',
-          '• add reflections',
-          '• upload notes from other workers',
-          '• choose who has access',
-          'Workers will add notes about sessions.',
-          'You can also add your own perspective.',
-          'Allied Health workers, Recovery Coaches and coordinators will also keep relevant case notes because they are required to by law, however they are kept completely confidential and secured securely on their own portal. These are only required if a worker is required to produce them in a court of law, which is rare.',
-          'You can ask for access to records that relate to you through the relevant privacy and access pathways. TMG180 should provide clear guidance about this in the dashboard.',
-        ],
-        questions: [],
-      },
-      {
-        title: 'Why Documentation Matters',
-        intro: [
-          'Under the NDIS, participants are now expected to explain how their disability impacts daily life and how supports are being used.',
-          'This can be difficult to do from memory, especially during reassessments.',
-          'Workers using TMG180 use structured documentation to track:',
-          '• frequency of support',
-          '• duration of support',
-          '• type of support provided',
-          '• fluctuations',
-          '• changes over time',
-          '• outcomes and impacts',
-          'The more consistently information is added, the clearer the picture becomes.',
-        ],
-        questions: [],
-      },
-      {
-        title: 'How the System Works',
-        intro: [
-          'TMG180 uses an internal system to organise and summarise your information over time.',
-          'It does not replace your voice.',
-          'It does not make decisions for you.',
-          'It translates patterns into clear language so you can see:',
-          '• how your support is being used',
-          '• how your needs fluctuate',
-          '• where improvements are happening',
-          '• where support remains essential',
-          '• how this connects to your goals',
-          'This means that when reassessment time comes, you are not trying to prove your life from memory.',
-          'You have structured evidence built gradually over time.',
-          'You remain the one who explains it.',
-          'But you are not starting from scratch.',
-        ],
-        questions: [],
-      },
-      {
-        title: 'Your Choice',
-        questions: [
-          {
-            key: 'documentation_choice',
-            type: 'multi',
-            label: 'You can:',
-            options: opts([
-              ['allow_full_documentation', 'Allow full structured documentation'],
-              ['participate_actively', 'Participate actively in adding reflections'],
-              ['upload_external_notes', 'Upload external case notes'],
-              ['limit_involvement', 'Limit involvement'],
-              ['decide_later', 'Decide later'],
-            ]),
-          },
-        ],
-        outro: [
-          'The platform works best when documentation is consistent.',
-          'But participation is still your choice.',
-          'Nothing is hidden from you.',
-          'Nothing is created without visibility.',
-          'Nothing is shared without your consent.',
         ],
       },
     ],
@@ -1254,20 +1195,138 @@ export const PROFILE_SECTIONS = [
   },
 ];
 
-// The flat question list per section is what validation (and the API) reads;
+/**
+ * The closing step of Sue's flow. It is not one of the eleven — it does not
+ * count towards progress and has no position number — but it is opened, saved
+ * and validated exactly like a section, so the renderer and the API stay
+ * generic. Its groups are the Support Needs Tool v4 block that closes that
+ * document ("Consent, Ownership, and How Your Information Works…").
+ */
+export const PROFILE_REVIEW_STEP = {
+  key: 'review_submit',
+  title: 'Review & Submit',
+  description: 'A last look over your profile, and how your information works here.',
+  // Sue's letter ends the flow on "Review & Submit". The groups below are
+  // the Support Needs Tool v4's closing block ("Consent, Ownership, and How
+  // Your Information Works on the TMG180 Platform"), which sits at the end
+  // of that document too — so this step is the source's own ending, not new
+  // copy. The page also lists every other section with its status.
+  review: true,
+  groups: [
+    // v4 "Consent, Ownership, and How Your Information Works on the TMG180 Platform", verbatim.
+    {
+      title: 'You Own Your Personal Profile',
+      intro: [
+        'This platform is participant-controlled. You choose whether to use it and what information you share.',
+        'By joining, you agree that your profile and support documentation are stored securely on your personal portal.',
+        'But you own your information.',
+        'Your profile belongs to you.',
+        'You choose:',
+        '• who sees it',
+        '• who you share it with',
+        '• whether you update it',
+        '• whether you download it',
+        'No one can access your profile unless you allow it. Sharing it with your chosen workers may help your support network understand your support needs and how you would like support delivered.',
+      ],
+      questions: [],
+    },
+    {
+      title: 'You Own Your Support Evidence Notes',
+      intro: [
+        'TMG180 support evidence notes are visible to you at all times.',
+        'You can:',
+        '• read them',
+        '• contribute to them',
+        '• add reflections',
+        '• upload notes from other workers',
+        '• choose who has access',
+        'Workers will add notes about sessions.',
+        'You can also add your own perspective.',
+        'Allied Health workers, Recovery Coaches and coordinators will also keep relevant case notes because they are required to by law, however they are kept completely confidential and secured securely on their own portal. These are only required if a worker is required to produce them in a court of law, which is rare.',
+        'You can ask for access to records that relate to you through the relevant privacy and access pathways. TMG180 should provide clear guidance about this in the dashboard.',
+      ],
+      questions: [],
+    },
+    {
+      title: 'Why Documentation Matters',
+      intro: [
+        'Under the NDIS, participants are now expected to explain how their disability impacts daily life and how supports are being used.',
+        'This can be difficult to do from memory, especially during reassessments.',
+        'Workers using TMG180 use structured documentation to track:',
+        '• frequency of support',
+        '• duration of support',
+        '• type of support provided',
+        '• fluctuations',
+        '• changes over time',
+        '• outcomes and impacts',
+        'The more consistently information is added, the clearer the picture becomes.',
+      ],
+      questions: [],
+    },
+    {
+      title: 'How the System Works',
+      intro: [
+        'TMG180 uses an internal system to organise and summarise your information over time.',
+        'It does not replace your voice.',
+        'It does not make decisions for you.',
+        'It translates patterns into clear language so you can see:',
+        '• how your support is being used',
+        '• how your needs fluctuate',
+        '• where improvements are happening',
+        '• where support remains essential',
+        '• how this connects to your goals',
+        'This means that when reassessment time comes, you are not trying to prove your life from memory.',
+        'You have structured evidence built gradually over time.',
+        'You remain the one who explains it.',
+        'But you are not starting from scratch.',
+      ],
+      questions: [],
+    },
+    {
+      title: 'Your Choice',
+      questions: [
+        {
+          key: 'documentation_choice',
+          type: 'multi',
+          label: 'You can:',
+          options: opts([
+            ['allow_full_documentation', 'Allow full structured documentation'],
+            ['participate_actively', 'Participate actively in adding reflections'],
+            ['upload_external_notes', 'Upload external case notes'],
+            ['limit_involvement', 'Limit involvement'],
+            ['decide_later', 'Decide later'],
+          ]),
+        },
+      ],
+      outro: [
+        'The platform works best when documentation is consistent.',
+        'But participation is still your choice.',
+        'Nothing is hidden from you.',
+        'Nothing is created without visibility.',
+        'Nothing is shared without your consent.',
+      ],
+    },
+  ],
+};
+
+/** Everything the participant can open: the eleven, then the closing step. */
+export const PROFILE_STEPS = [...PROFILE_SECTIONS, PROFILE_REVIEW_STEP];
+
+// The flat question list per step is what validation (and the API) reads;
 // groups exist for rendering. Derived once here so the two can never diverge.
-for (const section of PROFILE_SECTIONS) {
-  section.questions = section.groups.flatMap((group) => group.questions);
+for (const step of PROFILE_STEPS) {
+  step.questions = step.groups.flatMap((group) => group.questions);
 }
 
 export const PROFILE_TOTAL_SECTIONS = PROFILE_SECTIONS.length;
 
+
 /** Canonical keys are snake_case (seed); URLs use kebab-case slugs. */
 export const profileSectionSlug = (key) => key.replace(/_/g, '-');
 
-const SECTION_BY_KEY = new Map(PROFILE_SECTIONS.map((section) => [section.key, section]));
+const SECTION_BY_KEY = new Map(PROFILE_STEPS.map((step) => [step.key, step]));
 const SECTION_BY_SLUG = new Map(
-  PROFILE_SECTIONS.map((section) => [profileSectionSlug(section.key), section])
+  PROFILE_STEPS.map((step) => [profileSectionSlug(step.key), step])
 );
 
 /** @returns the section definition, or undefined for an unknown key. */
@@ -1276,10 +1335,16 @@ export const profileSection = (key) => SECTION_BY_KEY.get(key);
 /** @returns the section definition for a URL slug, or undefined. */
 export const profileSectionBySlug = (slug) => SECTION_BY_SLUG.get(slug);
 
-/** The section after this one in seed order, or null at the end. */
+/** The step after this one, or null at the end. The eleventh leads to Review & Submit. */
 export function nextProfileSection(key) {
-  const index = PROFILE_SECTIONS.findIndex((section) => section.key === key);
-  return index >= 0 ? (PROFILE_SECTIONS[index + 1] ?? null) : null;
+  const index = PROFILE_STEPS.findIndex((step) => step.key === key);
+  return index >= 0 ? (PROFILE_STEPS[index + 1] ?? null) : null;
+}
+
+/** The step before this one, or null at the start. */
+export function previousProfileSection(key) {
+  const index = PROFILE_STEPS.findIndex((step) => step.key === key);
+  return index > 0 ? PROFILE_STEPS[index - 1] : null;
 }
 
 /**
@@ -1374,6 +1439,21 @@ export function validateSectionAnswers(section, answers = {}) {
     }
     const error = validateAnswerValue(question, value);
     if (error) errors[key] = error;
+  }
+  return errors;
+}
+
+/**
+ * Validates a visibility map (question_key -> visibility) for one section.
+ *
+ * @returns map of question_key -> error message; empty object when valid.
+ */
+export function validateSectionVisibility(section, visibility = {}) {
+  const errors = {};
+  const keys = new Set(section.questions.map((question) => question.key));
+  for (const [key, value] of Object.entries(visibility)) {
+    if (!keys.has(key)) errors[key] = 'Unknown question for this section.';
+    else if (!isAnswerVisibility(value)) errors[key] = 'Not one of the visibility options.';
   }
   return errors;
 }

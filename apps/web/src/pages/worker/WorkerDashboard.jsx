@@ -156,7 +156,7 @@ function RecentLogRow({ log, onOpen }) {
       className="w-full text-left flex items-center justify-between gap-4 bg-white border border-slate-100 rounded-xl px-4 py-3.5 hover:bg-slate-50 transition-colors"
     >
       <div className="flex items-center gap-4 min-w-0">
-        <div className="w-10 h-10 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
           <UserRound size={16} />
         </div>
         <div className="min-w-0">
@@ -282,7 +282,7 @@ export default function WorkerDashboard() {
             )}
             {todays.data?.length === 0 && (
               <div className={`${CARD} text-center py-10`}>
-                <div className="w-14 h-14 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
                   <NotebookPen size={24} />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mt-4">No support sessions logged today</h3>
@@ -390,7 +390,7 @@ export default function WorkerDashboard() {
 
             <button
               onClick={() => navigate(WORKER_PATHS.governance)}
-              className="w-full bg-purple-50 text-brand-700 text-sm font-semibold rounded-full py-2.5 mt-5 hover:bg-purple-100 transition-colors"
+              className="w-full bg-brand-50 text-brand-700 text-sm font-semibold rounded-full py-2.5 mt-5 hover:bg-brand-100 transition-colors"
             >
               Update documents
             </button>
@@ -413,7 +413,7 @@ export default function WorkerDashboard() {
                     title={enabled ? undefined : 'Not switched on yet'}
                     className={`rounded-xl py-5 px-3 flex flex-col items-center gap-2 transition-colors ${
                       enabled
-                        ? 'bg-slate-50 hover:bg-purple-50'
+                        ? 'bg-slate-50 hover:bg-brand-50'
                         : 'bg-slate-50/60 opacity-60 cursor-not-allowed'
                     }`}
                   >

@@ -160,7 +160,7 @@ export default function GovernanceItemDetail() {
 
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6 items-start">
             <div className="flex flex-col gap-6">
-              <section className="bg-purple-50/60 rounded-xl p-6">
+              <section className="bg-brand-50/60 rounded-xl p-6">
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
                   <Info size={17} className="text-brand-600" />
                   Item overview
@@ -173,7 +173,7 @@ export default function GovernanceItemDetail() {
                 <ul className="flex flex-col gap-3 mt-4">
                   {item.points.map((point) => (
                     <li key={point} className="flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-purple-50 text-brand-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-5 h-5 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 mt-0.5">
                         <Check size={12} />
                       </span>
                       <span className="text-sm text-slate-600 leading-relaxed">{point}</span>

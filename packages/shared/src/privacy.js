@@ -34,8 +34,11 @@ export const SHARING_PREFERENCES = [
     label: 'Allow time-limited export links',
     description: 'Enable creating links that automatically expire after 7 days.',
     default: false,
-    /** The external access layer is unbuilt; the preference is stored, not acted on. */
-    pending: true,
+    /**
+     * Acted on: a snapshot share link (snapshotShare.js) cannot be created
+     * while this is off, and turning it off does not revoke links already
+     * issued — those are the participant's to revoke one by one, on purpose.
+     */
   },
   {
     key: 'privacy_reminders',
@@ -140,6 +143,8 @@ export const PRIVACY_AUDIT_ACTIONS = {
   consent_revoked: { label: 'Removed access', tone: 'revoked' },
   privacy_preference_changed: { label: 'Changed a sharing preference', tone: 'success' },
   snapshot_exported: { label: 'Exported a snapshot', tone: 'completed' },
+  snapshot_link_created: { label: 'Created a share link', tone: 'success' },
+  snapshot_link_revoked: { label: 'Revoked a share link', tone: 'revoked' },
   account_created: { label: 'Account created', tone: 'completed' },
 };
 
